@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useBrillionContext } from "../BrillionContext";
 
 export const useUser = (endpoint: string) => {
-  const { sdk } = useBrillionContext();
+  const sdk = useBrillionContext();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

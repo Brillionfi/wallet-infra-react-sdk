@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import { BrillionContext } from "./BrillionContext";
+import React, { ReactNode, useState, useEffect } from "react";
+import { BrillionContext, BrillionContextType } from "./BrillionContext";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 
 type BrillionProviderProps = {
@@ -13,10 +13,12 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   baseUrl,
   children,
 }) => {
-  const sdk = new WalletInfra(appId, baseUrl);
+  const [sdk, setSdk] = useState<BrillionContextType>(null);
+  useEffect(() => {
+    const sdk = new WalletInfra(appId, baseUrl);
+    setSdk(sdk);
+  }, [appId, baseUrl]);
   return (
-    <BrillionContext.Provider value={{ sdk }}>
-      {children}
-    </BrillionContext.Provider>
+    <BrillionContext.Provider value={sdk}>{children}</BrillionContext.Provider>
   );
 };

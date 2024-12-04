@@ -1,9 +1,7 @@
 import { createContext, useContext } from "react";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 
-type BrillionContextType = {
-  sdk: WalletInfra;
-};
+export type BrillionContextType = WalletInfra | null;
 
 export const BrillionContext = createContext<BrillionContextType | null>(null);
 
