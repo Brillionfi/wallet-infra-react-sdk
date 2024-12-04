@@ -9,14 +9,14 @@ export const useUser = (endpoint: string) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      /* try {
         const response = await sdk.authenticateUser();
         setData(response);
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
-      }
+      } */
     };
     fetchData();
   }, [endpoint, sdk]);

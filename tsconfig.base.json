@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "target": "ES6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node", "jest"],
+    "declaration": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@api/*": ["api/*"],
+      "@config/*": ["config/*"],
+      "@models/*": ["models/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"]
+    }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

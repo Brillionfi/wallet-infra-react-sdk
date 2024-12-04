@@ -1,19 +1,50 @@
 {
   "name": "@brillionfi/react-waas",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc-alias",
+    "lint": "eslint src/.",
+    "lint:fix": "eslint src/. --fix",
+    "format": "prettier --write 'src/**/*.{js,ts,json,css,md}'",
+    "prepare": "husky",
+    "generate-changelog": "semantic-release -e ./.releaserc-changelog.js"
+  },
   "dependencies": {
     "@brillionfi/wallet-infra-sdk": "^0.15.16-e0f6c50.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/js": "^9.16.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.16.0",
+    "globals": "^15.13.0",
     "husky": "^9.1.7",
     "prettier": "^3.4.1",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
