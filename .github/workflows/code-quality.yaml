@@ -3,10 +3,10 @@ name: My code is pristine
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 env:
   NODE_VERSION: 20.11.0

@@ -3,7 +3,7 @@ name: Create release git tag
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - package.json
 
@@ -27,7 +27,7 @@ jobs:
           git checkout HEAD^
           echo "PREVIOUS_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
-      - name: Re-Checkout main HEAD
+      - name: Re-Checkout master HEAD
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -46,7 +46,7 @@ jobs:
             echo "Package version increased from ${{ env.PREVIOUS_VERSION }} to $CURRENT_VERSION. New tag will be created."
             echo "IS_NEW_TAG_REQUIRED=true" >> $GITHUB_ENV
           else
-            echo "Error: Version in PR is lower than on main branch, package.json must be increased."
+            echo "Error: Version in PR is lower than on master branch, package.json must be increased."
             exit 1
           fi
 

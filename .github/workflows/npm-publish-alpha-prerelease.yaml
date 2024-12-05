@@ -3,7 +3,7 @@ name: NPM Publish alpha prerelease
 on:
   push:
     branches:
-      - main
+      - master
 
 env:
   NODE_VERSION: 20.12.2

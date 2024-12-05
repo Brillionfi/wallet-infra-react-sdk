@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
     branches:
-      - main
+      - master
 
 jobs:
   version-check:
@@ -13,10 +13,10 @@ jobs:
       - name: Checkout the base branch
         uses: actions/checkout@v4
         with:
-          ref: 'main'
+          ref: 'master'
 
-      - name: Save version from main branch
-        id: main_version
+      - name: Save version from master branch
+        id: master_version
         run: echo "MAIN_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: Checkout the PR branch
@@ -34,6 +34,6 @@ jobs:
             fi
             echo "Package version increased from ${{ env.MAIN_VERSION }} to $PR_VERSION."
           else
-            echo "Error: Version in PR is lower than on main branch, package.json must be increased."
+            echo "Error: Version in PR is lower than on master branch, package.json must be increased."
             exit 1
           fi
