@@ -13,9 +13,11 @@
     "generate-changelog": "semantic-release -e ./.releaserc-changelog.js"
   },
   "dependencies": {
-    "@brillionfi/wallet-infra-sdk": "^0.15.16-e0f6c50.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@brillionfi/wallet-infra-sdk": "^0.15.16-e0f6c50.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
@@ -28,8 +30,8 @@
     "@semantic-release/github": "^11.0.1",
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.0.1",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
     "cz-conventional-changelog": "^3.3.0",

@@ -1,25 +1,24 @@
-import { useState, useEffect } from "react";
 import { useBrillionContext } from "../BrillionContext";
+import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 
-export const useUser = (endpoint: string) => {
+export const useUser = (jwt?: string) => {
   const sdk = useBrillionContext();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      /* try {
-        const response = await sdk.authenticateUser();
-        setData(response);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      } */
-    };
-    fetchData();
-  }, [endpoint, sdk]);
+  if (jwt) {
+    sdk?.authenticateUser(jwt);
+  }
 
-  return { data, loading, error };
+  const login = async () => {
+    const url = await sdk?.generateAuthUrl({
+      provider: AuthProvider.GOOGLE,
+      redirectUrl: "",
+    });
+    return url;
+  };
+
+  const wallets = async () => {
+    return await sdk?.Wallet.getWallets();
+  };
+
+  return { login, wallets };
 };
