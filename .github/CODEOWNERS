@@ -1,0 +1,5 @@
+# The following are the codeowners of the wallet-infra-react-sdk repository
+
+.github/ @mauromedda @lecomax
+* @Brillionfi/developers
+

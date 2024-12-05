@@ -1,0 +1,67 @@
+name: Create release git tag
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - package.json
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: 20.12.2
+
+jobs:
+  create_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          
+      - name: Save package version from previous commit (HEAD^)
+        run: |
+          git checkout HEAD^
+          echo "PREVIOUS_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Re-Checkout main HEAD
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Compare versions
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [ "$(printf '%s\n' "$CURRENT_VERSION" "${{ env.PREVIOUS_VERSION }}" | sort -V | head -n1)" = "${{ env.PREVIOUS_VERSION }}" ]; then
+            if [ "$CURRENT_VERSION" = "${{ env.PREVIOUS_VERSION }}" ]; then
+              echo "Warning: Version in package.json has not been increased so a release tag wont be created" 
+              echo "IS_NEW_TAG_REQUIRED=false" >> $GITHUB_ENV
+            fi
+            echo "Package version increased from ${{ env.PREVIOUS_VERSION }} to $CURRENT_VERSION. New tag will be created."
+            echo "IS_NEW_TAG_REQUIRED=true" >> $GITHUB_ENV
+          else
+            echo "Error: Version in PR is lower than on main branch, package.json must be increased."
+            exit 1
+          fi
+
+      - name: Create and push version git tag on repo
+        if: ${{ env.IS_NEW_TAG_REQUIRED == 'true' }}
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          version=$(npm pkg get version | tr -d '"')
+          echo "checking if package.json version $version is in a valid semver format"
+          version_tag=$(npm version --allow-same-version --no-git-tag-version $version)
+          echo "version $version is in a valid semver, creating and pushing tag $version_tag"
+          git tag $version_tag
+          git push origin $version_tag
+
+      - name: Do not create new git tag
+        if: ${{ env.IS_NEW_TAG_REQUIRED == 'false' }}
+        run: echo "from the result of 'Compare version' step this run wont create a new tag"
