@@ -1,0 +1,43 @@
+name: My code is pristine
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: 20.11.0
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - uses: mskelton/setup-yarn@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Prettier
+        run: yarn format
+
+      - name: ESLint
+        run: yarn lint

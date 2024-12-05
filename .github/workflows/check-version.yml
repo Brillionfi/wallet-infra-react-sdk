@@ -1,0 +1,39 @@
+name: I didn't forget to bump the version
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+    branches:
+      - main
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the base branch
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+
+      - name: Save version from main branch
+        id: main_version
+        run: echo "MAIN_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Compare versions
+        run: |
+          PR_VERSION=$(node -p "require('./package.json').version")
+          if [ "$(printf '%s\n' "$PR_VERSION" "${{ env.MAIN_VERSION }}" | sort -V | head -n1)" = "${{ env.MAIN_VERSION }}" ]; then
+            if [ "$PR_VERSION" = "${{ env.MAIN_VERSION }}" ]; then
+              echo "Error: Version in package.json has not been increased."
+              exit 1
+            fi
+            echo "Package version increased from ${{ env.MAIN_VERSION }} to $PR_VERSION."
+          else
+            echo "Error: Version in PR is lower than on main branch, package.json must be increased."
+            exit 1
+          fi
