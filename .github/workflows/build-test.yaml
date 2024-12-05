@@ -3,10 +3,10 @@ name: My code passes all tests
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 env:
   NODE_VERSION: 20.12.2
