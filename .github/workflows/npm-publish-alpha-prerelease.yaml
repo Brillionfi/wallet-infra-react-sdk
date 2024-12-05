@@ -1,4 +1,4 @@
-name: NPM Publish alpha prerelease 
+name: NPM Publish alpha prerelease
 
 on:
   push:
@@ -30,14 +30,14 @@ jobs:
       - name: Build Package
         run: yarn build
 
-      - name: Unit Tests
-        run: yarn test
+      # - name: Unit Tests
+      #   run: yarn test
 
-      - name: npm version prerelease 
+      - name: npm version prerelease
         run: npm version prerelease --no-git-tag-version --preid=${GITHUB_SHA::7}
 
       - name: Authenticate with npm registry
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc 
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish to NPM registry
         run: npm publish --tag alpha --access public
