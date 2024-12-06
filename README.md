@@ -24,16 +24,21 @@ In a React or NextJS project, you can start by importing the LoginForm component
 ```tsx
 import { LoginForm, LoginMethods } from "@brillionfi/waas-react-sdk";
 
-const Home: React.FC = () => {
+const MyLoginPage = () => {
   return (
-    <LoginForm
-      redirectUrl="http://localhost:3000"
-      loginMethods={[
-        LoginMethods.Google,
-        LoginMethods.Discord,
-        LoginMethods.Twitter,
-      ]}
-    />
+    <BrillionProvider
+      appId={"my-brillion-app-id"}
+      baseUrl={"my-brillion-infra-url"}
+    >
+      <LoginForm
+        redirectUrl="http://localhost:3000"
+        loginMethods={[
+          LoginMethods.Google,
+          LoginMethods.Discord,
+          LoginMethods.Twitter,
+        ]}
+      />
+    </BrillionProvider>
   );
 };
 ```

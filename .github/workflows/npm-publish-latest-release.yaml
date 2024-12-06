@@ -32,5 +32,10 @@ jobs:
       # - name: Unit Tests
       #   run: yarn test
 
-      - name: Publish to NPM registry
+      - name: Create .npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+
+      - name: Publish to GitHub Packages
         run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
