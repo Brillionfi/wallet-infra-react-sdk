@@ -5,7 +5,7 @@ import { useBrillionContext } from "../components/BrillionContext";
 export const useUser = () => {
   const sdk = useBrillionContext();
 
-  const authenticateUser = async (jwt: string) => {
+  const authenticateUser = (jwt: string) => {
     return sdk?.authenticateUser(jwt);
   };
 
