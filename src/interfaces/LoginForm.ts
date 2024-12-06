@@ -15,24 +15,22 @@ export enum ICON_LIST {
   "telos",
   "base",
 }
-  
+
 export type TLocalIcons = keyof typeof ICON_LIST;
-  
+
 type TLoginOptions = {
   label: LoginMethods;
   icon: TLocalIcons;
   disabled: boolean;
   onClick: () => void;
 }[];
-  
+
 export interface ILoginOptions {
   loginOptions: TLoginOptions;
 }
-  
-  
+
 export enum LoginMethods {
   Google = "Google",
   Twitter = "Twitter",
-  Discord = "Discord"
+  Discord = "Discord",
 }
-  
