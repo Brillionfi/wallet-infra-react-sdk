@@ -6,6 +6,7 @@
 
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { useUser } from "hooks";
+import * from "./LoginForm.css"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 enum ICON_LIST {

@@ -1,6 +1,6 @@
 import { Address, ChainId } from "@brillionfi/wallet-infra-sdk";
 import { IWalletPortfolio } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { useBrillionContext } from "BrillionContext";
+import { useBrillionContext } from "components/BrillionContext";
 import { useQuery } from "@tanstack/react-query";
 
 export const useBalance = (address: Address, chainId: ChainId) => {

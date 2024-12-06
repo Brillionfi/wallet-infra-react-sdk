@@ -1,0 +1,84 @@
+/* General styles for the outer section */
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* Styles for the inner div */
+  .inner-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* Styles for the span (heading) */
+  .heading {
+    margin-bottom: 1rem; /* mb-4 */
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: bold; /* font-bold */
+    color: #fff; /* Replace with your specific primary text color */
+  }
+  
+  /* Styles for the main section containing options */
+  .options-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* zero:w-full */
+  }
+  
+  @media (min-width: 768px) {
+    /* md:w-4/6 */
+    .options-section {
+      width: 66.6667%;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    /* 2xl:w-5/12 */
+    .options-section {
+      width: 41.6667%;
+    }
+  }
+  
+  /* Styles for the inner section containing buttons */
+  .button-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    gap: 0.5rem; /* gap-2 */
+  }
+  
+  /* Button styles */
+  .button {
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  
+  .button:disabled {
+    cursor: not-allowed;
+  }
+  
+  /* Styles for the inner content of buttons */
+  .button-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 7px; /* gap-[7px] */
+    width: 100%;
+  }
+  
+  /* Text inside buttons */
+  .button-text {
+    font-size: 0.875rem; /* text-sm */
+    font-weight: bold; /* font-bold */
+    line-height: 16.44px; /* leading-[16.44px] */
+    color: #fff; /* Replace with your specific primary text color */
+  }
+  

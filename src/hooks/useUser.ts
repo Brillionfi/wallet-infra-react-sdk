@@ -1,4 +1,4 @@
-import { useBrillionContext } from "../BrillionContext";
+import { useBrillionContext } from "../components/BrillionContext";
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 
 export const useUser = () => {
