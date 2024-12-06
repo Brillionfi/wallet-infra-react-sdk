@@ -8,12 +8,11 @@ import {
   IWalletGasConfigurationAPI,
   IWalletGasEstimation,
   IWalletNotifications,
-  IWalletPortfolio,
   IWalletRecovery,
   IWalletSignTransaction,
   IWalletSignTransactionResponse,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { useBrillionContext } from "../BrillionContext";
+import { useBrillionContext } from "BrillionContext";
 
 export const useWallet = () => {
   const sdk = useBrillionContext();
@@ -76,13 +75,6 @@ export const useWallet = () => {
       page,
       indexer,
     );
-  };
-
-  const getPortfolio = async (
-    address: Address,
-    chainId: ChainId,
-  ): Promise<IWalletPortfolio | undefined> => {
-    return await sdk?.Wallet.getPortfolio(address, chainId);
   };
 
   const getGasConfig = async (
@@ -150,7 +142,6 @@ export const useWallet = () => {
     createWallet,
     signTransaction,
     getTransactionHistory,
-    getPortfolio,
     getGasConfig,
     setGasConfig,
     getGasFees,
