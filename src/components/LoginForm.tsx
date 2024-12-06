@@ -66,7 +66,7 @@ const LoginOptions = ({
                       color: "#fff",
                     }}
                   >
-                    {option.label}
+                    Continue with {option.label}
                   </span>
                 </section>
               </button>
