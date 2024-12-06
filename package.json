@@ -13,6 +13,7 @@
     "generate-changelog": "semantic-release -e ./.releaserc-changelog.js"
   },
   "dependencies": {
+    "@brillionfi/quill-core": "^0.0.28",
     "@brillionfi/wallet-infra-sdk": "^0.15.16-e0f6c50.0",
     "@tanstack/react-query": "^5.62.2"
   },
@@ -24,6 +25,7 @@
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
     "@eslint/js": "^9.16.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/exec": "^6.0.3",
@@ -40,6 +42,7 @@
     "globals": "^15.13.0",
     "husky": "^9.1.7",
     "prettier": "^3.4.1",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
