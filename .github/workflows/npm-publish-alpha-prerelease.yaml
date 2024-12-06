@@ -37,7 +37,7 @@ jobs:
         run: npm version prerelease --no-git-tag-version --preid=${GITHUB_SHA::7}
 
       - name: Authenticate with npm registry
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
 
       - name: Publish to NPM registry
         run: npm publish --tag alpha --access public
