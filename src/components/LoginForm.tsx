@@ -3,7 +3,12 @@
 // Full width and height so it fits parent component
 // Pass redirectUrl as prop
 
-export enum ICON_LIST {
+
+import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
+import { useUser } from "hooks";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+enum ICON_LIST {
   "apple-logo",
   "discord-logo",
   "email-logo",
@@ -21,58 +26,29 @@ export enum ICON_LIST {
   "base",
 }
 
-export type TLocalIcons = keyof typeof ICON_LIST;
+type TLocalIcons = keyof typeof ICON_LIST;
 
-export type TLoginOptions = {
-  label: string;
+type TLoginOptions = {
+  label: LoginMethods;
   icon: TLocalIcons;
   disabled: boolean;
   onClick: () => void;
 }[];
 
-export const Icon = ({
-    id,
-    icon,
-    localIcon,
-    type,
-    size = "normal",
-    ...props
-  }: IIcon) => {
-    const iconPi = type === "icon" || !localIcon ? icon : undefined;
-  
-    const image =
-      type === "svg" && !!localIcon
-        ? localIcon
-        : type === "url"
-          ? icon?.toString()
-          : undefined;
-  
-    const iconPiClass = twMerge([
-      iconPi,
-      size === "normal"
-        ? "text-3xl h-8 w-8"
-        : size === "large"
-          ? "text-5xl h-12 w-12"
-          : "text-6xl h-16 w-16",
-    ]);
-  
-    return (
-      <>
-        {image && (
-          <Avatar id={id} image={image} icon={iconPi} size={size} {...props} />
-        )}
-        {iconPi && <span id={id} className={iconPiClass} {...props} />}
-      </>
-    );
-  };
+const Icon = ({
+  localIcon,
+}: {localIcon: string}) => {
+  const image =`/icons/${localIcon}.svg`
+  return (<img src={image} width="16" height="16"/>)
+};
 
-export interface ILoginOptions {
+interface ILoginOptions {
   loginOptions: TLoginOptions;
 }
-export const LoginOptions = ({
+
+const LoginOptions = ({
   loginOptions,
 }: ILoginOptions) => {
-
   return (
     <section className="flex w-full flex-col items-center">
       <div className="flex w-full flex-col items-center">
@@ -90,13 +66,11 @@ export const LoginOptions = ({
                   onClick={option.onClick}
                 >
                   <section
-                    className={
-                      "flex w-full flex-row items-center justify-center gap-[7px]",
-                    }
+                    className={"flex w-full flex-row items-center justify-center gap-[7px]"}
                   >
-                    <Icon localIcon={option.icon} size="normal" type="svg" />
+                    <Icon localIcon={option.icon} />
                     <span className="text-sm font-bold leading-[16.44px] text-text-primary">
-                      {t("method", { method: option.label })}
+                      {option.label}
                     </span>
                   </section>
                 </button>
@@ -108,10 +82,60 @@ export const LoginOptions = ({
   );
 };
 
-export const LoginForm = () => {
-  const { loginOptions, isRedirecting } = useLoginConfigProvider();
+export enum LoginMethods {
+  Google = "Google",
+  Twitter = "Twitter",
+  Discord = "Discord"
+}
 
+export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMethods[], redirectUrl: string}) => {
+  const {login}=useUser()
+  const options = [
+    {
+      label: LoginMethods.Google,
+      icon: "google-logo" as TLocalIcons,
+      disabled: false,
+      onClick: async () => {
+        const url = await login(AuthProvider.GOOGLE,redirectUrl);
+        if (url) {
+          window.location.href = url;
+        }
+      },
+    },
+    {
+      label: LoginMethods.Discord,
+      icon: "discord-logo" as TLocalIcons,
+      disabled: false,
+      onClick: async () => {
+        const url = await login(AuthProvider.DISCORD,redirectUrl);
+        if (url) {
+          window.location.href = url;
+        }
+      },
+    },
+    {
+      label: LoginMethods.Twitter,
+      icon: "twitter-logo" as TLocalIcons,
+      disabled: false,
+      onClick: async () => {
+        const url = await login(AuthProvider.TWITTER,redirectUrl);
+        if (url) {
+          window.location.href = url;
+        }
+      },
+    },
+    // TODO: prepare an email input window
+    // {
+    //   label: "Continue-with Email",
+    //   icon: "email-logo" as TLocalIcons,
+    //   disabled: false,
+    //   onClick: () => {
+    //     activateOtpLogin(OTP_LOGIN_OPTIONS.EMAIL);
+    //   },
+    // },
+  ];
+  const methods = loginMethods.map(method=>options.find(option=>option.label===method)!)
   return (
-    <LoginOptions loginOptions={loginOptions} isRedirecting={isRedirecting} />
+    <LoginOptions loginOptions={methods} />
   );
 };
