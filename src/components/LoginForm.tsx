@@ -1,8 +1,9 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { useUser } from "hooks";
 import { ILoginOptions, LoginMethods, TLocalIcons } from "interfaces";
-
-// Full width and height so it fits parent component
+import {ReactComponent as GoogleIcon} from "./icons/google-logo.svg"
+import TwitterIcon from "./icons/twitter-logo.svg"
+import DiscordIcon from "./icons/discord-logo.svg"
 
 const LoginOptions = ({
   loginOptions,
@@ -57,7 +58,9 @@ const LoginOptions = ({
                     gap: "7px",
                   }}
                 >
-                  <img src={`/icons/${option.icon}.svg`} width="16" height="16"/>
+                  {option.icon === "google-logo" && <GoogleIcon width="16" height="16"/>}
+                  {option.icon === "twitter-logo"&& <TwitterIcon width="16" height="16"/>}
+                  {option.icon === "discord-logo"&& <DiscordIcon width="16" height="16"/>}
                   <span
                     style={{
                       fontSize: "0.875rem",
