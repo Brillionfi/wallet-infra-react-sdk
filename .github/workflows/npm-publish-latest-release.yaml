@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org/'
+
+      # Authenticate with npm
+      - name: Authenticate to npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPNJS_ACCESS_TOKEN }}" > ~/.npmrc
 
       - name: Install Yarn
         run: npm install -g yarn
@@ -35,3 +40,5 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPNJS_ACCESS_TOKEN }}
