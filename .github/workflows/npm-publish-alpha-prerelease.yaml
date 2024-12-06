@@ -7,6 +7,7 @@ on:
 
 env:
   NODE_VERSION: 20.12.2
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   version-release-beta:
@@ -20,6 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://npm.pkg.github.com'
 
       - name: Install Yarn
         run: npm install -g yarn
@@ -43,3 +45,4 @@ jobs:
         run: npm publish --tag alpha --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
