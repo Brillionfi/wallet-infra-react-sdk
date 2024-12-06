@@ -12,7 +12,7 @@ import {
   IWalletSignTransaction,
   IWalletSignTransactionResponse,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { useBrillionContext } from "BrillionContext";
+import { useBrillionContext } from "components/BrillionContext";
 
 export const useWallet = () => {
   const sdk = useBrillionContext();

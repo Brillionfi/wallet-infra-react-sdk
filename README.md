@@ -22,7 +22,7 @@ npm i @brillionfi/waas-react-sdk
 In a React or NextJS project, you can start by importing the LoginForm component:
 
 ```tsx
-import { LoginForm, LoginMethods } from "@brillionfi/waas-react-sdk";
+import { BrillionProvider, LoginForm, LoginMethods } from "@brillionfi/waas-react-sdk";
 
 const MyLoginPage = () => {
   return (
@@ -45,7 +45,7 @@ const MyLoginPage = () => {
 
 ## 🌐 Demo
 
-Check out our [Simple Wallet Demo](https://github.com/Brillionfi/simple-wallet-demo) to see the Wallet Infra SDK in action. This demo showcases how to manage your organization and applications and demonstrates how to access your application as a wallet user.
+To see the raw SDK in use, check out our [Simple Wallet Demo](https://github.com/Brillionfi/simple-wallet-demo). This demo showcases how to manage your organization and applications and demonstrates how to access your application as a wallet user.
 
 ## 🤝 Contributing
 
