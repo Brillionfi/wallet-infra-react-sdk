@@ -19,7 +19,8 @@
       "@models/*": ["models/*"],
       "@services/*": ["services/*"],
       "@utils/*": ["utils/*"]
-    }
+    },
+    "declarationDir": "./dist",
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]

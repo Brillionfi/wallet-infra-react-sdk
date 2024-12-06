@@ -1,8 +1,16 @@
 {
   "name": "@brillionfi/waas-react-sdk",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brillionfi/wallet-infra-react-sdk.git"
+  },
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc-alias",
