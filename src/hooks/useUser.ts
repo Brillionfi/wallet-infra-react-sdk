@@ -1,24 +1,20 @@
 import { useBrillionContext } from "../BrillionContext";
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 
-export const useUser = (jwt?: string) => {
+export const useUser = () => {
   const sdk = useBrillionContext();
 
-  if (jwt) {
-    sdk?.authenticateUser(jwt);
-  }
+  const authenticateUser = async (jwt: string) => {
+    return sdk?.authenticateUser(jwt);
+  };
 
-  const login = async () => {
+  const login = async (provider: AuthProvider, redirectUrl: string) => {
     const url = await sdk?.generateAuthUrl({
-      provider: AuthProvider.GOOGLE,
-      redirectUrl: "",
+      provider,
+      redirectUrl,
     });
     return url;
   };
 
-  const wallets = async () => {
-    return await sdk?.Wallet.getWallets();
-  };
-
-  return { login, wallets };
+  return { login, authenticateUser };
 };
