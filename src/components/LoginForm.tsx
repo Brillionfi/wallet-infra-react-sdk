@@ -1,9 +1,9 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { useUser } from "hooks";
 import { ILoginOptions, LoginMethods, TLocalIcons } from "interfaces";
-import {ReactComponent as GoogleIcon} from "./icons/google-logo.svg"
-import TwitterIcon from "./icons/twitter-logo.svg"
-import DiscordIcon from "./icons/discord-logo.svg"
+import GoogleLogo from "@/components/icons/google-logo";
+import TwitterLogo from "@/components/icons/twitter-logo";
+import DiscordLogo from "@/components/icons/discord-logo";
 
 const LoginOptions = ({
   loginOptions,
@@ -19,7 +19,7 @@ const LoginOptions = ({
             color: "#fff",
           }}
         >
-          Log in
+          Welcome
         </span>
         <section
           style={{
@@ -41,9 +41,22 @@ const LoginOptions = ({
               <button
                 key={`login-option-${option.label.toLocaleLowerCase()}`}
                 id={`login-option-${option.label.toLocaleLowerCase()}`}
+                className="loginButton"
                 style={{
                   width: "100%",
+                  color: "#fefefe",
+                  background: "#292d27",
+                  border: "1px solid #292d27",
                   cursor: option.disabled ? "not-allowed" : "pointer",
+                  padding: "1.125rem 1rem",
+                  fontSize: "1rem",
+                  transition: "background-color .2s, color .2s, border-color .2s, box-shadow .2s",
+                  borderRadius: "6px",
+                  // hover: {
+                  //   background: "#343633",
+                  //   color: "#b4b4b4",
+                  //   borderColor: "#343633"
+                  // }
                 }}
                 disabled={option.disabled}
                 onClick={option.onClick}
@@ -58,9 +71,9 @@ const LoginOptions = ({
                     gap: "7px",
                   }}
                 >
-                  {option.icon === "google-logo" && <GoogleIcon width="16" height="16"/>}
-                  {option.icon === "twitter-logo"&& <TwitterIcon width="16" height="16"/>}
-                  {option.icon === "discord-logo"&& <DiscordIcon width="16" height="16"/>}
+                  {option.icon === "google-logo" && <GoogleLogo />}
+                  {option.icon === "twitter-logo"&& <TwitterLogo />}
+                  {option.icon === "discord-logo"&& <DiscordLogo />}
                   <span
                     style={{
                       fontSize: "0.875rem",
@@ -69,7 +82,7 @@ const LoginOptions = ({
                       color: "#fff",
                     }}
                   >
-                    {option.label}
+                    Continue with {option.label}
                   </span>
                 </section>
               </button>
