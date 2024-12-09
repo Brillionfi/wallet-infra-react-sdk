@@ -1,28 +1,9 @@
-export enum ICON_LIST {
-  "apple-logo",
-  "discord-logo",
-  "email-logo",
-  "ethereum",
-  "google-logo",
-  "logo",
-  "polygon",
-  "brillion-dark-logo",
-  "brillion-dark-logo-circle",
-  "twitter-logo",
-  "vanar",
-  "wallet-connect",
-  "zilliqa",
-  "telos",
-  "base",
-}
-
-export type TLocalIcons = keyof typeof ICON_LIST;
-
-type TLoginOptions = {
+export type TLoginOptions = {
   label: LoginMethods;
-  icon: TLocalIcons;
-  disabled: boolean;
-  onClick: () => void;
+  icon?: JSX.Element;
+  disabled?: boolean;
+  onClick?: () => void;
+  html?: JSX.Element;
 }[];
 
 export interface ILoginOptions {
@@ -33,4 +14,7 @@ export enum LoginMethods {
   Google = "Google",
   Twitter = "Twitter",
   Discord = "Discord",
+  WalletConnect = "WalletConnect",
+  Metamask = "Metamask",
+  Email = "Email",
 }
