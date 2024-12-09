@@ -1,3 +1,5 @@
+import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
+
 export type TLoginOptions = {
   label: LoginMethods;
   icon?: JSX.Element;
@@ -11,10 +13,10 @@ export interface ILoginOptions {
 }
 
 export enum LoginMethods {
-  Google = "Google",
-  Twitter = "Twitter",
-  Discord = "Discord",
-  WalletConnect = "WalletConnect",
-  Metamask = "Metamask",
-  Email = "Email",
+  Google = AuthProvider.GOOGLE,
+  Twitter = AuthProvider.TWITTER,
+  Discord = AuthProvider.DISCORD,
+  Metamask = AuthProvider.METAMASK,
+  WalletConnect = AuthProvider.WALLET_CONNECT,
+  Email = AuthProvider.EMAIL
 }
