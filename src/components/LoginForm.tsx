@@ -101,8 +101,8 @@ const LoginOptions = ({
 export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMethods[], redirectUrl: string}) => {
   const { login } = useUser();
 
-  const [showEmail, setShowEmail] = useState<Boolean>(false);
-  const [isVisible, setIsVisible] = useState<Boolean>(false);
+  const [showEmail, setShowEmail] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
 
   const options: TLoginOptions = [
@@ -155,17 +155,10 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
       icon: <WalletConnectLogo />,
       disabled: false,
       onClick: async () => {
-        try {
-          const url = await login(AuthProvider.WALLET_CONNECT, redirectUrl);
-          if(!url) return;
-    
-          QRCodeModal.open(url, () => {
-            console.log("QR Code Modal Closed");
-          });
-
-        } catch (error) {
-          console.error("Error connecting with URI:", error);
-        }
+        const url = await login(AuthProvider.WALLET_CONNECT, redirectUrl);
+        if(!url) return;
+  
+        QRCodeModal.open(url, () => {});
       },
     },
     {
