@@ -130,6 +130,17 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
         }
       },
     },
+    {
+      label: LoginMethods.Metamask,
+      icon: "ethereum" as TLocalIcons,
+      disabled: false,
+      onClick: async () => {
+        const url = await login(AuthProvider.METAMASK, redirectUrl);
+        if (url) {
+          window.location.href = url;
+        }
+      },
+    },
     // TODO: prepare an email input window
     // {
     //   label: "Continue-with Email",

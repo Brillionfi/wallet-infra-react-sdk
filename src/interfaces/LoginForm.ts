@@ -1,3 +1,5 @@
+import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
+
 export enum ICON_LIST {
   "apple-logo",
   "discord-logo",
@@ -30,7 +32,8 @@ export interface ILoginOptions {
 }
 
 export enum LoginMethods {
-  Google = "Google",
-  Twitter = "Twitter",
-  Discord = "Discord",
+  Google = AuthProvider.GOOGLE,
+  Twitter = AuthProvider.TWITTER,
+  Discord = AuthProvider.DISCORD,
+  Metamask = AuthProvider.METAMASK
 }
