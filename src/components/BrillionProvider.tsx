@@ -5,7 +5,7 @@ import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 type BrillionProviderProps = {
   appId: string;
   baseUrl: string;
-  WCProjectId: string;
+  WCProjectId?: string;
   children: ReactNode;
 };
 
@@ -24,7 +24,7 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   }, [appId, baseUrl]);
 
   useEffect(() => {
-    setWalletConnectProjectId(WCProjectId);
+    if(WCProjectId) setWalletConnectProjectId(WCProjectId);
   }, [WCProjectId]);
 
   return (
