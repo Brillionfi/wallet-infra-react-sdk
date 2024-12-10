@@ -1,89 +1,27 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { useUser } from "hooks";
-import { ILoginOptions, LoginMethods, TLocalIcons } from "interfaces";
+import { LoginMethods, TLoginOptions } from "interfaces";
+import GoogleLogo from "@/components/icons/google-logo";
+import TwitterLogo from "@/components/icons/twitter-logo";
+import DiscordLogo from "@/components/icons/discord-logo";
+import MetamaskLogo from "@/components/icons/metamask-logo";
+import WalletConnectLogo from "@/components/icons/walletconnect-logo";
+import EmailLogo from "@/components/icons/email-logo";
+import { useState } from "react";
+import QRCodeModal from "@walletconnect/qrcode-modal"; 
+import { defaultStyles, TCustomProps } from "@/components/LoginFormStyles";
 
-// Full width and height so it fits parent component
-
-const LoginOptions = ({
-  loginOptions,
-}: ILoginOptions) => {
-  return (
-    <section style={{ display: "flex", width: "100%", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ display: "flex", width: "100%", flexDirection: "column", alignItems: "center" }}>
-        <span
-          style={{
-            marginBottom: "1rem",
-            fontSize: "2.25rem",
-            fontWeight: "bold",
-            color: "#fff",
-          }}
-        >
-          Log in
-        </span>
-        <section
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-          }}
-        >
-          <section
-            style={{
-              display: "flex",
-              width: "100%",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              gap: "0.5rem",
-            }}
-          >
-            {loginOptions.map((option) => (
-              <button
-                key={`login-option-${option.label.toLocaleLowerCase()}`}
-                id={`login-option-${option.label.toLocaleLowerCase()}`}
-                style={{
-                  width: "100%",
-                  cursor: option.disabled ? "not-allowed" : "pointer",
-                }}
-                disabled={option.disabled}
-                onClick={option.onClick}
-              >
-                <section
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "7px",
-                  }}
-                >
-                  <img src={`/icons/${option.icon}.svg`} width="16" height="16"/>
-                  <span
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: "bold",
-                      lineHeight: "16.44px",
-                      color: "#fff",
-                    }}
-                  >
-                    Continue with {option.label}
-                  </span>
-                </section>
-              </button>
-            ))}
-          </section>
-        </section>
-      </div>
-    </section>
-  );
-};
-
-export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMethods[], redirectUrl: string}) => {
+export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethods: LoginMethods[], redirectUrl: string, customProps?: TCustomProps}) => {
   const { login } = useUser();
-  const options = [
+
+  const [showEmail, setShowEmail] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
+
+  const options: TLoginOptions = [
     {
       label: LoginMethods.Google,
-      icon: "google-logo" as TLocalIcons,
+      icon: <GoogleLogo />,
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.GOOGLE, redirectUrl);
@@ -94,7 +32,7 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
     },
     {
       label: LoginMethods.Discord,
-      icon: "discord-logo" as TLocalIcons,
+      icon: <TwitterLogo />,
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.DISCORD, redirectUrl);
@@ -105,7 +43,7 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
     },
     {
       label: LoginMethods.Twitter,
-      icon: "twitter-logo" as TLocalIcons,
+      icon: <DiscordLogo />,
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.TWITTER, redirectUrl);
@@ -116,7 +54,7 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
     },
     {
       label: LoginMethods.Metamask,
-      icon: "ethereum" as TLocalIcons,
+      icon: <MetamaskLogo />,
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.METAMASK, redirectUrl);
@@ -125,18 +63,135 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
         }
       },
     },
-    // TODO: prepare an email input window
-    // {
-    //   label: "Continue-with Email",
-    //   icon: "email-logo" as TLocalIcons,
-    //   disabled: false,
-    //   onClick: () => {
-    //     activateOtpLogin(OTP_LOGIN_OPTIONS.EMAIL);
-    //   },
-    // },
+    {
+      label: LoginMethods.WalletConnect,
+      icon: <WalletConnectLogo />,
+      disabled: false,
+      onClick: async () => {
+        const url = await login(AuthProvider.WALLET_CONNECT, redirectUrl);
+        if(!url) return;
+  
+        QRCodeModal.open(url, () => {});
+      },
+    },
+    {
+      label: LoginMethods.Email,
+      icon: <EmailLogo />,
+      disabled: false,
+      onClick: async () => {
+        if (isVisible) {
+          setIsVisible(false);
+          setTimeout(() => setShowEmail(false), 280); // Wait for the transition to complete
+        } else {
+          setShowEmail(true);
+          setTimeout(() => setIsVisible(true), 10); // Delay slightly for the transition to start
+        }
+      },
+    },
   ];
-  const methods = loginMethods.map(method=>options.find(option=>option.label===method)!)
+  if(showEmail) {
+    options.push({
+      label: LoginMethods.Email,
+      html: (
+        <div
+          key={`login-option-email-input`}
+          id={`login-option-email-input`}
+          className="loginButton"
+          style={{
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? "translateY(0)" : "translateY(-20px)",
+            width: "100%",
+            color: "#fefefe",
+            background: "#292d27",
+            border: "1px solid #292d27",
+            padding: "1rem 1.5rem",
+            fontSize: "1rem",
+            borderRadius: "6px",
+          }}
+        >
+          <section
+            style={{
+              display: "flex",
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "left",
+              gap: "7px",
+            }}
+          >
+            <input
+              autoComplete={'off'}
+              type="text"
+              onChange={(e) => setEmail(e.target.value)}
+              id="email"
+              placeholder='Email'
+              value={email}
+              style={{
+                minHeight: '45px',
+                borderRadius: '5px',
+                background: 'black',
+                padding: '8px',
+              }}
+            />
+            <button
+              onClick={async () => {
+                const url = await login(AuthProvider.EMAIL, redirectUrl, email);
+                if (url) {
+                  window.location.href = url;
+                }
+              }
+            }
+              style={{
+                margin: 'auto',
+                background: "#444444",
+                borderRadius: "5px",
+                padding: "8px",
+              }}
+            >
+              Send
+            </button>
+          </section>
+        </div>
+      )
+    });
+  }
+
+  const methods = options.filter(option=> loginMethods.includes(option.label))
+
+  const containerStyle = customProps?.containerStyle ? customProps.containerStyle : defaultStyles.container;
+  const tittleStyle = customProps?.tittleStyle ? customProps.tittleStyle : defaultStyles.tittle;
+  const tittleText = customProps?.tittleText ? customProps.tittleText : "Welcome";
+  const buttonsContainerStyle = customProps?.buttonsContainerStyle ? customProps.buttonsContainerStyle : defaultStyles.buttonsContainer;
+  const buttonStyle = customProps?.buttonStyle ? customProps.buttonStyle : defaultStyles.button;
+  const buttonText = customProps?.buttonText ? customProps.buttonText : "Continue with";
+
   return (
-    <LoginOptions loginOptions={methods} />
+    <div style={containerStyle}>
+      <span style={tittleStyle}>
+        {tittleText}
+      </span>
+      <section style={buttonsContainerStyle}>
+        {methods.map((option) => (
+          option.html ? option.html :
+          <button
+            key={`login-option-${option.label!.toLocaleLowerCase()}`}
+            id={`login-option-${option.label!.toLocaleLowerCase()}`}
+            className="loginButton"
+            style={{
+              ...buttonStyle,
+              cursor: option.disabled ? "not-allowed" : "pointer",
+            }}
+            disabled={option.disabled}
+            onClick={option.onClick}
+          >
+            {option.icon}
+            <span style={defaultStyles.buttonText}>
+              {buttonText} {option.label}
+            </span>
+          </button>
+        ))}
+      </section>
+    </div>
   );
 };

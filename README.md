@@ -19,6 +19,13 @@ npm i @brillionfi/waas-react-sdk
 
 ## ⚡ Quick Start
 
+First you must wrap your app inside `<BrillionProvider/>` in order to be able to interact with the SDK. 
+
+This providers has 3 props: 
+  - `appId`: Your Brillion App ID.
+  - `baseUrl`: Brillion API URL.
+  - `WCProjectId`: Your walletConnect Project ID (mandatory only if you are planning to use WalletConnect as login method)
+
 In a React or NextJS project, you can start by importing the LoginForm component:
 
 ```tsx
@@ -28,7 +35,7 @@ const MyLoginPage = () => {
   return (
     <BrillionProvider
       appId={"my-brillion-app-id"}
-      baseUrl={"my-brillion-infra-url"}
+      baseUrl={"brillion-infra-url"}
     >
       <LoginForm
         redirectUrl="http://localhost:3000"
@@ -40,6 +47,102 @@ const MyLoginPage = () => {
       />
     </BrillionProvider>
   );
+};
+```
+
+###  Login Form Customizations
+
+If you want to personalize this login form, you can easily put your own styles or add/override default styles.
+
+  1) `containerStyle?: React.CSSProperties;`
+  2) `tittleStyle?: React.CSSProperties;`
+  3) `tittleText?: string;`
+  4) `buttonsContainerStyle?: React.CSSProperties;`
+  5) `buttonStyle?: React.CSSProperties;`
+  6) `buttonTextStyle?: React.CSSProperties;`
+  7) `buttonText?: string;`
+
+Note: you can leave some/all of these blank to have default styles
+
+```tsx
+import { BrillionProvider, LoginForm, LoginMethods, defaultStyles } from "@brillionfi/waas-react-sdk";
+
+const MyLoginPage = () => {
+  return (
+    <BrillionProvider
+      appId={"my-brillion-app-id"}
+      baseUrl={"my-brillion-infra-url"}
+      WCProjectId={"my-walletConnect-projectId"}
+    >
+      <LoginForm 
+        loginMethods={[
+          LoginMethods.Google, 
+          LoginMethods.Discord, 
+          LoginMethods.Twitter, 
+          LoginMethods.Metamask, 
+          LoginMethods.WalletConnect, 
+          LoginMethods.Email
+        ]} 
+        redirectUrl="http://localhost:3000"
+        customProps={{
+          containerStyle: {
+            ...defaultStyles.container,
+          },
+          tittleStyle: {
+            ...defaultStyles.tittle,
+            textAlign: "center",
+          },
+          tittleText: "Login to your wallet",
+        }}
+      />
+    </BrillionProvider>
+  );
+};
+```
+
+## 💻 Usage
+
+We provide several hooks for you to easily interact with Brillion (more coming...).
+
+```tsx
+import { useBalance, useTransaction, useUser, useWallet } from "@brillionfi/waas-react-sdk";
+
+const { balances, getPortfolio } = useBalance("wallet address", "chainId");
+
+const { 
+  createTransaction,
+  getTransactionById,
+  cancelTransaction,
+  approveSignTransaction,
+  rejectSignTransaction.
+} = useTransaction();
+
+const { 
+  wallets,
+  createWallet,
+  signTransaction,
+  getTransactionHistory,
+  getGasConfig,
+  setGasConfig,
+  getGasFees,
+  getNonce,
+  initRecovery,
+  execRecovery,
+  approveSignTransaction,
+  rejectSignTransaction,
+  getNotifications
+} = useWallet();
+
+const { login, authenticateUser } = useUser();
+```
+
+Note: you can also manually interact with Brillion with already included Brillion Infra SDK
+ `@brillionfi/wallet-infra-sdk`
+```tsx
+const { sdk } = useBrillionContext();
+
+const authenticateUser = (jwt: string) => {
+  return sdk?.authenticateUser(jwt);
 };
 ```
 

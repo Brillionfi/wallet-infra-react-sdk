@@ -15,7 +15,7 @@ import {
 import { useBrillionContext } from "components/BrillionContext";
 
 export const useWallet = () => {
-  const sdk = useBrillionContext();
+  const { sdk } = useBrillionContext();
 
   const createWallet = async (data: IWallet): Promise<IWallet | undefined> => {
     return await sdk?.Wallet.createWallet(data);

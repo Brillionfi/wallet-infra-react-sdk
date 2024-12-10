@@ -7,7 +7,7 @@ import {
 import { useBrillionContext } from "components/BrillionContext";
 
 export const useTransaction = () => {
-  const sdk = useBrillionContext();
+  const { sdk } = useBrillionContext();
 
   const createTransaction = async (
     transaction: ITransactionSigned | ITransactionUnsigned,
