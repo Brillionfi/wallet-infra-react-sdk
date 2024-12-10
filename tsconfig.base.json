@@ -14,14 +14,11 @@
     "declaration": true,
     "baseUrl": "./src",
     "paths": {
-      "@api/*": ["api/*"],
-      "@config/*": ["config/*"],
-      "@models/*": ["models/*"],
-      "@services/*": ["services/*"],
-      "@utils/*": ["utils/*"]
+      "@/*": ["*"]
     },
     "declarationDir": "./dist",
   },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.css"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }

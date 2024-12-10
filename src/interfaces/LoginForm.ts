@@ -1,30 +1,11 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 
-export enum ICON_LIST {
-  "apple-logo",
-  "discord-logo",
-  "email-logo",
-  "ethereum",
-  "google-logo",
-  "logo",
-  "polygon",
-  "brillion-dark-logo",
-  "brillion-dark-logo-circle",
-  "twitter-logo",
-  "vanar",
-  "wallet-connect",
-  "zilliqa",
-  "telos",
-  "base",
-}
-
-export type TLocalIcons = keyof typeof ICON_LIST;
-
-type TLoginOptions = {
+export type TLoginOptions = {
   label: LoginMethods;
-  icon: TLocalIcons;
-  disabled: boolean;
-  onClick: () => void;
+  icon?: JSX.Element;
+  disabled?: boolean;
+  onClick?: () => void;
+  html?: JSX.Element;
 }[];
 
 export interface ILoginOptions {
@@ -35,5 +16,7 @@ export enum LoginMethods {
   Google = AuthProvider.GOOGLE,
   Twitter = AuthProvider.TWITTER,
   Discord = AuthProvider.DISCORD,
-  Metamask = AuthProvider.METAMASK
+  Metamask = AuthProvider.METAMASK,
+  WalletConnect = AuthProvider.WALLET_CONNECT,
+  Email = AuthProvider.EMAIL,
 }

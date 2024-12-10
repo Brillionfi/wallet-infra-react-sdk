@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useBrillionContext } from "components/BrillionContext";
 
 export const useBalance = (address: Address, chainId: ChainId) => {
-  const sdk = useBrillionContext();
+  const { sdk } = useBrillionContext();
 
   const balances = useQuery({
     queryKey: ["balances", chainId, address],
