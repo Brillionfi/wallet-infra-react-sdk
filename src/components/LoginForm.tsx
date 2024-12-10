@@ -1,6 +1,6 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { useUser } from "hooks";
-import { ILoginOptions, LoginMethods, TLoginOptions } from "interfaces";
+import { LoginMethods, TLoginOptions } from "interfaces";
 import GoogleLogo from "@/components/icons/google-logo";
 import TwitterLogo from "@/components/icons/twitter-logo";
 import DiscordLogo from "@/components/icons/discord-logo";
@@ -9,96 +9,9 @@ import WalletConnectLogo from "@/components/icons/walletconnect-logo";
 import EmailLogo from "@/components/icons/email-logo";
 import { useState } from "react";
 import QRCodeModal from "@walletconnect/qrcode-modal"; 
+import { defaultStyles, TCustomProps } from "@/components/LoginFormStyles";
 
-const LoginOptions = ({
-  loginOptions,
-}: ILoginOptions) => {
-  return (
-    <section style={{ display: "flex", width: "100%", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ display: "flex", width: "100%", flexDirection: "column", alignItems: "center" }}>
-        <span
-          style={{
-            marginBottom: "1rem",
-            fontSize: "2.25rem",
-            fontWeight: "bold",
-            color: "#fff",
-          }}
-        >
-          Welcome
-        </span>
-        <section
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-          }}
-        >
-          <section
-            style={{
-              display: "flex",
-              width: "100%",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              gap: "0.5rem",
-            }}
-          >
-            {loginOptions.map((option) => (
-              option.html ? option.html :
-              <button
-                key={`login-option-${option.label!.toLocaleLowerCase()}`}
-                id={`login-option-${option.label!.toLocaleLowerCase()}`}
-                className="loginButton"
-                style={{
-                  width: "100%",
-                  color: "#fefefe",
-                  background: "#292d27",
-                  border: "1px solid #292d27",
-                  cursor: option.disabled ? "not-allowed" : "pointer",
-                  padding: "1rem 1.5rem",
-                  fontSize: "1rem",
-                  transition: "background-color .2s, color .2s, border-color .2s, box-shadow .2s",
-                  borderRadius: "6px",
-                  // hover: {
-                  //   background: "#343633",
-                  //   color: "#b4b4b4",
-                  //   borderColor: "#343633"
-                  // }
-                }}
-                disabled={option.disabled}
-                onClick={option.onClick}
-              >
-                <section
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "left",
-                    gap: "7px",
-                  }}
-                >
-                  {option.icon}
-                  <span
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: "bold",
-                      lineHeight: "16.44px",
-                      color: "#fff",
-                    }}
-                  >
-                    Continue with {option.label}
-                  </span>
-                </section>
-              </button>
-            ))}
-          </section>
-        </section>
-      </div>
-    </section>
-  );
-};
-
-export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMethods[], redirectUrl: string}) => {
+export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethods: LoginMethods[], redirectUrl: string, customProps?: TCustomProps}) => {
   const { login } = useUser();
 
   const [showEmail, setShowEmail] = useState<boolean>(false);
@@ -246,9 +159,39 @@ export const LoginForm = ({loginMethods, redirectUrl}: {loginMethods: LoginMetho
 
   const methods = options.filter(option=> loginMethods.includes(option.label))
 
+  const containerStyle = customProps?.containerStyle ? customProps.containerStyle : defaultStyles.container;
+  const tittleStyle = customProps?.tittleStyle ? customProps.tittleStyle : defaultStyles.tittle;
+  const tittleText = customProps?.tittleText ? customProps.tittleText : "Welcome";
+  const buttonsContainerStyle = customProps?.buttonsContainerStyle ? customProps.buttonsContainerStyle : defaultStyles.buttonsContainer;
+  const buttonStyle = customProps?.buttonStyle ? customProps.buttonStyle : defaultStyles.button;
+  const buttonText = customProps?.buttonText ? customProps.buttonText : "Continue with";
+
   return (
-    <>
-      <LoginOptions loginOptions={methods} />
-    </>
+    <div style={containerStyle}>
+      <span style={tittleStyle}>
+        {tittleText}
+      </span>
+      <section style={buttonsContainerStyle}>
+        {methods.map((option) => (
+          option.html ? option.html :
+          <button
+            key={`login-option-${option.label!.toLocaleLowerCase()}`}
+            id={`login-option-${option.label!.toLocaleLowerCase()}`}
+            className="loginButton"
+            style={{
+              ...buttonStyle,
+              cursor: option.disabled ? "not-allowed" : "pointer",
+            }}
+            disabled={option.disabled}
+            onClick={option.onClick}
+          >
+            {option.icon}
+            <span style={defaultStyles.buttonText}>
+              {buttonText} {option.label}
+            </span>
+          </button>
+        ))}
+      </section>
+    </div>
   );
 };

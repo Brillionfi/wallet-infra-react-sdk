@@ -18,5 +18,5 @@ export enum LoginMethods {
   Discord = AuthProvider.DISCORD,
   Metamask = AuthProvider.METAMASK,
   WalletConnect = AuthProvider.WALLET_CONNECT,
-  Email = AuthProvider.EMAIL
+  Email = AuthProvider.EMAIL,
 }
