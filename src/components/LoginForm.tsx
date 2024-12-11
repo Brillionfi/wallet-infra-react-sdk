@@ -45,7 +45,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     },
     {
       label: LoginMethods.Discord,
-      icon: <TwitterLogo />,
+      icon: <DiscordLogo />,
       disabled: false,
       onClick: async () => {
         await makeLogin(AuthProvider.DISCORD, redirectUrl, true);
@@ -53,7 +53,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     },
     {
       label: LoginMethods.Twitter,
-      icon: <DiscordLogo />,
+      icon: <TwitterLogo />,
       disabled: false,
       onClick: async () => {
         await makeLogin(AuthProvider.TWITTER, redirectUrl, true);
