@@ -1,6 +1,9 @@
 import { ReactNode, useState, useEffect } from "react";
 import { BrillionContext } from "./BrillionContext";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 type BrillionProviderProps = {
   appId: string;
@@ -15,12 +18,14 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   WCProjectId,
   children,
 }) => {
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
   const [walletConnectProjectId, setWalletConnectProjectId] = useState<string>("");
 
   useEffect(() => {
-    const sdk = new WalletInfra(appId, baseUrl);
-    setSdk(sdk);
+    if(!appId || !baseUrl) return;
+    setSdk(new WalletInfra(appId, baseUrl));
+    setIsReady(true);
   }, [appId, baseUrl]);
 
   useEffect(() => {
@@ -28,11 +33,14 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   }, [WCProjectId]);
 
   return (
-    <BrillionContext.Provider value={{
-      sdk, 
-      walletConnectProjectId
-    }}>
-      {children}
-    </BrillionContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <BrillionContext.Provider value={{
+        sdk, 
+        walletConnectProjectId,
+        isReady
+      }}>
+        {children}
+      </BrillionContext.Provider>
+    </QueryClientProvider>
   );
 };
