@@ -1,17 +1,25 @@
+import { useState } from "react";
+import DiscordLogo from "@/components/icons/discord-logo";
+import EmailLogo from "@/components/icons/email-logo";
+import GoogleLogo from "@/components/icons/google-logo";
+import MetamaskLogo from "@/components/icons/metamask-logo";
+import TwitterLogo from "@/components/icons/twitter-logo";
+import WalletConnectLogo from "@/components/icons/walletconnect-logo";
+import { defaultStyles, TCustomProps } from "@/components/LoginFormStyles";
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
+import QRCodeModal from "@walletconnect/qrcode-modal";
 import { useUser } from "hooks";
 import { LoginMethods, TLoginOptions } from "interfaces";
-import GoogleLogo from "@/components/icons/google-logo";
-import TwitterLogo from "@/components/icons/twitter-logo";
-import DiscordLogo from "@/components/icons/discord-logo";
-import MetamaskLogo from "@/components/icons/metamask-logo";
-import WalletConnectLogo from "@/components/icons/walletconnect-logo";
-import EmailLogo from "@/components/icons/email-logo";
-import { useState } from "react";
-import QRCodeModal from "@walletconnect/qrcode-modal"; 
-import { defaultStyles, TCustomProps } from "@/components/LoginFormStyles";
 
-export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethods: LoginMethods[], redirectUrl: string, customProps?: TCustomProps}) => {
+export const LoginForm = ({
+  loginMethods,
+  redirectUrl,
+  customProps,
+}: {
+  loginMethods: LoginMethods[];
+  redirectUrl: string;
+  customProps?: TCustomProps;
+}) => {
   const { login } = useUser();
 
   const [showEmail, setShowEmail] = useState<boolean>(false);
@@ -32,7 +40,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     },
     {
       label: LoginMethods.Discord,
-      icon: <TwitterLogo />,
+      icon: <DiscordLogo />,
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.DISCORD, redirectUrl);
@@ -43,7 +51,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     },
     {
       label: LoginMethods.Twitter,
-      icon: <DiscordLogo />,
+      icon: <TwitterLogo />,
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.TWITTER, redirectUrl);
@@ -69,8 +77,8 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       disabled: false,
       onClick: async () => {
         const url = await login(AuthProvider.WALLET_CONNECT, redirectUrl);
-        if(!url) return;
-  
+        if (!url) return;
+
         QRCodeModal.open(url, () => {});
       },
     },
@@ -89,7 +97,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       },
     },
   ];
-  if(showEmail) {
+  if (showEmail) {
     options.push({
       label: LoginMethods.Email,
       html: (
@@ -121,17 +129,17 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
             }}
           >
             <input
-              autoComplete={'off'}
+              autoComplete={"off"}
               type="text"
               onChange={(e) => setEmail(e.target.value)}
               id="email"
-              placeholder='Email'
+              placeholder="Email"
               value={email}
               style={{
-                minHeight: '45px',
-                borderRadius: '5px',
-                background: 'black',
-                padding: '8px',
+                minHeight: "45px",
+                borderRadius: "5px",
+                background: "black",
+                padding: "8px",
               }}
             />
             <button
@@ -140,10 +148,9 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
                 if (url) {
                   window.location.href = url;
                 }
-              }
-            }
+              }}
               style={{
-                margin: 'auto',
+                margin: "auto",
                 background: "#444444",
                 borderRadius: "5px",
                 padding: "8px",
@@ -153,44 +160,59 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
             </button>
           </section>
         </div>
-      )
+      ),
     });
   }
 
-  const methods = options.filter(option=> loginMethods.includes(option.label))
+  const methods = options.filter((option) =>
+    loginMethods.includes(option.label),
+  );
 
-  const containerStyle = customProps?.containerStyle ? customProps.containerStyle : defaultStyles.container;
-  const tittleStyle = customProps?.tittleStyle ? customProps.tittleStyle : defaultStyles.tittle;
-  const tittleText = customProps?.tittleText ? customProps.tittleText : "Welcome";
-  const buttonsContainerStyle = customProps?.buttonsContainerStyle ? customProps.buttonsContainerStyle : defaultStyles.buttonsContainer;
-  const buttonStyle = customProps?.buttonStyle ? customProps.buttonStyle : defaultStyles.button;
-  const buttonText = customProps?.buttonText ? customProps.buttonText : "Continue with";
+  const containerStyle = customProps?.containerStyle
+    ? customProps.containerStyle
+    : defaultStyles.container;
+  const tittleStyle = customProps?.tittleStyle
+    ? customProps.tittleStyle
+    : defaultStyles.tittle;
+  const tittleText = customProps?.tittleText
+    ? customProps.tittleText
+    : "Welcome";
+  const buttonsContainerStyle = customProps?.buttonsContainerStyle
+    ? customProps.buttonsContainerStyle
+    : defaultStyles.buttonsContainer;
+  const buttonStyle = customProps?.buttonStyle
+    ? customProps.buttonStyle
+    : defaultStyles.button;
+  const buttonText = customProps?.buttonText
+    ? customProps.buttonText
+    : "Continue with";
 
   return (
     <div style={containerStyle}>
-      <span style={tittleStyle}>
-        {tittleText}
-      </span>
+      <span style={tittleStyle}>{tittleText}</span>
       <section style={buttonsContainerStyle}>
-        {methods.map((option) => (
-          option.html ? option.html :
-          <button
-            key={`login-option-${option.label!.toLocaleLowerCase()}`}
-            id={`login-option-${option.label!.toLocaleLowerCase()}`}
-            className="loginButton"
-            style={{
-              ...buttonStyle,
-              cursor: option.disabled ? "not-allowed" : "pointer",
-            }}
-            disabled={option.disabled}
-            onClick={option.onClick}
-          >
-            {option.icon}
-            <span style={defaultStyles.buttonText}>
-              {buttonText} {option.label}
-            </span>
-          </button>
-        ))}
+        {methods.map((option) =>
+          option.html ? (
+            option.html
+          ) : (
+            <button
+              key={`login-option-${option.label!.toLocaleLowerCase()}`}
+              id={`login-option-${option.label!.toLocaleLowerCase()}`}
+              className="loginButton"
+              style={{
+                ...buttonStyle,
+                cursor: option.disabled ? "not-allowed" : "pointer",
+              }}
+              disabled={option.disabled}
+              onClick={option.onClick}
+            >
+              {option.icon}
+              <span style={defaultStyles.buttonText}>
+                {buttonText} {option.label}
+              </span>
+            </button>
+          ),
+        )}
       </section>
     </div>
   );
