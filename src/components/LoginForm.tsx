@@ -23,9 +23,9 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     try {
       const url = await login(provider, redirectUrl, email);
       if (url) {
-        redirect ? 
-          window.location.href = url 
-        : 
+        if(redirect)  
+          window.location.href = url;
+        else
           QRCodeModal.open(url, () => {});
       }
     } catch (error) {
