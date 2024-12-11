@@ -13,8 +13,7 @@ export const useTransaction = () => {
     transaction: ITransactionSigned | ITransactionUnsigned,
   ): Promise<ITransaction | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
-      return;
+      throw new Error("AppId is not valid");
     }
     return await sdk.Transaction.createTransaction(transaction);
   };
@@ -23,16 +22,14 @@ export const useTransaction = () => {
     id: string,
   ): Promise<ITransaction | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
-      return;
+      throw new Error("AppId is not valid");
     }
     return await sdk.Transaction.getTransactionById(id);
   };
 
   const cancelTransaction = async (id: string): Promise<void | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
-      return;
+      throw new Error("AppId is not valid");
     }
     return await sdk.Transaction.cancelTransaction(id);
   };
@@ -44,8 +41,7 @@ export const useTransaction = () => {
     fromOrigin: string,
   ): Promise<ISignTransactionResponse | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
-      return;
+      throw new Error("AppId is not valid");
     }
     return await sdk.Transaction.approveSignTransaction(
       id,
@@ -62,8 +58,7 @@ export const useTransaction = () => {
     fromOrigin: string,
   ): Promise<ISignTransactionResponse | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
-      return;
+      throw new Error("AppId is not valid");
     }
     return await sdk.Transaction.rejectSignTransaction(
       id,

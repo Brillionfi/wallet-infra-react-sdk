@@ -17,6 +17,21 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
   const [showEmail, setShowEmail] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
+  const [errorText, setErrorText] = useState<string>("");
+
+  const makeLogin = async (provider: AuthProvider, redirectUrl: string, redirect: boolean, email?: string) => {
+    try {
+      const url = await login(provider, redirectUrl, email);
+      if (url) {
+        redirect ? 
+          window.location.href = url 
+        : 
+          QRCodeModal.open(url, () => {});
+      }
+    } catch (error) {
+      setErrorText((error as Error).message);
+    }
+  }
 
   const options: TLoginOptions = [
     {
@@ -24,10 +39,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       icon: <GoogleLogo />,
       disabled: false,
       onClick: async () => {
-        const url = await login(AuthProvider.GOOGLE, redirectUrl);
-        if (url) {
-          window.location.href = url;
-        }
+        await makeLogin(AuthProvider.GOOGLE, redirectUrl, true);
       },
     },
     {
@@ -35,10 +47,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       icon: <TwitterLogo />,
       disabled: false,
       onClick: async () => {
-        const url = await login(AuthProvider.DISCORD, redirectUrl);
-        if (url) {
-          window.location.href = url;
-        }
+        await makeLogin(AuthProvider.DISCORD, redirectUrl, true);
       },
     },
     {
@@ -46,10 +55,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       icon: <DiscordLogo />,
       disabled: false,
       onClick: async () => {
-        const url = await login(AuthProvider.TWITTER, redirectUrl);
-        if (url) {
-          window.location.href = url;
-        }
+        await makeLogin(AuthProvider.TWITTER, redirectUrl, true);
       },
     },
     {
@@ -57,10 +63,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       icon: <MetamaskLogo />,
       disabled: false,
       onClick: async () => {
-        const url = await login(AuthProvider.METAMASK, redirectUrl);
-        if (url) {
-          window.location.href = url;
-        }
+        await makeLogin(AuthProvider.METAMASK, redirectUrl, true);
       },
     },
     {
@@ -68,10 +71,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       icon: <WalletConnectLogo />,
       disabled: false,
       onClick: async () => {
-        const url = await login(AuthProvider.WALLET_CONNECT, redirectUrl);
-        if(!url) return;
-  
-        QRCodeModal.open(url, () => {});
+        await makeLogin(AuthProvider.WALLET_CONNECT, redirectUrl, false);
       },
     },
     {
@@ -136,10 +136,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
             />
             <button
               onClick={async () => {
-                const url = await login(AuthProvider.EMAIL, redirectUrl, email);
-                if (url) {
-                  window.location.href = url;
-                }
+                await makeLogin(AuthProvider.EMAIL, redirectUrl, true, email);
               }
             }
               style={{
@@ -165,6 +162,8 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
   const buttonsContainerStyle = customProps?.buttonsContainerStyle ? customProps.buttonsContainerStyle : defaultStyles.buttonsContainer;
   const buttonStyle = customProps?.buttonStyle ? customProps.buttonStyle : defaultStyles.button;
   const buttonText = customProps?.buttonText ? customProps.buttonText : "Continue with";
+  const errorContainerStyle = customProps?.errorContainerStyle ? customProps.errorContainerStyle : defaultStyles.errorContainer;
+  const errorTextStyle = customProps?.errorTextStyle ? customProps.errorTextStyle : defaultStyles.errorStyle;
 
   return (
     <div style={containerStyle}>
@@ -191,6 +190,11 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
             </span>
           </button>
         ))}
+      </section>
+      <section style={errorContainerStyle}>
+        <span style={errorTextStyle}>
+          {errorText}
+        </span>
       </section>
     </div>
   );
