@@ -107,7 +107,7 @@ We provide several hooks for you to easily interact with Brillion (more coming..
 ```tsx
 import { useBalance, useTransaction, useUser, useWallet } from "@brillionfi/waas-react-sdk";
 
-const { balances, getPortfolio } = useBalance("wallet address", "chainId");
+const { balances, getBalances, getPortfolio } = useBalance("wallet address", "chainId");
 
 const { 
   createTransaction,

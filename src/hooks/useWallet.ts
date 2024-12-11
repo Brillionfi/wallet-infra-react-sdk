@@ -7,30 +7,46 @@ import {
   IWalletGasConfiguration,
   IWalletGasConfigurationAPI,
   IWalletGasEstimation,
-  IWalletNotifications,
   IWalletRecovery,
   IWalletSignTransaction,
   IWalletSignTransactionResponse,
+  TNotifications,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
+import { useQuery } from "@tanstack/react-query";
 import { useBrillionContext } from "components/BrillionContext";
 
 export const useWallet = () => {
   const { sdk } = useBrillionContext();
 
   const createWallet = async (data: IWallet): Promise<IWallet | undefined> => {
-    return await sdk?.Wallet.createWallet(data);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.createWallet(data);
   };
 
-  const wallets = async (): Promise<IWallet[] | undefined> => {
-    return await sdk?.Wallet.getWallets();
-  };
+  const wallets = useQuery({
+    queryKey: ["wallets"],
+    queryFn: async () => {
+      if (!sdk) {
+        console.error("Brillion context not ready");
+        return;
+      }
+      return (await sdk.Wallet.getWallets()) as IWallet[];
+    },
+  });
 
   const signTransaction = async (
     address: Address,
     data: IWalletSignTransaction,
     fromOrigin: string,
   ): Promise<IWalletSignTransactionResponse | undefined> => {
-    return await sdk?.Wallet.signTransaction(address, data, fromOrigin);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.signTransaction(address, data, fromOrigin);
   };
 
   const approveSignTransaction = async (
@@ -39,7 +55,11 @@ export const useWallet = () => {
     fingerprint: string,
     fromOrigin: string,
   ): Promise<IWalletSignTransactionResponse | undefined> => {
-    return await sdk?.Wallet.approveTransaction(
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.approveTransaction(
       address,
       organizationId,
       fingerprint,
@@ -53,7 +73,11 @@ export const useWallet = () => {
     fingerprint: string,
     fromOrigin: string,
   ): Promise<IWalletSignTransactionResponse | undefined> => {
-    return await sdk?.Wallet.rejectTransaction(
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.rejectTransaction(
       address,
       organizationId,
       fingerprint,
@@ -69,7 +93,11 @@ export const useWallet = () => {
   ): Promise<
     { transactions: Partial<ITransaction>[]; currentPage: number } | undefined
   > => {
-    return await sdk?.Wallet.getTransactionHistory(
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.getTransactionHistory(
       address,
       chainId,
       page,
@@ -81,7 +109,11 @@ export const useWallet = () => {
     address: Address,
     chainId: ChainId,
   ): Promise<IWalletGasConfiguration | undefined> => {
-    return await sdk?.Wallet.getGasConfig(address, chainId);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.getGasConfig(address, chainId);
   };
 
   const setGasConfig = async (
@@ -89,7 +121,11 @@ export const useWallet = () => {
     chainId: ChainId,
     configuration: IWalletGasConfiguration,
   ): Promise<IWalletGasConfigurationAPI | undefined> => {
-    return await sdk?.Wallet.setGasConfig(address, chainId, configuration);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.setGasConfig(address, chainId, configuration);
   };
 
   const getGasFees = async (
@@ -99,20 +135,32 @@ export const useWallet = () => {
     value: string,
     data: string,
   ): Promise<IWalletGasEstimation | undefined> => {
-    return await sdk?.Wallet.getGasFees(chainId, from, to, value, data);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.getGasFees(chainId, from, to, value, data);
   };
 
   const getNonce = async (
     address: Address,
     chainId: ChainId,
   ): Promise<number | undefined> => {
-    return await sdk?.Wallet.getNonce(address, chainId);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.getNonce(address, chainId);
   };
 
   const initRecovery = async (
     address: Address,
   ): Promise<IWalletRecovery | undefined> => {
-    return await sdk?.Wallet.initRecovery(address);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.initRecovery(address);
   };
 
   const execRecovery = async (
@@ -122,7 +170,11 @@ export const useWallet = () => {
     bundle: string,
     fromOrigin: string,
   ): Promise<IExecRecovery | undefined> => {
-    return await sdk?.Wallet.execRecovery(
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Wallet.execRecovery(
       organizationId,
       userId,
       passkeyName,
@@ -131,10 +183,14 @@ export const useWallet = () => {
     );
   };
 
-  const getNotifications = async (): Promise<
-    IWalletNotifications | undefined
-  > => {
-    return await sdk?.Wallet.getNotifications();
+  const getNotifications = async (address: Address, chainId: ChainId) => {
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return (await sdk.Notifications.getNotifications(address, chainId)) as
+      | TNotifications
+      | undefined;
   };
 
   return {
