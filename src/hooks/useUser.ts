@@ -7,7 +7,12 @@ export const useUser = () => {
   const { sdk, walletConnectProjectId } = useBrillionContext();
 
   const authenticateUser = (jwt: string) => {
-    return sdk?.authenticateUser(jwt);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+
+    sdk.authenticateUser(jwt);
   };
 
   const login = async (
@@ -15,11 +20,16 @@ export const useUser = () => {
     redirectUrl: string,
     email?: string,
   ) => {
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+
     let uri;
 
     if (provider === AuthProvider.WALLET_CONNECT) {
-      uri = sdk?.generateWalletConnectUri(walletConnectProjectId, redirectUrl);
-      sdk?.onConnectWallet((authUrl: unknown) => {
+      uri = sdk.generateWalletConnectUri(walletConnectProjectId, redirectUrl);
+      sdk.onConnectWallet((authUrl: unknown) => {
         window.location.href = authUrl as string;
       });
     } else {
@@ -28,7 +38,7 @@ export const useUser = () => {
         redirectUrl,
       };
       if (email) params.email = email;
-      uri = await sdk?.generateAuthUrl(params);
+      uri = await sdk.generateAuthUrl(params);
     }
 
     return uri;

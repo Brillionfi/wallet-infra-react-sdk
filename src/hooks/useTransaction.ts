@@ -12,26 +12,42 @@ export const useTransaction = () => {
   const createTransaction = async (
     transaction: ITransactionSigned | ITransactionUnsigned,
   ): Promise<ITransaction | undefined> => {
-    return await sdk?.Transaction.createTransaction(transaction);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Transaction.createTransaction(transaction);
   };
 
   const getTransactionById = async (
     id: string,
   ): Promise<ITransaction | undefined> => {
-    return await sdk?.Transaction.getTransactionById(id);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Transaction.getTransactionById(id);
   };
 
   const cancelTransaction = async (id: string): Promise<void | undefined> => {
-    return await sdk?.Transaction.cancelTransaction(id);
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Transaction.cancelTransaction(id);
   };
 
-  const approveSignTransaction = async (
+  const approveTransaction = async (
     id: string,
     organizationId: string,
     fingerprint: string,
     fromOrigin: string,
   ): Promise<ISignTransactionResponse | undefined> => {
-    return await sdk?.Transaction.approveSignTransaction(
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Transaction.approveSignTransaction(
       id,
       organizationId,
       fingerprint,
@@ -39,13 +55,17 @@ export const useTransaction = () => {
     );
   };
 
-  const rejectSignTransaction = async (
+  const rejectTransaction = async (
     id: string,
     organizationId: string,
     fingerprint: string,
     fromOrigin: string,
   ): Promise<ISignTransactionResponse | undefined> => {
-    return await sdk?.Transaction.rejectSignTransaction(
+    if (!sdk) {
+      console.error("Brillion context not ready");
+      return;
+    }
+    return await sdk.Transaction.rejectSignTransaction(
       id,
       organizationId,
       fingerprint,
@@ -57,7 +77,7 @@ export const useTransaction = () => {
     createTransaction,
     getTransactionById,
     cancelTransaction,
-    approveSignTransaction,
-    rejectSignTransaction,
+    approveTransaction,
+    rejectTransaction,
   };
 };
