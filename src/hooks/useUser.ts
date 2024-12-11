@@ -8,7 +8,7 @@ export const useUser = () => {
 
   const authenticateUser = (jwt: string) => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
 
@@ -21,7 +21,7 @@ export const useUser = () => {
     email?: string,
   ) => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
 

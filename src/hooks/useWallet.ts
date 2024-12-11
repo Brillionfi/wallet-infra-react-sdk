@@ -20,7 +20,7 @@ export const useWallet = () => {
 
   const createWallet = async (data: IWallet): Promise<IWallet | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.createWallet(data);
@@ -30,7 +30,7 @@ export const useWallet = () => {
     queryKey: ["wallets"],
     queryFn: async () => {
       if (!sdk) {
-        console.error("Brillion context not ready");
+        console.error("AppId is not loaded");
         return;
       }
       return (await sdk.Wallet.getWallets()) as IWallet[];
@@ -43,7 +43,7 @@ export const useWallet = () => {
     fromOrigin: string,
   ): Promise<IWalletSignTransactionResponse | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.signTransaction(address, data, fromOrigin);
@@ -56,7 +56,7 @@ export const useWallet = () => {
     fromOrigin: string,
   ): Promise<IWalletSignTransactionResponse | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.approveTransaction(
@@ -74,7 +74,7 @@ export const useWallet = () => {
     fromOrigin: string,
   ): Promise<IWalletSignTransactionResponse | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.rejectTransaction(
@@ -94,7 +94,7 @@ export const useWallet = () => {
     { transactions: Partial<ITransaction>[]; currentPage: number } | undefined
   > => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.getTransactionHistory(
@@ -110,7 +110,7 @@ export const useWallet = () => {
     chainId: ChainId,
   ): Promise<IWalletGasConfiguration | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.getGasConfig(address, chainId);
@@ -122,7 +122,7 @@ export const useWallet = () => {
     configuration: IWalletGasConfiguration,
   ): Promise<IWalletGasConfigurationAPI | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.setGasConfig(address, chainId, configuration);
@@ -136,7 +136,7 @@ export const useWallet = () => {
     data: string,
   ): Promise<IWalletGasEstimation | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.getGasFees(chainId, from, to, value, data);
@@ -147,7 +147,7 @@ export const useWallet = () => {
     chainId: ChainId,
   ): Promise<number | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.getNonce(address, chainId);
@@ -157,7 +157,7 @@ export const useWallet = () => {
     address: Address,
   ): Promise<IWalletRecovery | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.initRecovery(address);
@@ -171,7 +171,7 @@ export const useWallet = () => {
     fromOrigin: string,
   ): Promise<IExecRecovery | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.execRecovery(
@@ -185,7 +185,7 @@ export const useWallet = () => {
 
   const getNotifications = async (address: Address, chainId: ChainId) => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return (await sdk.Notifications.getNotifications(address, chainId)) as

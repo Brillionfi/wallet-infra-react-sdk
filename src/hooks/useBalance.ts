@@ -11,7 +11,7 @@ export const useBalance = (address?: Address, chainId?: ChainId) => {
     queryFn: async () => {
       if (!chainId || !address) throw new Error("Missing chainId or address");
       if (!sdk) {
-        console.error("Brillion context not ready");
+        console.error("AppId is not loaded");
         return;
       }
 
@@ -23,7 +23,7 @@ export const useBalance = (address?: Address, chainId?: ChainId) => {
 
   const getBalances = async (address: Address, chainId: ChainId) => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     const response = await sdk.Wallet.getPortfolio(address, chainId);
@@ -35,7 +35,7 @@ export const useBalance = (address?: Address, chainId?: ChainId) => {
     chainId: ChainId,
   ): Promise<IWalletPortfolio | undefined> => {
     if (!sdk) {
-      console.error("Brillion context not ready");
+      console.error("AppId is not loaded");
       return;
     }
     return await sdk.Wallet.getPortfolio(address, chainId);
