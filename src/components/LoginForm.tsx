@@ -23,10 +23,11 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     try {
       const url = await login(provider, redirectUrl, email);
       if (url) {
-        if(redirect)  
+        if(redirect){
           window.location.href = url;
-        else
+        }else{
           QRCodeModal.open(url, () => {});
+        }
       }
     } catch (error) {
       setErrorText((error as Error).message);
