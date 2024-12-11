@@ -33,7 +33,7 @@ export const useWallet = () => {
         console.error("Brillion context not ready");
         return;
       }
-      return await sdk.Wallet.getWallets() as IWallet[];
+      return (await sdk.Wallet.getWallets()) as IWallet[];
     },
   });
 
@@ -188,7 +188,9 @@ export const useWallet = () => {
       console.error("Brillion context not ready");
       return;
     }
-    return await sdk.Notifications.getNotifications(address, chainId) as TNotifications | undefined;
+    return (await sdk.Notifications.getNotifications(address, chainId)) as
+      | TNotifications
+      | undefined;
   };
 
   return {
