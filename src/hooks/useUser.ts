@@ -8,8 +8,7 @@ export const useUser = () => {
 
   const authenticateUser = (jwt: string) => {
     if (!sdk) {
-      console.error("AppId is not loaded");
-      return;
+      throw new Error("AppId is not valid");
     }
 
     sdk.authenticateUser(jwt);
@@ -21,8 +20,7 @@ export const useUser = () => {
     email?: string,
   ) => {
     if (!sdk) {
-      console.error("AppId is not loaded");
-      return;
+      throw new Error("AppId is not valid");
     }
 
     let uri;

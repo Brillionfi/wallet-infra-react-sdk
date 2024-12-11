@@ -11,8 +11,7 @@ export const useBalance = (address?: Address, chainId?: ChainId) => {
     queryFn: async () => {
       if (!chainId || !address) throw new Error("Missing chainId or address");
       if (!sdk) {
-        console.error("AppId is not loaded");
-        return;
+        throw new Error("AppId is not valid");
       }
 
       const response = await sdk.Wallet.getPortfolio(address, chainId);
@@ -23,8 +22,7 @@ export const useBalance = (address?: Address, chainId?: ChainId) => {
 
   const getBalances = async (address: Address, chainId: ChainId) => {
     if (!sdk) {
-      console.error("AppId is not loaded");
-      return;
+      throw new Error("AppId is not valid");
     }
     const response = await sdk.Wallet.getPortfolio(address, chainId);
     return response?.portfolio || [];
@@ -35,8 +33,7 @@ export const useBalance = (address?: Address, chainId?: ChainId) => {
     chainId: ChainId,
   ): Promise<IWalletPortfolio | undefined> => {
     if (!sdk) {
-      console.error("AppId is not loaded");
-      return;
+      throw new Error("AppId is not valid");
     }
     return await sdk.Wallet.getPortfolio(address, chainId);
   };

@@ -6,6 +6,8 @@ export type TCustomProps = {
   tittleStyle?: React.CSSProperties;
   tittleText?: string;
   buttonText?: string;
+  errorContainerStyle?: React.CSSProperties;
+  errorTextStyle?: React.CSSProperties;
 };
 
 const container: React.CSSProperties = {
@@ -60,10 +62,20 @@ const tittle: React.CSSProperties = {
   color: "#fff",
 }
 
+const errorContainer: React.CSSProperties = {
+  marginTop: "1rem",
+}
+
+const errorStyle: React.CSSProperties = {  
+  color: "red",
+}
+
 export const defaultStyles = {
   container,
   buttonsContainer,
   button,
   buttonText,
-  tittle
+  tittle,
+  errorContainer,
+  errorStyle,
 }
