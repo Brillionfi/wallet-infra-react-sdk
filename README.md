@@ -61,6 +61,8 @@ If you want to personalize this login form, you can easily put your own styles o
   5) `buttonStyle?: React.CSSProperties;`
   6) `buttonTextStyle?: React.CSSProperties;`
   7) `buttonText?: string;`
+  8) `errorContainerStyle?: React.CSSProperties;`
+  9) `errorTextStyle?: React.CSSProperties;`
 
 Note: you can leave some/all of these blank to have default styles
 

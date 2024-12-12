@@ -23,10 +23,11 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     try {
       const url = await login(provider, redirectUrl, email);
       if (url) {
-        redirect ? 
-          window.location.href = url 
-        : 
+        if(redirect){
+          window.location.href = url;
+        }else{
           QRCodeModal.open(url, () => {});
+        }
       }
     } catch (error) {
       setErrorText((error as Error).message);
@@ -44,7 +45,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     },
     {
       label: LoginMethods.Discord,
-      icon: <TwitterLogo />,
+      icon: <DiscordLogo />,
       disabled: false,
       onClick: async () => {
         await makeLogin(AuthProvider.DISCORD, redirectUrl, true);
@@ -52,7 +53,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
     },
     {
       label: LoginMethods.Twitter,
-      icon: <DiscordLogo />,
+      icon: <TwitterLogo />,
       disabled: false,
       onClick: async () => {
         await makeLogin(AuthProvider.TWITTER, redirectUrl, true);
