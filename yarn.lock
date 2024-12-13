@@ -86,10 +86,10 @@
   resolved "https://registry.yarnpkg.com/@brillionfi/quill-core/-/quill-core-0.0.28.tgz#43c3ec59f81e3ff70831aa4e244ea7967187371d"
   integrity sha512-v8M1pmDlNdEL3KMxLloSgwhco5IMWcJy4Jwzhz6znug27h6/AGoRJKJ3ktFN5qdxtZ5HYi6YBo372uuR7altVQ==
 
-"@brillionfi/wallet-infra-sdk@^0.15.16-e0f6c50.0":
-  version "0.15.16-e0f6c50.0"
-  resolved "https://registry.yarnpkg.com/@brillionfi/wallet-infra-sdk/-/wallet-infra-sdk-0.15.16-e0f6c50.0.tgz#ee454bc20b848dbfd78aeda9f89e0db55ca30e44"
-  integrity sha512-KgU5VD2FfgBycWMDQgPDM1P05AcHfJOVGNGiUI+Vna1GBP1Jt+29PL19W3FrKTraVTmjXJUxeo9nBZbkisK4BA==
+"@brillionfi/wallet-infra-sdk@0.15.18-67c3e09.0":
+  version "0.15.18-67c3e09.0"
+  resolved "https://registry.yarnpkg.com/@brillionfi/wallet-infra-sdk/-/wallet-infra-sdk-0.15.18-67c3e09.0.tgz#fea9380f3686ea8e6d54f57d68e1349f8da5ba4c"
+  integrity sha512-v7WNwLwOV0FmYWxnlAbvw/wf+mdAjOUHrhYuTmcTWYy8DzVvL6q6JhvaaFfbWhzQTPDF4Hv82eMwMNnEjDSztQ==
   dependencies:
     "@metamask/sdk" "^0.30.3"
     "@nexeraid/identity-sdk" "1.2.32"

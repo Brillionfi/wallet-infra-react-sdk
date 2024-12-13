@@ -1,11 +1,12 @@
 export type TCustomProps = {
   buttonStyle?: React.CSSProperties;
   buttonTextStyle?: React.CSSProperties;
+  buttonIconStyle?: React.CSSProperties;
   buttonsContainerStyle?: React.CSSProperties;
+  buttonText?: string;
   containerStyle?: React.CSSProperties;
   tittleStyle?: React.CSSProperties;
   tittleText?: string;
-  buttonText?: string;
   errorContainerStyle?: React.CSSProperties;
   errorTextStyle?: React.CSSProperties;
 };
@@ -41,14 +42,14 @@ const button: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "left",
   gap: "7px",
-  // hover: {
-  //   background: "#343633",
-  //   color: "#b4b4b4",
-  //   borderColor: "#343633"
-  // }
 };
 
-const buttonText: React.CSSProperties = {
+const buttonIconStyle: React.CSSProperties = {
+  width: '20px', 
+  height: '20px'
+};
+
+const buttonTextStyle: React.CSSProperties = {
   fontSize: "0.875rem",
   fontWeight: "bold",
   lineHeight: "16.44px",
@@ -74,7 +75,8 @@ export const defaultStyles = {
   container,
   buttonsContainer,
   button,
-  buttonText,
+  buttonIconStyle,
+  buttonTextStyle,
   tittle,
   errorContainer,
   errorStyle,

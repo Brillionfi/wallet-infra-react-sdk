@@ -26,7 +26,10 @@ export const useUser = () => {
     let uri;
 
     if (provider === AuthProvider.WALLET_CONNECT) {
-      uri = sdk.generateWalletConnectUri(walletConnectProjectId, redirectUrl);
+      uri = await sdk.generateWalletConnectUri(
+        walletConnectProjectId,
+        redirectUrl,
+      );
       sdk.onConnectWallet((authUrl: unknown) => {
         window.location.href = authUrl as string;
       });

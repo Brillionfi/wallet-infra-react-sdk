@@ -1,6 +1,6 @@
-export default function Logo() {
+export default function MetamaskLogo() {
   return (
-    <svg width="25px" height="25px" viewBox="0 0 256 240" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+    <svg width="25px" height="25px" viewBox="0 0 256 240" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" style={{ width: 'inherit', height: 'inherit' }}>
       <title>MetaMask</title>
       <g>
           <polygon fill="#E17726" points="250.066018 -8.89651791e-15 140.218553 81.2793133 160.645643 33.3787726"></polygon>

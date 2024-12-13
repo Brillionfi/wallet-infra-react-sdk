@@ -2,6 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { BrillionContext } from "./BrillionContext";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
 }) => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
+  const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
   const [walletConnectProjectId, setWalletConnectProjectId] = useState<string>("");
 
   useEffect(() => {
@@ -37,7 +39,9 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
       <BrillionContext.Provider value={{
         sdk, 
         walletConnectProjectId,
-        isReady
+        isReady,
+        chain,
+        changeChain: (chain: SUPPORTED_CHAINS) => setChain(chain),
       }}>
         {children}
       </BrillionContext.Provider>
