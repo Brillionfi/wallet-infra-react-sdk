@@ -9,7 +9,7 @@ import WalletConnectLogo from "@/components/icons/walletconnect-logo";
 import EmailLogo from "@/components/icons/email-logo";
 import { useState } from "react";
 import QRCodeModal from "@walletconnect/qrcode-modal"; 
-import { defaultStyles, TCustomProps } from "@/components/LoginFormStyles";
+import { defaultStyles, TCustomProps } from "@/components/LoginForm/LoginFormStyles";
 
 export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethods: LoginMethods[], redirectUrl: string, customProps?: TCustomProps}) => {
   const { login } = useUser();
@@ -31,6 +31,7 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
       }
     } catch (error) {
       setErrorText((error as Error).message);
+      QRCodeModal.close();
     }
   }
 
@@ -162,6 +163,8 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
   const tittleText = customProps?.tittleText ? customProps.tittleText : "Welcome";
   const buttonsContainerStyle = customProps?.buttonsContainerStyle ? customProps.buttonsContainerStyle : defaultStyles.buttonsContainer;
   const buttonStyle = customProps?.buttonStyle ? customProps.buttonStyle : defaultStyles.button;
+  const buttonIconStyle = customProps?.buttonIconStyle ? customProps.buttonIconStyle : defaultStyles.buttonIconStyle;
+  const buttonTextStyle = customProps?.buttonTextStyle ? customProps.buttonTextStyle : defaultStyles.buttonTextStyle;
   const buttonText = customProps?.buttonText ? customProps.buttonText : "Continue with";
   const errorContainerStyle = customProps?.errorContainerStyle ? customProps.errorContainerStyle : defaultStyles.errorContainer;
   const errorTextStyle = customProps?.errorTextStyle ? customProps.errorTextStyle : defaultStyles.errorStyle;
@@ -177,7 +180,6 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
           <button
             key={`login-option-${option.label!.toLocaleLowerCase()}`}
             id={`login-option-${option.label!.toLocaleLowerCase()}`}
-            className="loginButton"
             style={{
               ...buttonStyle,
               cursor: option.disabled ? "not-allowed" : "pointer",
@@ -185,8 +187,10 @@ export const LoginForm = ({loginMethods, redirectUrl, customProps}: {loginMethod
             disabled={option.disabled}
             onClick={option.onClick}
           >
-            {option.icon}
-            <span style={defaultStyles.buttonText}>
+            <span style={buttonIconStyle}>
+              {option.icon}
+            </span>
+            <span style={buttonTextStyle}>
               {buttonText} {option.label}
             </span>
           </button>

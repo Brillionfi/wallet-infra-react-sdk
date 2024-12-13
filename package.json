@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@brillionfi/quill-core": "^0.0.28",
-    "@brillionfi/wallet-infra-sdk": "^0.15.16-e0f6c50.0",
+    "@brillionfi/wallet-infra-sdk": "0.15.18-67c3e09.0",
     "@tanstack/react-query": "^5.62.2",
     "@walletconnect/qrcode-modal": "^1.8.0",
     "pino-pretty": "^13.0.0"
