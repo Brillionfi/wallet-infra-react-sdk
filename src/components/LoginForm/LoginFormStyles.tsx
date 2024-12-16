@@ -10,11 +10,14 @@ export type TCustomStyles = {
 
 const container: React.CSSProperties = {
   backgroundColor: "#FCFCFC",
+  borderRadius: "16px",
+  border: "1px solid #E8E8E8",
   display: "flex",
-  width: "100%",
-  flexDirection: "column",
   alignItems: "center",
-  padding: "1rem",
+  flexDirection: "column",
+  padding: "2rem",
+  width: "314px",
+  minHeight: "436px",
 };
 
 const errorContainer: React.CSSProperties = {

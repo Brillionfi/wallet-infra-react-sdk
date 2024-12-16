@@ -5,19 +5,16 @@ export type TCustomStyles = {
 };
 
 const footer: React.CSSProperties = {
-  backgroundColor: "#FCFCFC",
   display: "flex",
   width: "100%",
-  flexDirection: "column",
+  justifyContent: "center",
   alignItems: "center",
-  padding: "1rem",
+  marginTop: "auto",
 };
 
 const footerText: React.CSSProperties = {
-  marginBottom: "1rem",
-  fontSize: "2.25rem",
-  fontWeight: "bold",
-  color: "#fff",
+  fontSize: "0.8rem",
+  color: "#838383",
 }
 
 export const defaultStyles = {

@@ -6,26 +6,24 @@ export type TCustomStyles = {
 };
 
 const header: React.CSSProperties = {
-  backgroundColor: "#FCFCFC",
-  display: "flex",
   width: "100%",
-  flexDirection: "column",
+  display: "flex",
+  justifyContent: "space-between",
   alignItems: "center",
-  padding: "1rem",
+  marginBottom: "1rem",
 };
 
 const headerText: React.CSSProperties = {
-  marginBottom: "1rem",
-  fontSize: "2.25rem",
-  fontWeight: "bold",
-  color: "#fff",
+  fontSize: "1.2rem",
+  color: "#000",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "0.8rem",
 }
 
 const close: React.CSSProperties = {
-  marginBottom: "1rem",
-  fontSize: "2.25rem",
-  fontWeight: "bold",
-  color: "#fff",
+  color: "#000",
 }
 
 export const defaultStyles = {

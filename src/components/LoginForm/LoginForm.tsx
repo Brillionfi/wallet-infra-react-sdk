@@ -8,6 +8,7 @@ import { Content } from "@/components/LoginForm/Content/Content";
 export const LoginForm = ({loginMethods, redirectUrl, onClose, customStyles}: {loginMethods: LoginMethods[], redirectUrl: string, onClose: () => void, customStyles?: TCustomStyles}) => {
 
   const [errorText, setErrorText] = useState<string>("");
+  const [showInnerContent, setShowInnerContent] = useState<boolean>(false);
 
   const containerStyle = customStyles?.containerStyle ?? defaultStyles.container;
   const errorContainerStyle = customStyles?.errorContainerStyle ?? defaultStyles.errorContainer;
@@ -15,16 +16,30 @@ export const LoginForm = ({loginMethods, redirectUrl, onClose, customStyles}: {l
 
   return (
     <div style={containerStyle}>
-      <Header onClose={onClose} customStyles={customStyles}/>
+      <Header 
+        onClose={showInnerContent ? () => setShowInnerContent(false) : onClose} 
+        customStyles={
+          {
+            ...customStyles, 
+            headerText: showInnerContent? "Select wallet" : "Sign in"
+          }
+        }
+      />
+
+      <Content 
+        loginMethods={loginMethods} 
+        redirectUrl={redirectUrl} 
+        setErrorText={setErrorText} 
+        customStyles={customStyles} 
+        showInnerContent={showInnerContent}
+        toggleInnerContent={() => setShowInnerContent(!showInnerContent)}
+      />
 
       <section style={errorContainerStyle}>
         <span style={errorTextStyle}>
           {errorText}
         </span>
       </section>
-
-      <Content loginMethods={loginMethods} redirectUrl={redirectUrl} setErrorText={setErrorText} customStyles={customStyles}/>
-            
       <Footer customStyles={customStyles}/>
     </div>
   );
