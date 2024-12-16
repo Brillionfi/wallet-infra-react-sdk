@@ -1,6 +1,6 @@
-import {TCustomStyles as TCustomContentStyles} from '@/components/LoginForm/Content/ContentStyles';
-import {TCustomStyles as TCustomHeaderStyles} from '@/components/LoginForm/Header/HeaderStyles';
-import {TCustomStyles as TCustomFooterStyles} from '@/components/LoginForm/Footer/FooterStyles';
+import {defaultStyles as defaultContentStyles, TCustomStyles as TCustomContentStyles} from '@/components/LoginForm/Content/ContentStyles';
+import {defaultStyles as defaultHeaderStyles, TCustomStyles as TCustomHeaderStyles} from '@/components/LoginForm/Header/HeaderStyles';
+import {defaultStyles as defaultFooterStyles, TCustomStyles as TCustomFooterStyles} from '@/components/LoginForm/Footer/FooterStyles';
 
 export type TCustomStyles = {
   containerStyle?: React.CSSProperties;
@@ -29,6 +29,9 @@ const errorStyle: React.CSSProperties = {
 }
 
 export const defaultStyles = {
+  ...defaultContentStyles,
+  ...defaultHeaderStyles,
+  ...defaultFooterStyles,
   container,
   errorContainer,
   errorStyle,
