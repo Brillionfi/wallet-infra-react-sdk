@@ -52,17 +52,37 @@ const MyLoginPage = () => {
 
 ###  Login Form Customizations
 
-If you want to personalize this login form, you can easily put your own styles or add/override default styles.
-
+If you want to personalize this login form, you can easily put your own styles or add/override default styles. Separated by sections:
+- Main Container:
   1) `containerStyle?: React.CSSProperties;`
-  2) `tittleStyle?: React.CSSProperties;`
-  3) `tittleText?: string;`
-  4) `buttonsContainerStyle?: React.CSSProperties;`
-  5) `buttonStyle?: React.CSSProperties;`
-  6) `buttonTextStyle?: React.CSSProperties;`
-  7) `buttonText?: string;`
-  8) `errorContainerStyle?: React.CSSProperties;`
-  9) `errorTextStyle?: React.CSSProperties;`
+- Header:
+  1) `headerStyle?: React.CSSProperties;`
+  2) `headerTextStyle?: React.CSSProperties;`
+  3) `headerText?: string;`
+  4) `closeStyle?: React.CSSProperties;`
+- Content Container: 
+  1) `contentContainerStyle?: React.CSSProperties;`
+  2) `buttonStyle?: React.CSSProperties;`
+  3) `buttonIconStyle?: React.CSSProperties;`
+  4) `buttonTextStyle?: React.CSSProperties;`
+  5) `inputContainerStyle?: React.CSSProperties;`
+  6) `inputStyle?: React.CSSProperties;`
+  7) `inputNextStyle?: React.CSSProperties;`
+  8) `socialButtonsContainerStyle?: React.CSSProperties;`
+  9) `socialButtonStyle?: React.CSSProperties;`
+  10) `socialButtonIconStyle?: React.CSSProperties;`
+  11) `otpButtonsContainerStyle?: React.CSSProperties;`
+  12) `walletButtonsContainerStyle?: React.CSSProperties;`
+  13) `walletButtonStyle?: React.CSSProperties;`
+  14) `walletButtonIconStyle?: React.CSSProperties;`
+  15) `walletButtonTextStyle?: React.CSSProperties;`
+- Error Container: 
+  1) `errorContainerStyle?: React.CSSProperties;`
+  2) `errorTextStyle?: React.CSSProperties;`
+- Footer: 
+  1) `footerStyle?: React.CSSProperties;`
+  2) `footerTextStyle?: React.CSSProperties;`
+  3) `footerText?: string;`
 
 Note: you can leave some/all of these blank to have default styles
 
@@ -86,15 +106,15 @@ const MyLoginPage = () => {
           LoginMethods.Email
         ]} 
         redirectUrl="http://localhost:3000"
-        customProps={{
+        customStyles={{
           containerStyle: {
             ...defaultStyles.container,
           },
-          tittleStyle: {
-            ...defaultStyles.tittle,
+          headerStyle: {
+            ...defaultStyles.header,
             textAlign: "center",
           },
-          tittleText: "Login to your wallet",
+          headerText: "Login to your wallet",
         }}
       />
     </BrillionProvider>

@@ -1,15 +1,13 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 
-export type TLoginOptions = {
+export type TLoginOption = {
   label: LoginMethods;
   icon?: JSX.Element;
-  disabled?: boolean;
-  onClick?: () => void;
-  html?: JSX.Element;
-}[];
+  onClick?: (loginAs?: string) => void;
+};
 
 export interface ILoginOptions {
-  loginOptions: TLoginOptions;
+  loginOptions: TLoginOption[];
 }
 
 export enum LoginMethods {
