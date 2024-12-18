@@ -8,6 +8,8 @@ export type BrillionContextType = {
   isReady: boolean;
   chain: SUPPORTED_CHAINS;
   wallet: string;
+  sessionInfo: Record<string, string>;
+  setSessionInfo: (payload: Record<string, string>) => void,
   changeChain: (chain: SUPPORTED_CHAINS) => void;
   changeWallet: (wallet: string) => void;
 };
@@ -18,6 +20,8 @@ export const BrillionContext = createContext<BrillionContextType>({
   isReady: false,
   chain: SUPPORTED_CHAINS.ETHEREUM,
   wallet: "",
+  sessionInfo: {},
+  setSessionInfo: () => {},
   changeChain: () => {},
   changeWallet: () => {},
 });

@@ -133,9 +133,23 @@ We provide several hooks for you to easily interact with Brillion (more coming..
 
 import { useBalance, useTransaction, useUser, useWallet, useBrillionContext } from "@brillionfi/waas-react-sdk";
 
-const { sdk, isReady, chain, changeChain } = useBrillionContext();
+const {
+  sdk,
+  walletConnectProjectId,
+  isReady,
+  chain,
+  wallet,
+  sessionInfo,
+  setSessionInfo,
+  changeChain,
+  changeWallet,
+ } = useBrillionContext();
 
-const { balances, getBalances, getPortfolio } = useBalance("wallet address", "chainId");
+const { 
+  balances, 
+  getBalances, 
+  getPortfolio 
+} = useBalance();
 
 const { 
   createTransaction,

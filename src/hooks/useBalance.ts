@@ -3,21 +3,21 @@ import { IWalletPortfolio } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { useQuery } from "@tanstack/react-query";
 import { useBrillionContext } from "components/BrillionContext";
 
-export const useBalance = (address?: Address, chainId?: ChainId) => {
-  const { sdk } = useBrillionContext();
+export const useBalance = () => {
+  const { sdk, wallet, chain } = useBrillionContext();
 
   const balances = useQuery({
-    queryKey: ["balances", chainId, address],
+    queryKey: ["balances", chain, wallet],
     queryFn: async () => {
-      if (!chainId || !address) throw new Error("Missing chainId or address");
+      if (!chain || !wallet) throw new Error("Missing chain or wallet");
       if (!sdk) {
         throw new Error("AppId is not valid");
       }
 
-      const response = await sdk.Wallet.getPortfolio(address, chainId);
+      const response = await sdk.Wallet.getPortfolio(wallet, chain);
       return response?.portfolio || [];
     },
-    enabled: !!chainId && !!address,
+    enabled: !!chain && !!wallet,
   });
 
   const getBalances = async (address: Address, chainId: ChainId) => {

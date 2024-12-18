@@ -25,6 +25,7 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
   const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
   const [wallet, setWallet] = useState<string>("");
+  const [sessionInfo, setSessionInfo] = useState<Record<string,string>>({});
   const [walletConnectProjectId, setWalletConnectProjectId] = useState<string>("");
 
   useEffect(() => {
@@ -49,8 +50,10 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
         isReady,
         chain,
         wallet,
+        sessionInfo,
         changeChain: (chain: SUPPORTED_CHAINS) => setChain(chain),
         changeWallet: (wallet: string) => setWallet(wallet),
+        setSessionInfo: (sessionInfo: Record<string, string>)=> setSessionInfo(sessionInfo)
       }}>
         {children}
       </BrillionContext.Provider>
