@@ -42,8 +42,8 @@ export const useTransaction = () => {
         });
         await tx.wait();
 
-        const response = {
-          transactionType: "unsigned" as "unsigned",
+        const response: ITransaction = {
+          transactionType: "unsigned",
           transactionId: tx.hash,
           transactionHash: tx.hash,
           signedTx: "",
@@ -66,7 +66,7 @@ export const useTransaction = () => {
 
         return response;
       } catch (error) {
-        throw new Error("Transaction failed");
+        throw new Error("Transaction failed: " + error);
       }
     } else {
       return await sdk.Transaction.createTransaction(transaction);
