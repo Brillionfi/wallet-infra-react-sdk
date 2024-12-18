@@ -10,6 +10,7 @@ type BrillionProviderProps = {
   appId: string;
   baseUrl: string;
   WCProjectId?: string;
+  defaultChain?: SUPPORTED_CHAINS;
   children: ReactNode;
 };
 
@@ -17,11 +18,13 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   appId,
   baseUrl,
   WCProjectId,
+  defaultChain,
   children,
 }) => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
   const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
+  const [wallet, setWallet] = useState<string>("");
   const [walletConnectProjectId, setWalletConnectProjectId] = useState<string>("");
 
   useEffect(() => {
@@ -34,6 +37,10 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
     if(WCProjectId) setWalletConnectProjectId(WCProjectId);
   }, [WCProjectId]);
 
+  useEffect(() => {
+    if(defaultChain) setChain(defaultChain ?? SUPPORTED_CHAINS.ETHEREUM);
+  }, [defaultChain]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrillionContext.Provider value={{
@@ -41,7 +48,9 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
         walletConnectProjectId,
         isReady,
         chain,
+        wallet,
         changeChain: (chain: SUPPORTED_CHAINS) => setChain(chain),
+        changeWallet: (wallet: string) => setWallet(wallet),
       }}>
         {children}
       </BrillionContext.Provider>

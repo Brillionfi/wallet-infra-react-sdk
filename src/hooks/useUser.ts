@@ -1,17 +1,22 @@
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { IAuthURLParams } from "@brillionfi/wallet-infra-sdk/dist/models";
-
-import { useBrillionContext } from "../components/BrillionContext";
+import { useBrillionContext } from "@/components/BrillionContext";
 
 export const useUser = () => {
-  const { sdk, walletConnectProjectId } = useBrillionContext();
+  const { sdk, walletConnectProjectId, changeWallet } = useBrillionContext();
 
-  const authenticateUser = (jwt: string) => {
+  const authenticateUser = async (jwt: string) => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
 
     sdk.authenticateUser(jwt);
+    
+    const wallets = await sdk.Wallet.getWallets();
+
+    if(wallets[0]){
+      changeWallet(wallets[0].address ?? "");
+    }
   };
 
   const login = async (

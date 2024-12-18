@@ -1,11 +1,11 @@
 import { useBalance } from "hooks";
 import { useEffect, useState } from "react";
-import { defaultAssetsTableStyles, TAssetsTableCustomProps } from "@/components/AssetsTable/AssetsTableStyles";
+import { defaultAssetsTableStyles, TCustomAssetsTableStyles } from "@/components/AssetsTable/AssetsTableStyles";
 import { Address } from "@brillionfi/wallet-infra-sdk";
 import { IWalletPortfolio } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { useBrillionContext } from "../BrillionContext";
 
-export const AssetsTable = ({address, customProps}: {address: Address, customProps?: TAssetsTableCustomProps}) => {
+export const AssetsTable = ({address, customStyles}: {address: Address, customStyles?: TCustomAssetsTableStyles}) => {
   const { chain } = useBrillionContext();
   const { getPortfolio } = useBalance();
 
@@ -26,20 +26,20 @@ export const AssetsTable = ({address, customProps}: {address: Address, customPro
     if(address && chain) loadBalances();
   }, [address, chain])
 
-  const containerStyle = customProps?.containerStyle ? customProps.containerStyle : defaultAssetsTableStyles.container;
-  const assetsListStyle = customProps?.assetsListStyle ? customProps.assetsListStyle : defaultAssetsTableStyles.assetsList;
-  const assetStyle = customProps?.assetStyle ? customProps.assetStyle : defaultAssetsTableStyles.asset;
+  const containerStyle = customStyles?.containerStyle ? customStyles.containerStyle : defaultAssetsTableStyles.container;
+  const assetsListStyle = customStyles?.assetsListStyle ? customStyles.assetsListStyle : defaultAssetsTableStyles.assetsList;
+  const assetStyle = customStyles?.assetStyle ? customStyles.assetStyle : defaultAssetsTableStyles.asset;
 
-  const assetLeftContainerStyle = customProps?.assetLeftContainerStyle ? customProps.assetLeftContainerStyle : defaultAssetsTableStyles.assetLeftContainerStyle;
-  const assetNameStyle = customProps?.assetNameStyle ? customProps.assetNameStyle : defaultAssetsTableStyles.assetNameStyle;
-  const assetAddressStyle = customProps?.assetAddressStyle ? customProps.assetAddressStyle : defaultAssetsTableStyles.assetAddressStyle;
+  const assetLeftContainerStyle = customStyles?.assetLeftContainerStyle ? customStyles.assetLeftContainerStyle : defaultAssetsTableStyles.assetLeftContainerStyle;
+  const assetNameStyle = customStyles?.assetNameStyle ? customStyles.assetNameStyle : defaultAssetsTableStyles.assetNameStyle;
+  const assetAddressStyle = customStyles?.assetAddressStyle ? customStyles.assetAddressStyle : defaultAssetsTableStyles.assetAddressStyle;
   
-  const assetRightContainerStyle = customProps?.assetRightContainerStyle ? customProps.assetRightContainerStyle : defaultAssetsTableStyles.assetRightContainerStyle;
-  const assetMoneyStyle = customProps?.assetMoneyStyle ? customProps.assetMoneyStyle : defaultAssetsTableStyles.assetMoneyStyle;
-  const assetBalanceStyle = customProps?.assetBalanceStyle ? customProps.assetBalanceStyle : defaultAssetsTableStyles.assetBalanceStyle;
+  const assetRightContainerStyle = customStyles?.assetRightContainerStyle ? customStyles.assetRightContainerStyle : defaultAssetsTableStyles.assetRightContainerStyle;
+  const assetMoneyStyle = customStyles?.assetMoneyStyle ? customStyles.assetMoneyStyle : defaultAssetsTableStyles.assetMoneyStyle;
+  const assetBalanceStyle = customStyles?.assetBalanceStyle ? customStyles.assetBalanceStyle : defaultAssetsTableStyles.assetBalanceStyle;
 
-  const errorContainerStyle = customProps?.errorContainerStyle ? customProps.errorContainerStyle : defaultAssetsTableStyles.errorContainer;
-  const errorTextStyle = customProps?.errorTextStyle ? customProps.errorTextStyle : defaultAssetsTableStyles.errorText;
+  const errorContainerStyle = customStyles?.errorContainerStyle ? customStyles.errorContainerStyle : defaultAssetsTableStyles.errorContainer;
+  const errorTextStyle = customStyles?.errorTextStyle ? customStyles.errorTextStyle : defaultAssetsTableStyles.errorText;
 
   return (
     <div style={containerStyle}>

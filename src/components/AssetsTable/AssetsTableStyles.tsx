@@ -1,4 +1,4 @@
-export type TAssetsTableCustomProps = {
+export type TCustomAssetsTableStyles = {
   containerStyle?: React.CSSProperties;
   assetsListStyle?: React.CSSProperties;
   assetStyle?: React.CSSProperties;
