@@ -23,7 +23,7 @@ export const useWallet = () => {
       throw new Error("AppId is not valid");
     }
     const wallet = await sdk.Wallet.createWallet(data);
-    if(wallet) changeWallet(wallet.address ?? "");
+    if (wallet) changeWallet(wallet.address ?? "");
 
     return wallet;
   };
@@ -174,11 +174,14 @@ export const useWallet = () => {
     );
   };
 
-  const getNotifications = async (address: Address, chainId: ChainId): Promise<TNotifications> => {
+  const getNotifications = async (
+    address: Address,
+    chainId: ChainId,
+  ): Promise<TNotifications> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return await sdk.Notifications.getNotifications(address, chainId)
+    return await sdk.Notifications.getNotifications(address, chainId);
   };
 
   return {

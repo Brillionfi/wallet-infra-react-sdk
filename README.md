@@ -140,7 +140,7 @@ const {
   chain,
   wallet,
   sessionInfo,
-  setSessionInfo,
+  saveSessionInfo,
   changeChain,
   changeWallet,
  } = useBrillionContext();
