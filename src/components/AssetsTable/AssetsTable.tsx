@@ -44,22 +44,25 @@ export const AssetsTable = ({address, customStyles}: {address: Address, customSt
   return (
     <div style={containerStyle}>
       <section style={assetsListStyle}>
-        {assests?.portfolio.map((asset) => (
-          <div
-            key={`asset-${asset.tokenId}`}
-            id={`asset-${asset.tokenId}`}
-            style={assetStyle}
-          >
-            <div style={assetLeftContainerStyle}>
-              <span style={assetNameStyle}>{asset.tokenId}</span>
-              <span style={assetAddressStyle}>{asset.address}</span>
-            </div>
-            <div style={assetRightContainerStyle}>
-              <span style={assetMoneyStyle}>${(BigInt(asset.tokenPriceUsd?.split(".")[0] ?? 0) * BigInt(asset.balance)).toLocaleString()}</span>
-              <span style={assetBalanceStyle}>{asset.balance} {asset.tokenId}</span>
-            </div>
-          </div>
-        ))}
+        {assests?.portfolio.map((asset) => {
+            const balance = Number(asset.balance) / 10 ** Number(asset.decimals ?? 18)
+            const usdBalance = Number(Number(asset.tokenPriceUsd).toFixed(1)) * Number(balance)
+            return (<div
+              key={`asset-${asset.tokenId}`}
+              id={`asset-${asset.tokenId}`}
+              style={assetStyle}
+            >
+              <div style={assetLeftContainerStyle}>
+                <span style={assetNameStyle}>{asset.tokenId}</span>
+                <span style={assetAddressStyle}>{asset.address}</span>
+              </div>
+              <div style={assetRightContainerStyle}>
+                <span style={assetMoneyStyle}>${usdBalance.toString()}</span>
+                <span style={assetBalanceStyle}>{balance.toString()} {asset.tokenId}</span>
+              </div>
+            </div>)
+          }
+        )}
         <section style={errorContainerStyle}>
           <span style={errorTextStyle}>
             {errorText}
