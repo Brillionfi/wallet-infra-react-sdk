@@ -2,7 +2,8 @@ import { ReactNode, useState, useEffect } from "react";
 import { BrillionContext } from "./BrillionContext";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+import { AuthProvider, SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+import MetaMaskSDK from "@metamask/sdk";
 
 const queryClient = new QueryClient();
 
@@ -23,8 +24,10 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
 }) => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
+  const [sdkMM, setSdkMM] = useState<MetaMaskSDK | null>(null);
   const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
   const [wallet, setWallet] = useState<string>("");
+  const [sessionInfo, setSessionInfo] = useState<Record<string,string>>({});
   const [walletConnectProjectId, setWalletConnectProjectId] = useState<string>("");
 
   useEffect(() => {
@@ -41,6 +44,30 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
     if(defaultChain) setChain(defaultChain ?? SUPPORTED_CHAINS.ETHEREUM);
   }, [defaultChain]);
 
+  const changeChain = async (chain: SUPPORTED_CHAINS) => {
+    if(sessionInfo.loggedInVia === AuthProvider.METAMASK){
+      if(!sdkMM) throw new Error('MetaMask is not connected');
+      const ethereum = sdkMM.getProvider(); 
+      if (!ethereum) {
+        throw new Error('No MetaMask provider found');
+      }
+      ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${Number(chain).toString(16)}` }],
+      })
+    }
+    setChain(chain)
+  }
+
+  const saveSessionInfo = (sessionInfo: Record<string, string>) => {
+    if(sessionInfo.loggedInVia === AuthProvider.METAMASK && !sdkMM){
+      const mmSDK = new MetaMaskSDK();
+      void mmSDK.connect();
+      setSdkMM(mmSDK);
+    }
+    setSessionInfo(sessionInfo)
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrillionContext.Provider value={{
@@ -49,8 +76,11 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
         isReady,
         chain,
         wallet,
-        changeChain: (chain: SUPPORTED_CHAINS) => setChain(chain),
+        sessionInfo,
+        sdkMM,
+        changeChain,
         changeWallet: (wallet: string) => setWallet(wallet),
+        saveSessionInfo
       }}>
         {children}
       </BrillionContext.Provider>

@@ -15,7 +15,7 @@ const container: React.CSSProperties = {
 };
 
 const dropdown: React.CSSProperties = {
-  width: "10rem",
+  minWidth: "10rem",
   display: "inline-flex",
   alignItems: "center",
   gap: "1rem",

@@ -1,9 +1,11 @@
+import { useBrillionContext } from "@/components/BrillionContext";
+import { jwtDecode } from "@/utils/jwtDecode";
 import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { IAuthURLParams } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { useBrillionContext } from "@/components/BrillionContext";
 
 export const useUser = () => {
-  const { sdk, walletConnectProjectId, changeWallet } = useBrillionContext();
+  const { sdk, walletConnectProjectId, changeWallet, saveSessionInfo } =
+    useBrillionContext();
 
   const authenticateUser = async (jwt: string) => {
     if (!sdk) {
@@ -11,10 +13,14 @@ export const useUser = () => {
     }
 
     sdk.authenticateUser(jwt);
-    
-    const wallets = await sdk.Wallet.getWallets();
+    const info = JSON.parse(jwtDecode(jwt.split(".")[1])) as Record<
+      string,
+      string
+    >;
+    saveSessionInfo(info);
 
-    if(wallets[0]){
+    const wallets = await sdk.Wallet.getWallets();
+    if (wallets[0]) {
       changeWallet(wallets[0].address ?? "");
     }
   };
