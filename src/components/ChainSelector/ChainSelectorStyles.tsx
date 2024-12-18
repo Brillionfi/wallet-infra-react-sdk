@@ -1,4 +1,4 @@
-export type TChainSelectorCustomProps = {
+export type TCustomChainSelectorStyles = {
   containerStyle?: React.CSSProperties;
   dropdownStyle?: React.CSSProperties;
   dropdownContainerStyle?: React.CSSProperties;
@@ -11,7 +11,6 @@ export type TChainSelectorCustomProps = {
 
 const container: React.CSSProperties = {
   backgroundColor: "#444444",
-  display: "flex",
   padding: "1rem",
 };
 
@@ -39,7 +38,7 @@ const dropdownIcons: React.CSSProperties = {
 
 const dropdownContainer: React.CSSProperties = {
   position: "absolute",
-  marginTop: "2.5rem",
+  // marginTop: "2.5rem",
   zIndex: 2
 }
 

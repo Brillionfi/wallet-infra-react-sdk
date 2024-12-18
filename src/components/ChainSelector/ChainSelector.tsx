@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { defaultChainSelectorStyles, TChainSelectorCustomProps } from "@/components/ChainSelector/ChainSelectorStyles";
+import { defaultChainSelectorStyles, TCustomChainSelectorStyles } from "@/components/ChainSelector/ChainSelectorStyles";
 import { useBrillionContext } from "@/components/BrillionContext";
 import { CHAINS_INFO, IChainSelectorProps, PROD_NETWORKS, TEST_NETWORKS } from "@/interfaces/ChainSelector";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
-export const ChainSelector = ({data, customProps}: {data?: IChainSelectorProps, customProps?: TChainSelectorCustomProps}) => {
+export const ChainSelector = ({data, customStyles}: {data?: IChainSelectorProps, customStyles?: TCustomChainSelectorStyles}) => {
   const { chain, changeChain } = useBrillionContext();
   const [open, setOpen] = useState(false);
 
@@ -21,12 +21,12 @@ export const ChainSelector = ({data, customProps}: {data?: IChainSelectorProps, 
     return filteredChains
   }, [data])
   
-  const containerStyle = customProps?.containerStyle ? customProps.containerStyle : defaultChainSelectorStyles.container;
-  const dropdownStyle = customProps?.dropdownStyle ? customProps.dropdownStyle : defaultChainSelectorStyles.dropdown;
-  const dropdownIconsStyle = customProps?.dropdownIconsStyle ? customProps.dropdownIconsStyle : defaultChainSelectorStyles.dropdownIcons;
-  const dropdownContainerStyle = customProps?.dropdownContainerStyle ? customProps.dropdownContainerStyle : defaultChainSelectorStyles.dropdownContainer;
-  const dropdownListStyle = customProps?.dropdownListStyle ? customProps.dropdownListStyle : defaultChainSelectorStyles.dropdownList;
-  const dropdownOptionStyle = customProps?.dropdownOptionStyle ? customProps.dropdownOptionStyle : defaultChainSelectorStyles.dropdownOption;
+  const containerStyle = customStyles?.containerStyle ? customStyles.containerStyle : defaultChainSelectorStyles.container;
+  const dropdownStyle = customStyles?.dropdownStyle ? customStyles.dropdownStyle : defaultChainSelectorStyles.dropdown;
+  const dropdownIconsStyle = customStyles?.dropdownIconsStyle ? customStyles.dropdownIconsStyle : defaultChainSelectorStyles.dropdownIcons;
+  const dropdownContainerStyle = customStyles?.dropdownContainerStyle ? customStyles.dropdownContainerStyle : defaultChainSelectorStyles.dropdownContainer;
+  const dropdownListStyle = customStyles?.dropdownListStyle ? customStyles.dropdownListStyle : defaultChainSelectorStyles.dropdownList;
+  const dropdownOptionStyle = customStyles?.dropdownOptionStyle ? customStyles.dropdownOptionStyle : defaultChainSelectorStyles.dropdownOption;
 
   return (
     <div style={containerStyle}>

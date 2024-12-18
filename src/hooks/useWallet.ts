@@ -16,13 +16,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useBrillionContext } from "components/BrillionContext";
 
 export const useWallet = () => {
-  const { sdk } = useBrillionContext();
+  const { sdk, changeWallet } = useBrillionContext();
 
   const createWallet = async (data: IWallet): Promise<IWallet | undefined> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return await sdk.Wallet.createWallet(data);
+    const wallet = await sdk.Wallet.createWallet(data);
+    if(wallet) changeWallet(wallet.address ?? "");
+
+    return wallet;
   };
 
   const wallets = useQuery({
@@ -171,13 +174,11 @@ export const useWallet = () => {
     );
   };
 
-  const getNotifications = async (address: Address, chainId: ChainId) => {
+  const getNotifications = async (address: Address, chainId: ChainId): Promise<TNotifications> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return (await sdk.Notifications.getNotifications(address, chainId)) as
-      | TNotifications
-      | undefined;
+    return await sdk.Notifications.getNotifications(address, chainId)
   };
 
   return {

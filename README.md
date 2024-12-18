@@ -24,18 +24,21 @@ First you must wrap your app inside `<BrillionProvider/>` in order to be able to
 This providers has 3 props: 
   - `appId`: Your Brillion App ID.
   - `baseUrl`: Brillion API URL.
+  - `defaultChain`: Your preferred chain to connect first.
   - `WCProjectId`: Your walletConnect Project ID (mandatory only if you are planning to use WalletConnect as login method)
 
 In a React or NextJS project, you can start by importing the LoginForm component:
 
 ```tsx
 import { BrillionProvider, LoginForm, LoginMethods } from "@brillionfi/waas-react-sdk";
+import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
 const MyLoginPage = () => {
   return (
     <BrillionProvider
       appId={"my-brillion-app-id"}
       baseUrl={"brillion-infra-url"}
+      defaultChain={SUPPORTED_CHAINS.ETHEREUM}
     >
       <LoginForm
         redirectUrl="http://localhost:3000"

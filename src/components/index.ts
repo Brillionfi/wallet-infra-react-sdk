@@ -6,3 +6,6 @@ export * from "./AssetsTable/AssetsTable";
 export * from "./AssetsTable/AssetsTableStyles";
 export * from "./ChainSelector/ChainSelector";
 export * from "./ChainSelector/ChainSelectorStyles";
+export * from "./AddressPill/AddressPill";
+export * from "./AddressPill/AddressPillStyles";
+

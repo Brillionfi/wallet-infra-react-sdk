@@ -2,7 +2,7 @@ import {defaultStyles as defaultContentStyles, TCustomStyles as TCustomContentSt
 import {defaultStyles as defaultHeaderStyles, TCustomStyles as TCustomHeaderStyles} from '@/components/LoginForm/Header/HeaderStyles';
 import {defaultStyles as defaultFooterStyles, TCustomStyles as TCustomFooterStyles} from '@/components/LoginForm/Footer/FooterStyles';
 
-export type TCustomStyles = {
+export type TCustomLoginFormStyles = {
   containerStyle?: React.CSSProperties;
   errorContainerStyle?: React.CSSProperties;
   errorTextStyle?: React.CSSProperties;
@@ -28,7 +28,7 @@ const errorStyle: React.CSSProperties = {
   color: "red",
 }
 
-export const defaultStyles = {
+export const defaultLoginFormStyles = {
   ...defaultContentStyles,
   ...defaultHeaderStyles,
   ...defaultFooterStyles,

@@ -1,18 +1,18 @@
 import { LoginMethods } from "interfaces";
 import { useState } from "react";
-import { defaultStyles, TCustomStyles } from "@/components/LoginForm/LoginFormStyles";
+import { defaultLoginFormStyles, TCustomLoginFormStyles } from "@/components/LoginForm/LoginFormStyles";
 import { Header } from "@/components/LoginForm/Header/Header";
 import { Footer } from "@/components/LoginForm/Footer/Footer";
 import { Content } from "@/components/LoginForm/Content/Content";
 
-export const LoginForm = ({loginMethods, redirectUrl, onClose, customStyles}: {loginMethods: LoginMethods[], redirectUrl: string, onClose: () => void, customStyles?: TCustomStyles}) => {
+export const LoginForm = ({loginMethods, redirectUrl, onClose, customStyles}: {loginMethods: LoginMethods[], redirectUrl: string, onClose: () => void, customStyles?: TCustomLoginFormStyles}) => {
 
   const [errorText, setErrorText] = useState<string>("");
   const [showInnerContent, setShowInnerContent] = useState<boolean>(false);
 
-  const containerStyle = customStyles?.containerStyle ?? defaultStyles.container;
-  const errorContainerStyle = customStyles?.errorContainerStyle ?? defaultStyles.errorContainer;
-  const errorTextStyle = customStyles?.errorTextStyle ?? defaultStyles.errorStyle;
+  const containerStyle = customStyles?.containerStyle ?? defaultLoginFormStyles.container;
+  const errorContainerStyle = customStyles?.errorContainerStyle ?? defaultLoginFormStyles.errorContainer;
+  const errorTextStyle = customStyles?.errorTextStyle ?? defaultLoginFormStyles.errorStyle;
 
   return (
     <div style={containerStyle}>

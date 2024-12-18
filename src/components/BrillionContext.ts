@@ -7,7 +7,9 @@ export type BrillionContextType = {
   walletConnectProjectId: string;
   isReady: boolean;
   chain: SUPPORTED_CHAINS;
+  wallet: string;
   changeChain: (chain: SUPPORTED_CHAINS) => void;
+  changeWallet: (wallet: string) => void;
 };
 
 export const BrillionContext = createContext<BrillionContextType>({
@@ -15,7 +17,9 @@ export const BrillionContext = createContext<BrillionContextType>({
   walletConnectProjectId: "",
   isReady: false,
   chain: SUPPORTED_CHAINS.ETHEREUM,
+  wallet: "",
   changeChain: () => {},
+  changeWallet: () => {},
 });
 
 export const useBrillionContext = () => {
