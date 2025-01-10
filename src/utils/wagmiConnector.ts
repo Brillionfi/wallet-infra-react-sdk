@@ -1,11 +1,12 @@
 import { AuthProvider, WalletInfra } from '@brillionfi/wallet-infra-sdk';
 import { createConnector } from '@wagmi/core'
 import { jwtDecode } from '@/utils/jwtDecode';
-import { IAuthURLParams } from '@brillionfi/wallet-infra-sdk/dist/models';
+import { IAuthURLParams, SUPPORTED_CHAINS } from '@brillionfi/wallet-infra-sdk/dist/models';
 import { 
   type EIP1193RequestFn, Chain, custom, 
   RpcRequestError} from 'viem';
   import { rpc } from 'viem/utils'
+import { AxiosError } from 'axios';
 
 type BrillionProviderProps = {
   appId: string;
@@ -112,6 +113,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
 
     async getProvider({ chainId } = {}) {
       console.log('getProvider :>> ', chainId);
+      console.log('currentWallets :>> ', currentWallets);
       console.log('currentChain :>> ', currentChain);
 
       const chain =
@@ -136,7 +138,6 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             // ]
             const data = (params as [{ to: string; value: string; data: string }])[0];
             try {
-            } catch (error) {
               await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: currentWallets[0],
@@ -145,6 +146,23 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
                 data: parseInt(data.data || "0x0", 16).toString(),
                 chainId: currentChain.toString(),
               });
+            } catch (error) {
+              if(error instanceof AxiosError && error.response?.data.message.includes('Gas settings are not set')){
+                // TODO - setGasConfig
+                await sdk.Wallet.setGasConfig(currentWallets[0], currentChain as unknown as SUPPORTED_CHAINS, {
+                  gasLimit: '1',
+                  maxFeePerGas: '1',
+                  maxPriorityFeePerGas: '1'
+                })
+                await sdk.Transaction.createTransaction({
+                  transactionType: "unsigned",
+                  from: currentWallets[0],
+                  to: data.to,
+                  value: parseInt(data.value || "0x0", 16).toString(),
+                  data: parseInt(data.data || "0x0", 16).toString(),
+                  chainId: currentChain.toString(),
+                });
+              }
             }
           break;
           
