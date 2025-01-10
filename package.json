@@ -1,6 +1,6 @@
 {
   "name": "@brillionfi/waas-react-sdk",
-  "version": "1.0.38",
+  "version": "1.0.48",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -28,7 +28,8 @@
     "@wagmi/core": "^2.16.3",
     "@walletconnect/qrcode-modal": "^1.8.0",
     "ethers": "^6.13.4",
-    "pino-pretty": "^13.0.0"
+    "pino-pretty": "^13.0.0",
+    "viem": "^2.22.5"
   },
   "peerDependencies": {
     "react": "^18.2.0",

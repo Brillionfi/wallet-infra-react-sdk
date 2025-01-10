@@ -1,7 +1,11 @@
 import { AuthProvider, WalletInfra } from '@brillionfi/wallet-infra-sdk';
-import { createConnector, custom } from '@wagmi/core'
+import { createConnector } from '@wagmi/core'
 import { jwtDecode } from '@/utils/jwtDecode';
 import { IAuthURLParams } from '@brillionfi/wallet-infra-sdk/dist/models';
+import { 
+  type EIP1193RequestFn, Chain, custom, 
+  RpcRequestError} from 'viem';
+  import { rpc } from 'viem/utils'
 
 type BrillionProviderProps = {
   appId: string;
@@ -19,9 +23,9 @@ export type ConnectBrillionProps = {
 export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}: BrillionProviderProps) {
   const sdk = new WalletInfra(appId, baseUrl);
   let currentChain = defaultNetwork || 1;
-  let currentWallets = [];
+  let currentWallets:`0x${string}`[] = [];
 
-  const isLogged = (() =>{
+  const checkLogged = () =>{
     const params = new URLSearchParams(new URL(window.location.href).search);
     const code = params.get('code');
     if(code) {
@@ -31,33 +35,32 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     const sessionCookie = cookies.find((strings) => strings.includes('brillion-session-wallet'));
     const jwt = sessionCookie?.split('=')[1];
     if (jwt) {
-      console.log('jwt :>> ', jwt);
       const data = JSON.parse(jwtDecode(jwt.split(".")[1])) as Record<
         string,
         string
       >;
-      if(Number(data.exp) > Date.now()){
-        console.log("authenticated");
+      if(Number(data.exp) * 1000 > Date.now()){
         sdk.authenticateUser(jwt);
         return true;
       }
     }
+    document.cookie = 'brillion-session-wallet=';
     return false
-  })();
+  };
   
-  return createConnector((_config) => ({
+  return createConnector((config) => ({
     id: 'brillion',
     name: 'Brillion Connector',
     type: 'brillion',
     
     // FUNCTIONS
     async connect({ chainId, ...rest } = {}) {
-        currentChain = chainId || currentChain;
+      currentChain = chainId || currentChain;
+      const isLogged = checkLogged();
+
       if(isLogged){
         const wallets = await sdk.Wallet.getWallets();
-        console.log('wallets :>> ', wallets);
         currentWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[]
-
         return {
           accounts: currentWallets,
           chainId: Number(currentChain)
@@ -84,10 +87,8 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
           if (data.email) params.email = data.email;
           uri = await sdk.generateAuthUrl(params);
         }
-  
         if(!uri) throw new Error("Error on login");
         window.location.href = uri;
-  
         return {
           accounts: [],
           chainId: Number(1)
@@ -101,7 +102,6 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
 
     async getAccounts() {
       const wallets = await sdk.Wallet.getWallets();
-      console.log('wallets :>> ', wallets);
       currentWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[]
       return currentWallets;
     },
@@ -110,174 +110,263 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
       return currentChain;
     },
 
-    async getProvider() {
-      const request = async (data: any) => {
-        console.log('data :>> ', data);
-        // eth methods
-        // if (method === 'eth_chainId') return numberToHex(connectedChainId)
-        // if (method === 'eth_requestAccounts') return parameters.accounts
-      //   if (method === 'eth_signTypedData_v4')
-      //     if (features.signTypedDataError) {
-      //       if (typeof features.signTypedDataError === 'boolean')
-      //         throw new UserRejectedRequestError(
-      //           new Error('Failed to sign typed data.'),
-      //         )
-      //       throw features.signTypedDataError
-      //     }
+    async getProvider({ chainId } = {}) {
+      console.log('getProvider :>> ', chainId);
+      console.log('currentChain :>> ', currentChain);
 
-      //   // wallet methods
-      //   if (method === 'wallet_switchEthereumChain') {
-      //     if (features.switchChainError) {
-      //       if (typeof features.switchChainError === 'boolean')
-      //         throw new UserRejectedRequestError(
-      //           new Error('Failed to switch chain.'),
-      //         )
-      //       throw features.switchChainError
-      //     }
-      //     type Params = [{ chainId: Hex }]
-      //     connectedChainId = fromHex((params as Params)[0].chainId, 'number')
-      //     this.onChainChanged(connectedChainId.toString())
-      //     return
-      //   }
+      const chain =
+        config.chains.find((x) => x.id === chainId) ?? config.chains[0]
+      const url = chain.rpcUrls.default.http[0]!
 
-      //   if (method === 'wallet_watchAsset') {
-      //     if (features.watchAssetError) {
-      //       if (typeof features.watchAssetError === 'boolean')
-      //         throw new UserRejectedRequestError(
-      //           new Error('Failed to switch chain.'),
-      //         )
-      //       throw features.watchAssetError
-      //     }
-      //     return connected
-      //   }
+      const request: EIP1193RequestFn = async ({ method, params }) => {
+        console.log('request method:>> ', method);
+        console.log('request params:>> ', params);
 
-      //   if (method === 'wallet_getCapabilities')
-      //     return {
-      //       '0x2105': {
-      //         paymasterService: {
-      //           supported:
-      //             (params as [Hex])[0] ===
-      //             '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-      //         },
-      //         sessionKeys: {
-      //           supported: true,
-      //         },
-      //       },
-      //       '0x14A34': {
-      //         paymasterService: {
-      //           supported:
-      //             (params as [Hex])[0] ===
-      //             '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-      //         },
-      //       },
-      //     }
+        switch (method) {
+          case "eth_sendTransaction":
+            // "params": [
+            //   {
+            //     "from": "0xYourAddress",
+            //     "to": "0xRecipientAddress",
+            //     "value": "0xValue",
+            //     "gas": "0xGasLimit",
+            //     "gasPrice": "0xGasPrice",
+            //     "data": "0xData"
+            //   }
+            // ]
+            const data = (params as [{ to: string; value: string; data: string }])[0];
+            try {
+            } catch (error) {
+              await sdk.Transaction.createTransaction({
+                transactionType: "unsigned",
+                from: currentWallets[0],
+                to: data.to,
+                value: parseInt(data.value || "0x0", 16).toString(),
+                data: parseInt(data.data || "0x0", 16).toString(),
+                chainId: currentChain.toString(),
+              });
+            }
+          break;
+          
+          case 'eth_accounts': //Returns an array of accounts currently connected to the provider
+          break;
 
-      //   if (method === 'wallet_sendCalls') {
-      //     const hashes = []
-      //     const calls = (params as any)[0].calls
-      //     for (const call of calls) {
-      //       const { result, error } = await rpc.http(url, {
-      //         body: {
-      //           method: 'eth_sendTransaction',
-      //           params: [call],
-      //         },
-      //       })
-      //       if (error)
-      //         throw new RpcRequestError({
-      //           body: { method, params },
-      //           error,
-      //           url,
-      //         })
-      //       hashes.push(result)
-      //     }
-      //     const id = keccak256(stringToHex(JSON.stringify(calls)))
-      //     transactionCache.set(id, hashes)
-      //     return id
-      //   }
+          case 'eth_chainId': //Retrieves the current chain ID of the provider.
+          break;
 
-      //   if (method === 'wallet_getCallsStatus') {
-      //     const hashes = transactionCache.get((params as any)[0])
-      //     if (!hashes) return null
-      //     const receipts = await Promise.all(
-      //       hashes.map(async (hash) => {
-      //         const { result, error } = await rpc.http(url, {
-      //           body: {
-      //             method: 'eth_getTransactionReceipt',
-      //             params: [hash],
-      //             id: 0,
-      //           },
-      //         })
-      //         if (error)
-      //           throw new RpcRequestError({
-      //             body: { method, params },
-      //             error,
-      //             url,
-      //           })
-      //         if (!result) return null
-      //         return {
-      //           blockHash: result.blockHash,
-      //           blockNumber: result.blockNumber,
-      //           gasUsed: result.gasUsed,
-      //           logs: result.logs,
-      //           status: result.status,
-      //           transactionHash: result.transactionHash,
-      //         } satisfies WalletCallReceipt
-      //       }),
-      //     )
-      //     if (receipts.some((x) => !x))
-      //       return { status: 'PENDING', receipts: [] }
-      //     return { status: 'CONFIRMED', receipts }
-      //   }
+          case 'eth_blockNumber': //Returns the latest block number.
+          break;
 
-      //   if (method === 'wallet_showCallsStatus') return
+          case 'eth_getBalance': //Retrieves the balance of a given account.
+            // "params": ["0xYourAddress", "latest"]
+          break;
 
-      //   // other methods
-      //   if (method === 'personal_sign') {
-      //     if (features.signMessageError) {
-      //       if (typeof features.signMessageError === 'boolean')
-      //         throw new UserRejectedRequestError(
-      //           new Error('Failed to sign message.'),
-      //         )
-      //       throw features.signMessageError
-      //     }
-      //     // Change `personal_sign` to `eth_sign` and swap params
-      //     method = 'eth_sign'
-      //     type Params = [data: Hex, address: Address]
-      //     params = [(params as Params)[1], (params as Params)[0]]
-      //   }
+          case 'eth_getTransactionCount': //Retrieves the transaction count (nonce) for an account.
+            // "params": ["0xYourAddress", "latest"]
+          break;
 
-      //   const body = { method, params }
-      //   const { error, result } = await rpc.http(url, { body })
-      //   if (error) throw new RpcRequestError({ body, error, url })
+          case 'eth_call': //Executes a read-only call on a smart contract.
+            // "params": [
+            //   {
+            //     "to": "0xContractAddress",
+            //     "data": "0xYourData"
+            //   },
+            //   "latest"
+            // ]
+          break;
 
-        // return result
+          case 'eth_getTransactionReceipt': //Retrieves the receipt of a specific transaction.
+            // "params": ["0xTransactionHash"]
+          break;
+
+          case 'eth_requestAccounts': //Prompts the user to connect their wallet and returns the selected accounts
+          break;
+
+          case 'eth_subscribe': //Subscribes to an event (e.g., new blocks or logs).
+            // "params": ["newHeads"]
+          break;
+
+          case 'eth_unsubscribe': //Unsubscribes from an event.
+            // "params": ["0xSubscriptionId"]
+          break;
+
+          case 'eth_sign': //Signs arbitrary data using the user’s private key
+            // "params": ["0xYourAddress", "0xYourData"]
+          break;
+
+          case 'personal_sign': //Signs a message, adding a user-readable prefix for security.
+            // "params": ["0xYourData", "0xYourAddress"]
+          break;
+
+          case 'eth_signTransaction': //Signs a transaction without sending it.
+            // "params": [
+            //   {
+            //     "from": "0xYourAddress",
+            //     "to": "0xRecipientAddress",
+            //     "value": "0xValue",
+            //     "gas": "0xGasLimit",
+            //     "gasPrice": "0xGasPrice",
+            //     "data": "0xData"
+            //   }
+            // ]
+          break;
+
+          case 'wallet_addEthereumChain': //Requests the wallet to add a new blockchain to its list of available networks
+            // "params": [
+            //   {
+            //     "chainId": "0x89",
+            //     "chainName": "Polygon Mainnet",
+            //     "rpcUrls": ["https://polygon-rpc.com/"],
+            //     "nativeCurrency": {
+            //       "name": "MATIC",
+            //       "symbol": "MATIC",
+            //       "decimals": 18
+            //     }
+            //   }
+            // ]
+          break;
+
+          case 'wallet_switchEthereumChain': //Requests to switch the user’s wallet to a different network
+            // "params": [{ "chainId": "0x1" }]
+          break;
+
+          case 'net_version': //Retrieves the current network ID.
+          break;
+
+          case 'web3_clientVersion': //Returns the client software version.
+          break;
+
+          case 'web3_sha3': //Computes the Keccak-256 hash of the given data.
+            // "params": ["0xYourData"]
+          break;
+
+          case 'eth_signTypedData_v4': //This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+            // "params": [
+            //   "0xYourAddress", // Address of the signer
+            //   JSON.stringify({
+            //     "types": {
+            //       "EIP712Domain": [
+            //         { "name": "name", "type": "string" },
+            //         { "name": "version", "type": "string" },
+            //         { "name": "chainId", "type": "uint256" },
+            //         { "name": "verifyingContract", "type": "address" }
+            //       ],
+            //       "Person": [
+            //         { "name": "name", "type": "string" },
+            //         { "name": "wallet", "type": "address" }
+            //       ]
+            //     },
+            //     "primaryType": "Person",
+            //     "domain": {
+            //       "name": "MyApp",
+            //       "version": "1",
+            //       "chainId": 1,
+            //       "verifyingContract": "0xContractAddress"
+            //     },
+            //     "message": {
+            //       "name": "John Doe",
+            //       "wallet": "0xWalletAddress"
+            //     }
+            //   })
+            // ]
+          break;
+
+          case 'wallet_watchAsset': //Allows users to add custom tokens (e.g., ERC-20) to their wallet for tracking balances
+            // "params": {
+            //   "type": "ERC20",
+            //   "options": {
+            //     "address": "0xTokenAddress",
+            //     "symbol": "TKN",
+            //     "decimals": 18,
+            //     "image": "https://example.com/token-logo.png"
+            //   }
+            // }
+          break;
+
+          case 'wallet_requestPermissions': //Used to gain access to specific wallet functionality or data (e.g., accounts, methods).
+            // "params": [{ "eth_accounts": {} }]
+          break;
+
+          case 'wallet_scanQRCode': //Facilitates interactions like scanning wallet addresses or connecting to other wallets.
+          break;
+
+          case 'wallet_getPermissions': //Checks what permissions the application currently has.
+          break;
+
+          case 'wallet_registerOnboarding': //Guides users to install or onboard with a specific wallet.
+          break;
+
+          case 'wallet_invokeSnap': //Extends wallet functionality using external scripts (Snaps).
+            // "params": {
+            //   "snapId": "npm:@metamask/example-snap",
+            //   "request": { "method": "exampleMethod", "params": {} }
+            // }
+          break;
+
+          case 'wallet_enable': //Deprecated method for connecting to the wallet.
+          break;
+
+          case 'wallet_getCapabilities':
+          break;
+
+          case 'wallet_sendCalls':
+          break;
+
+          case 'wallet_getCallsStatus': //Likely used to retrieve the status of calls (e.g., pending, successful, or failed transactions) associated with the wallet or dApp.
+          break;
+
+          case 'wallet_showCallsStatus':
+          break;
+
+          default:
+            const body = { method, params }
+            const { error, result } = await rpc.http(url, { body })
+            if (error) throw new RpcRequestError({ body, error, url })
+            return result
+        }
+
       }
       return custom({ request })({ retryCount: 0 })
     },
 
     async isAuthorized () {
-      return isLogged;
+      return checkLogged();
     },
 
     // ---- OPTIONALS
     async getAccount () {
       const wallets = await sdk.Wallet.getWallets();
-      console.log('wallet :>> ', wallets);
       return wallets[0].address as `0x${string}`;
     },
     // async getSigner () {
     //   // Implement your getSigner logic here
     // },
-    // async switchChain ({ chainId }) {
-    //   changeChain(chainId as unknown as SUPPORTED_CHAINS);
-    // },
+    async switchChain ({ chainId }) {
+      console.log('switchChain :>> ', chainId);
+      currentChain = chainId;
+      return {
+        id: currentChain,
+        name: `Chain ${currentChain}`,
+        network: `network-${currentChain}`,
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+        rpcUrls: {
+          default: { http: ['https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'] },
+        },
+      };
+    },
 
     //EVENTS
-    onAccountsChanged: (accounts: string[]) => {
+    onAccountsChanged: (accounts: `0x${string}`[]) => {
+      console.log('onAccountsChanged :>> ', accounts);
       currentWallets = accounts;
     },
 
     onChainChanged: (chainId: string) => {
+      console.log('onChainChanged :>> ', chainId);
       currentChain = Number(chainId);
     },
 
