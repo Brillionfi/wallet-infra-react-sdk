@@ -1,12 +1,24 @@
 import { AuthProvider, WalletInfra } from '@brillionfi/wallet-infra-sdk';
-import { createConnector } from '@wagmi/core'
+import { ChainNotConfiguredError, createConnector } from '@wagmi/core'
 import { jwtDecode } from '@/utils/jwtDecode';
 import { IAuthURLParams, SUPPORTED_CHAINS } from '@brillionfi/wallet-infra-sdk/dist/models';
 import { 
-  type EIP1193RequestFn, Chain, custom, 
-  RpcRequestError} from 'viem';
-  import { rpc } from 'viem/utils'
+  type EIP1193RequestFn, 
+  Chain, 
+  custom, 
+  RpcRequestError,
+  SwitchChainError
+} from 'viem';
+import { rpc } from 'viem/utils'
 import { AxiosError } from 'axios';
+
+const hexToString = (hex: string) => {
+  return parseInt(hex || "0x0", 16).toString()
+}
+
+const numberToHex = (number: number) => {
+  return `0x${number.toString(16)}`
+}
 
 type BrillionProviderProps = {
   appId: string;
@@ -14,6 +26,19 @@ type BrillionProviderProps = {
   WcProjectId: string;
   defaultNetwork?: number;
 };
+
+type eth_sendTransaction = {
+  from: string;
+  to: string;
+  value: string;
+  gas: string;
+  gasPrice: string;
+  data: string;
+}
+
+type wallet_switchEthereumChain = {
+  chainId: string;
+}
 
 export type ConnectBrillionProps = {
   provider: AuthProvider,
@@ -23,8 +48,6 @@ export type ConnectBrillionProps = {
 
 export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}: BrillionProviderProps) {
   const sdk = new WalletInfra(appId, baseUrl);
-  let currentChain = defaultNetwork || 1;
-  let currentWallets:`0x${string}`[] = [];
 
   const checkLogged = () =>{
     const params = new URLSearchParams(new URL(window.location.href).search);
@@ -48,23 +71,54 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     document.cookie = 'brillion-session-wallet=';
     return false
   };
-  
+
   return createConnector((config) => ({
     id: 'brillion',
     name: 'Brillion Connector',
     type: 'brillion',
+
+    localData: {
+      store: {} as Record<string, number | string | boolean | object>,
+      set(key: string, value: number | string | boolean | object) {
+        console.log("setea", key, value)
+        this.store[key] = value;
+      },
+      get(key: string) {
+        console.log("Get", key)
+        return this.store[key];
+      },
+      remove(key: string) {
+        delete this.store[key];
+      },
+      clear() {
+        this.store = {};
+      },
+    },
+
+    async setup() {
+      this.localData.set('connectedChain', defaultNetwork!);
+      const isLogged = checkLogged();
+      if(isLogged){
+        this.localData.set('connectedChain', defaultNetwork!);
+        const wallets = await sdk.Wallet.getWallets();
+        const connectedWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[];
+        this.localData.set('connectedWallets', connectedWallets);
+      }
+    },
     
     // FUNCTIONS
     async connect({ chainId, ...rest } = {}) {
-      currentChain = chainId || currentChain;
+      this.localData.set('connectedChain', chainId! || defaultNetwork!);
+      const connectedChain = this.localData.get('connectedChain') as number;
       const isLogged = checkLogged();
 
       if(isLogged){
         const wallets = await sdk.Wallet.getWallets();
-        currentWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[]
+        const connectedWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[];
+        this.localData.set('connectedWallets', connectedWallets);
         return {
-          accounts: currentWallets,
-          chainId: Number(currentChain)
+          accounts: connectedWallets,
+          chainId: Number(connectedChain)
         };
       }else{
         if (!sdk) {
@@ -99,25 +153,30 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
 
     async disconnect() {
       document.cookie = 'brillion-session-wallet=';
+      this.localData.clear();
     },
 
     async getAccounts() {
       const wallets = await sdk.Wallet.getWallets();
-      currentWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[]
-      return currentWallets;
+      this.localData.set('connectedWallets', wallets.map((wallet) => wallet.address) as `0x${string}`[]);
+      const connectedWallets = this.localData.get('connectedWallets') as `0x${string}`[];
+      return connectedWallets;
     },
 
     async getChainId () {
-      return currentChain;
+      const connectedChain = this.localData.get('connectedChain') as number;
+      return connectedChain;
     },
 
     async getProvider({ chainId } = {}) {
-      console.log('getProvider :>> ', chainId);
-      console.log('currentWallets :>> ', currentWallets);
-      console.log('currentChain :>> ', currentChain);
+      const connectedWallets = this.localData.get('connectedWallets') as `0x${string}`[];
+      const connectedChain = this.localData.get('connectedChain') as number;
 
-      const chain =
-        config.chains.find((x) => x.id === chainId) ?? config.chains[0]
+      console.log('getProvider :>> ', chainId);
+      console.log('connectedWallets :>> ', connectedWallets);
+      console.log('connectedChain :>> ', connectedChain);
+
+      const chain = config.chains.find((x) => x.id === chainId) ?? config.chains[0]
       const url = chain.rpcUrls.default.http[0]!
 
       const request: EIP1193RequestFn = async ({ method, params }) => {
@@ -136,31 +195,31 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //     "data": "0xData"
             //   }
             // ]
-            const data = (params as [{ to: string; value: string; data: string }])[0];
+            const data = (params as eth_sendTransaction[])[0];
             try {
-              await sdk.Transaction.createTransaction({
+              return await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
-                from: currentWallets[0],
+                from: connectedWallets[0],
                 to: data.to,
-                value: parseInt(data.value || "0x0", 16).toString(),
-                data: parseInt(data.data || "0x0", 16).toString(),
-                chainId: currentChain.toString(),
+                value: hexToString(data.value),
+                data: hexToString(data.data),
+                chainId: connectedChain.toString(),
               });
             } catch (error) {
               if(error instanceof AxiosError && error.response?.data.message.includes('Gas settings are not set')){
                 // TODO - setGasConfig
-                await sdk.Wallet.setGasConfig(currentWallets[0], currentChain as unknown as SUPPORTED_CHAINS, {
+                await sdk.Wallet.setGasConfig(connectedWallets[0], connectedChain as unknown as SUPPORTED_CHAINS, {
                   gasLimit: '1',
                   maxFeePerGas: '1',
                   maxPriorityFeePerGas: '1'
                 })
-                await sdk.Transaction.createTransaction({
+                return await sdk.Transaction.createTransaction({
                   transactionType: "unsigned",
-                  from: currentWallets[0],
+                  from: connectedWallets[0],
                   to: data.to,
-                  value: parseInt(data.value || "0x0", 16).toString(),
-                  data: parseInt(data.data || "0x0", 16).toString(),
-                  chainId: currentChain.toString(),
+                  value: hexToString(data.value),
+                  data: hexToString(data.data),
+                  chainId: connectedChain.toString(),
                 });
               }
             }
@@ -246,7 +305,10 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
 
           case 'wallet_switchEthereumChain': //Requests to switch the user’s wallet to a different network
             // "params": [{ "chainId": "0x1" }]
-          break;
+            const chain = (params as wallet_switchEthereumChain[])[0].chainId;
+            this.localData.set('connectedChain', hexToString(chain));
+            this.onChainChanged(chain.toString())
+            return chain;
 
           case 'net_version': //Retrieves the current network ID.
           break;
@@ -344,7 +406,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         }
 
       }
-      return custom({ request })({ retryCount: 0 })
+      return custom({ request })({ retryCount: 1 })
     },
 
     async isAuthorized () {
@@ -356,47 +418,53 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
       const wallets = await sdk.Wallet.getWallets();
       return wallets[0].address as `0x${string}`;
     },
+
     // async getSigner () {
     //   // Implement your getSigner logic here
     // },
+
     async switchChain ({ chainId }) {
-      console.log('switchChain :>> ', chainId);
-      currentChain = chainId;
-      return {
-        id: currentChain,
-        name: `Chain ${currentChain}`,
-        network: `network-${currentChain}`,
-        nativeCurrency: {
-          name: 'Ether',
-          symbol: 'ETH',
-          decimals: 18,
-        },
-        rpcUrls: {
-          default: { http: ['https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'] },
-        },
-      };
+      console.log('switchChain chainId :>> ', chainId);
+      const connectedChain = this.localData.get('connectedChain') as number;
+      console.log('switchChain connectedChain :>> ', connectedChain);
+
+      const provider = await this.getProvider();
+      const chain = config.chains.find((x) => x.id === chainId);
+      if (!chain) throw new SwitchChainError(new ChainNotConfiguredError())
+
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: numberToHex(chainId) }] });
+      
+      return chain;
     },
 
     //EVENTS
-    onAccountsChanged: (accounts: `0x${string}`[]) => {
+    onAccountsChanged (accounts: `0x${string}`[]) {
       console.log('onAccountsChanged :>> ', accounts);
-      currentWallets = accounts;
+      if (accounts.length === 0) this.onDisconnect()
+      else{
+        this.localData.set('connectedWallets', accounts);
+        config.emitter.emit('change', {
+          accounts,
+        })
+      }
     },
 
-    onChainChanged: (chainId: string) => {
+    onChainChanged (chainId: string) {
       console.log('onChainChanged :>> ', chainId);
-      currentChain = Number(chainId);
+      this.localData.set('connectedChain', chainId);
+      config.emitter.emit('change', { chainId: Number(chainId) })
     },
 
-    onDisconnect: () => {
+    onDisconnect () {
       document.cookie = 'brillion-session-wallet=';
+      config.emitter.emit('disconnect');
     },
   
     // ---- OPTIONALS
-    // onConnect: (_message) => {
+    // onConnect (_message){
     //   // Implement your onMessage logic here
     // },
-    // onMessage: (_message) => {
+    // onMessage (_message){
     //   // Implement your onMessage logic here
     // },
   }))
