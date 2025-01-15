@@ -1,7 +1,7 @@
 import { AuthProvider, WalletInfra } from '@brillionfi/wallet-infra-sdk';
 import { ChainNotConfiguredError, createConnector } from '@wagmi/core'
 import { jwtDecode } from '@/utils/jwtDecode';
-import { IAuthURLParams, SUPPORTED_CHAINS } from '@brillionfi/wallet-infra-sdk/dist/models';
+import { IAuthURLParams, SUPPORTED_CHAINS, WalletFormats, WalletTypes } from '@brillionfi/wallet-infra-sdk/dist/models';
 import { 
   type EIP1193RequestFn, 
   Chain, 
@@ -11,6 +11,7 @@ import {
 } from 'viem';
 import { rpc } from 'viem/utils'
 import { AxiosError } from 'axios';
+import { Transaction, keccak256 } from 'ethers';
 
 const hexToString = (hex: string) => {
   return parseInt(hex || "0x0", 16).toString()
@@ -28,6 +29,15 @@ type BrillionProviderProps = {
 };
 
 type eth_sendTransaction = {
+  from: string;
+  to: string;
+  value: string;
+  gas: string;
+  gasPrice: string;
+  data: string;
+}
+
+type eth_signTransaction = {
   from: string;
   to: string;
   value: string;
@@ -169,10 +179,9 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     },
 
     async getProvider({ chainId } = {}) {
+      console.log("triggers getProvider()")
       const connectedWallets = this.localData.get('connectedWallets') as `0x${string}`[];
       const connectedChain = this.localData.get('connectedChain') as number;
-
-      console.log('getProvider :>> ', chainId);
       console.log('connectedWallets :>> ', connectedWallets);
       console.log('connectedChain :>> ', connectedChain);
 
@@ -180,6 +189,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
       const url = chain.rpcUrls.default.http[0]!
 
       const request: EIP1193RequestFn = async ({ method, params }) => {
+        console.log("triggers request")
         console.log('request method:>> ', method);
         console.log('request params:>> ', params);
 
@@ -195,14 +205,14 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //     "data": "0xData"
             //   }
             // ]
-            const data = (params as eth_sendTransaction[])[0];
+            const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
               return await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: connectedWallets[0],
-                to: data.to,
-                value: hexToString(data.value),
-                data: hexToString(data.data),
+                to: sendTransactionData.to,
+                value: hexToString(sendTransactionData.value),
+                data: hexToString(sendTransactionData.data),
                 chainId: connectedChain.toString(),
               });
             } catch (error) {
@@ -216,9 +226,9 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
                 return await sdk.Transaction.createTransaction({
                   transactionType: "unsigned",
                   from: connectedWallets[0],
-                  to: data.to,
-                  value: hexToString(data.value),
-                  data: hexToString(data.data),
+                  to: sendTransactionData.to,
+                  value: hexToString(sendTransactionData.value),
+                  data: hexToString(sendTransactionData.data),
                   chainId: connectedChain.toString(),
                 });
               }
@@ -226,21 +236,21 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
           break;
           
           case 'eth_accounts': //Returns an array of accounts currently connected to the provider
-          break;
+            return connectedWallets;
 
           case 'eth_chainId': //Retrieves the current chain ID of the provider.
-          break;
+            return numberToHex(connectedChain);
 
           case 'eth_blockNumber': //Returns the latest block number.
-          break;
+            return await sdk.Wallet.providerRequest({ chainId: connectedChain, method, params });
 
           case 'eth_getBalance': //Retrieves the balance of a given account.
             // "params": ["0xYourAddress", "latest"]
-          break;
+              return await sdk.Wallet.providerRequest({ chainId: connectedChain, method, params });
 
           case 'eth_getTransactionCount': //Retrieves the transaction count (nonce) for an account.
             // "params": ["0xYourAddress", "latest"]
-          break;
+            return await sdk.Wallet.getNonce(connectedWallets[0], connectedChain as unknown as SUPPORTED_CHAINS);
 
           case 'eth_call': //Executes a read-only call on a smart contract.
             // "params": [
@@ -250,43 +260,14 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //   },
             //   "latest"
             // ]
-          break;
+              return await sdk.Wallet.providerRequest({ chainId: connectedChain, method, params });
 
           case 'eth_getTransactionReceipt': //Retrieves the receipt of a specific transaction.
             // "params": ["0xTransactionHash"]
-          break;
+              return await sdk.Wallet.providerRequest({ chainId: connectedChain, method, params });
 
           case 'eth_requestAccounts': //Prompts the user to connect their wallet and returns the selected accounts
-          break;
-
-          case 'eth_subscribe': //Subscribes to an event (e.g., new blocks or logs).
-            // "params": ["newHeads"]
-          break;
-
-          case 'eth_unsubscribe': //Unsubscribes from an event.
-            // "params": ["0xSubscriptionId"]
-          break;
-
-          case 'eth_sign': //Signs arbitrary data using the user’s private key
-            // "params": ["0xYourAddress", "0xYourData"]
-          break;
-
-          case 'personal_sign': //Signs a message, adding a user-readable prefix for security.
-            // "params": ["0xYourData", "0xYourAddress"]
-          break;
-
-          case 'eth_signTransaction': //Signs a transaction without sending it.
-            // "params": [
-            //   {
-            //     "from": "0xYourAddress",
-            //     "to": "0xRecipientAddress",
-            //     "value": "0xValue",
-            //     "gas": "0xGasLimit",
-            //     "gasPrice": "0xGasPrice",
-            //     "data": "0xData"
-            //   }
-            // ]
-          break;
+            return connectedWallets;
 
           case 'wallet_addEthereumChain': //Requests the wallet to add a new blockchain to its list of available networks
             // "params": [
@@ -301,7 +282,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //     }
             //   }
             // ]
-          break;
+            return "method not supported"
 
           case 'wallet_switchEthereumChain': //Requests to switch the user’s wallet to a different network
             // "params": [{ "chainId": "0x1" }]
@@ -311,14 +292,44 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             return chain;
 
           case 'net_version': //Retrieves the current network ID.
+            return await sdk.Wallet.providerRequest({ chainId: connectedChain, method, params });
           break;
 
           case 'web3_clientVersion': //Returns the client software version.
-          break;
+            return "Brillion Wallet v3"
 
           case 'web3_sha3': //Computes the Keccak-256 hash of the given data.
             // "params": ["0xYourData"]
-          break;
+            const hash = keccak256((params as string[])[0])
+            return hash;
+
+          case 'eth_signTransaction': //Signs a transaction without sending it.
+            // "params": [
+            //   {
+            //     "from": "0xYourAddress",
+            //     "to": "0xRecipientAddress",
+            //     "value": "0xValue",
+            //     "gas": "0xGasLimit",
+            //     "gasPrice": "0xGasPrice",
+            //     "data": "0xData"
+            //   }
+            // ]
+            const signTransactionData = (params as eth_signTransaction[])[0];
+            const txDetails = Transaction.from(signTransactionData);
+            const response = await sdk.Wallet.signTransaction(
+              signTransactionData.from, 
+              {
+                walletFormat: WalletFormats.ETHEREUM,
+                walletType: WalletTypes.EOA,
+                unsignedTransaction: txDetails.serialized
+              }, 
+              window.location.origin
+            );
+            if(response.needsApproval){
+              return "Transaction created, but needs another approval";
+            }else{
+              return response.signedTransaction;
+            }
 
           case 'eth_signTypedData_v4': //This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
             // "params": [
@@ -349,7 +360,15 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //     }
             //   })
             // ]
-          break;
+            return "method not supported"
+
+          case 'eth_sign': //Signs arbitrary data using the user’s private key
+            // "params": ["0xYourAddress", "0xYourData"]
+            return "method not supported"
+
+          case 'personal_sign': //Signs a message, adding a user-readable prefix for security.
+            // "params": ["0xYourData", "0xYourAddress"]
+            return "method not supported"
 
           case 'wallet_watchAsset': //Allows users to add custom tokens (e.g., ERC-20) to their wallet for tracking balances
             // "params": {
@@ -361,42 +380,42 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //     "image": "https://example.com/token-logo.png"
             //   }
             // }
-          break;
+            return "method not supported"
 
           case 'wallet_requestPermissions': //Used to gain access to specific wallet functionality or data (e.g., accounts, methods).
             // "params": [{ "eth_accounts": {} }]
-          break;
+            return "method not supported"
 
           case 'wallet_scanQRCode': //Facilitates interactions like scanning wallet addresses or connecting to other wallets.
-          break;
+            return "method not supported"
 
           case 'wallet_getPermissions': //Checks what permissions the application currently has.
-          break;
+            return "method not supported"
 
           case 'wallet_registerOnboarding': //Guides users to install or onboard with a specific wallet.
-          break;
+            return "method not supported"
 
           case 'wallet_invokeSnap': //Extends wallet functionality using external scripts (Snaps).
             // "params": {
             //   "snapId": "npm:@metamask/example-snap",
             //   "request": { "method": "exampleMethod", "params": {} }
             // }
-          break;
+            return "method not supported"
 
           case 'wallet_enable': //Deprecated method for connecting to the wallet.
-          break;
-
+            return "method not supported"
+          
           case 'wallet_getCapabilities':
-          break;
+            return "method not supported"
 
           case 'wallet_sendCalls':
-          break;
+            return "method not supported"
 
           case 'wallet_getCallsStatus': //Likely used to retrieve the status of calls (e.g., pending, successful, or failed transactions) associated with the wallet or dApp.
-          break;
-
+            return "method not supported"
+            
           case 'wallet_showCallsStatus':
-          break;
+            return "method not supported"
 
           default:
             const body = { method, params }
@@ -419,21 +438,16 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
       return wallets[0].address as `0x${string}`;
     },
 
-    // async getSigner () {
-    //   // Implement your getSigner logic here
-    // },
+    async getSigner () {
+      return "getSigner method not supported"
+    },
 
     async switchChain ({ chainId }) {
       console.log('switchChain chainId :>> ', chainId);
-      const connectedChain = this.localData.get('connectedChain') as number;
-      console.log('switchChain connectedChain :>> ', connectedChain);
-
       const provider = await this.getProvider();
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError())
-
       await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: numberToHex(chainId) }] });
-      
       return chain;
     },
 
