@@ -1,2 +1,46 @@
+import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+import { BrillionChains } from "./brillionChains";
+import { BrillionConnector } from "./wagmiConnector";
+import { BrillionTransport } from "./brillionTransports";
+
 export * from "./wagmiConnector";
 export * from "./brillionChains";
+export * from "./brillionTransports";
+
+export const parseChain = (chain: number) => {
+  switch (chain) {
+    case 1:
+      return SUPPORTED_CHAINS.ETHEREUM
+    default:
+      return SUPPORTED_CHAINS.ETHEREUM
+  }
+}
+
+export const hexToString = (hex: string) => {
+  return parseInt(hex || "0x0", 16).toString()
+}
+
+export const numberToHex = (number: number) => {
+  return `0x${number.toString(16)}`
+}
+
+export type BrillionProviderProps = {
+  appId: string;
+  baseUrl: string;
+  WcProjectId: string;
+  defaultNetwork?: number;
+};
+
+export const brillionWagmi = ({appId, baseUrl, defaultNetwork, WcProjectId}: BrillionProviderProps) => {
+  const brillionChains = BrillionChains(baseUrl);
+  const brillionConnector = BrillionConnector({appId, baseUrl, WcProjectId, defaultNetwork});
+  const brillionTransport = (chainId: number) => {
+    return BrillionTransport({appId, baseUrl}, chainId || defaultNetwork || 1);
+  }
+
+  return {
+    brillionChains,
+    brillionConnector,
+    brillionTransport
+  }
+}

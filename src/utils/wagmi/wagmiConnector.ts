@@ -12,30 +12,7 @@ import { rpc } from 'viem/utils'
 import { AxiosError } from 'axios';
 import { Transaction, keccak256 } from 'ethers';
 import { getAuthentication } from '../authentication';
-
-const parseChain = (chain: number) => {
-  switch (chain) {
-    case 1:
-      return SUPPORTED_CHAINS.ETHEREUM
-    default:
-      return SUPPORTED_CHAINS.ETHEREUM
-  }
-}
-
-const hexToString = (hex: string) => {
-  return parseInt(hex || "0x0", 16).toString()
-}
-
-const numberToHex = (number: number) => {
-  return `0x${number.toString(16)}`
-}
-
-type BrillionProviderProps = {
-  appId: string;
-  baseUrl: string;
-  WcProjectId: string;
-  defaultNetwork?: number;
-};
+import { BrillionProviderProps, hexToString, numberToHex, parseChain } from '.';
 
 type eth_sendTransaction = {
   from: string;
@@ -67,7 +44,6 @@ type eth_call = [
   string
 ]
 
-
 export type ConnectBrillionProps = {
   provider: AuthProvider,
   redirectUrl: string,
@@ -92,6 +68,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         string
       >;
       if(Number(data.exp) * 1000 > Date.now()){
+        console.log("jwt ")
         sdk.authenticateUser(jwt);
         return true;
       }
@@ -217,11 +194,12 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
 
       const chain = config.chains.find((x) => x.id === chainId) ?? config.chains[0]
       const url = chain.rpcUrls.default.http[0]!
-
+      
       const request: EIP1193RequestFn = async ({ method, params }) => {
         console.log("triggers request")
         console.log('request method:>> ', method);
         console.log('request params:>> ', params);
+        if(!checkLogged()) throw new Error("User not logged in");
 
         switch (method) {
           case "eth_sendTransaction":
