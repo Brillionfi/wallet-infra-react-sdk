@@ -1,1 +1,1 @@
-export * from "./wagmiConnector";
+export * from "./wagmi/wagmiConnector";

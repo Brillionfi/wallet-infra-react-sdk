@@ -11,7 +11,7 @@ import {
 import { rpc } from 'viem/utils'
 import { AxiosError } from 'axios';
 import { Transaction, keccak256 } from 'ethers';
-import { getAuthentication } from './authentication';
+import { getAuthentication } from '../authentication';
 
 const parseChain = (chain: number) => {
   switch (chain) {
@@ -272,11 +272,11 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             return numberToHex(connectedChain);
 
           case 'eth_blockNumber': //Returns the latest block number.
-            return await sdk.Wallet.providerRequest({ chainId: parseChain(connectedChain), method });
+            return await sdk.Wallet.rpcRequest({ method }, { chainId: parseChain(connectedChain) });
 
           case 'eth_getBalance': //Retrieves the balance of a given account.
             // "params": ["0xYourAddress", "latest"]
-            return await sdk.Wallet.providerRequest({ chainId: parseChain(connectedChain), method, params: params as string[] });
+            return await sdk.Wallet.rpcRequest({ method, params: params as string[] }, { chainId: parseChain(connectedChain) });
 
           case 'eth_getTransactionCount': //Retrieves the transaction count (nonce) for an account.
             // "params": ["0xYourAddress", "latest"]
@@ -290,11 +290,11 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //   },
             //   "latest"
             // ]
-            return await sdk.Wallet.providerRequest({ chainId: parseChain(connectedChain), method, params: params as eth_call });
+            return await sdk.Wallet.rpcRequest({ method, params: params as eth_call }, { chainId: parseChain(connectedChain) });
 
           case 'eth_getTransactionReceipt': //Retrieves the receipt of a specific transaction.
             // "params": ["0xTransactionHash"]
-            return await sdk.Wallet.providerRequest({ chainId: parseChain(connectedChain), method, params: params as string[] });
+            return await sdk.Wallet.rpcRequest({ method, params: params as string[] }, { chainId: parseChain(connectedChain) });
 
           case 'eth_requestAccounts': //Prompts the user to connect their wallet and returns the selected accounts
             return connectedWallets;
@@ -307,7 +307,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             return chain;
 
           case 'net_version': //Retrieves the current network ID.
-            return await sdk.Wallet.providerRequest({ chainId: parseChain(connectedChain), method });
+            return await sdk.Wallet.rpcRequest({ method }, { chainId: parseChain(connectedChain) });
 
           case 'web3_clientVersion': //Returns the client software version.
             return "Brillion Wallet v3"
@@ -416,7 +416,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             //     }
             //   }
             // ]
-            return "method not supported"
+            throw new Error("method not supported")
 
           default:
             const body = { method, params }
