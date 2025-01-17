@@ -1,2 +1,2 @@
 export * from "./wagmiConnector";
-export { Ethereum, Sepolia } from "./brillionChains";
+export * from "./brillionChains";

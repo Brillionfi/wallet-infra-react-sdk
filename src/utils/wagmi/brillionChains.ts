@@ -1,7 +1,9 @@
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
-export const Ethereum = (baseUrl: string) => ({
-  id: SUPPORTED_CHAINS.ETHEREUM,
+const defaultRpcUrls = "https://api.platform.brillion.finance";
+
+const Ethereum = (baseUrl?: string) => ({
+  id: Number(SUPPORTED_CHAINS.ETHEREUM),
   name: 'Ethereum',
   network: 'ethereum',
   nativeCurrency: {
@@ -11,11 +13,11 @@ export const Ethereum = (baseUrl: string) => ({
   },
   rpcUrls: {
     default: {
-      http: [`${baseUrl}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM}`],
+      http: [`${baseUrl ?? defaultRpcUrls}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM}`],
       webSocket: ['wss://rpc.mycustomchain.com/ws'], // TODO
     },
     public: {
-      http: [`${baseUrl}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM}`],
+      http: [`${baseUrl ?? defaultRpcUrls}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM}`],
     },
   },
   blockExplorers: {
@@ -27,8 +29,8 @@ export const Ethereum = (baseUrl: string) => ({
   testnet: false,
 });
 
-export const Sepolia = (baseUrl: string) => ({
-  id: SUPPORTED_CHAINS.ETHEREUM_SEPOLIA,
+const Sepolia = (baseUrl?: string) => ({
+  id: Number(SUPPORTED_CHAINS.ETHEREUM_SEPOLIA),
   name: 'Ethereum Sepolia',
   network: 'sepolia',
   nativeCurrency: {
@@ -38,11 +40,11 @@ export const Sepolia = (baseUrl: string) => ({
   },
   rpcUrls: {
     default: {
-      http: [`${baseUrl}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM_SEPOLIA}`],
+      http: [`${baseUrl ?? defaultRpcUrls}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM_SEPOLIA}`],
       webSocket: ['wss://rpc.mycustomchain.com/ws'], // TODO
     },
     public: {
-      http: [`${baseUrl}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM_SEPOLIA}`],
+      http: [`${baseUrl ?? defaultRpcUrls}/rpc/chainId/${SUPPORTED_CHAINS.ETHEREUM_SEPOLIA}`],
     },
   },
   blockExplorers: {
@@ -53,3 +55,8 @@ export const Sepolia = (baseUrl: string) => ({
   },
   testnet: true,
 });
+
+export const BrillionChains = (baseUrl?: string) => ({
+  Ethereum: Ethereum(baseUrl),
+  Sepolia: Sepolia(baseUrl),
+})
