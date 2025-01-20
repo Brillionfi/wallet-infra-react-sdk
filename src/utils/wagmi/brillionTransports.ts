@@ -11,7 +11,7 @@ export const BrillionTransport = (
   return custom({
     async request(body) {
       const cookies = document.cookie.split(';');
-      const sessionCookie = cookies.find((strings) => strings.includes('brillion-session-wallet'));
+      const sessionCookie = cookies.find((strings) => strings.includes('brillion-session-jwt'));
       const jwt = sessionCookie?.split('=')[1];
       if(!jwt) throw new Error('Login first');
 

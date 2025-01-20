@@ -58,10 +58,10 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     const params = new URLSearchParams(new URL(window.location.href).search);
     const code = params.get('code');
     if(code) {
-      document.cookie = `brillion-session-wallet=${code}`;
+      document.cookie = `brillion-session-jwt=${code}`;
     }
     const cookies = document.cookie.split(';');
-    const sessionCookie = cookies.find((strings) => strings.includes('brillion-session-wallet'));
+    const sessionCookie = cookies.find((strings) => strings.includes('brillion-session-jwt'));
     const jwt = sessionCookie?.split('=')[1];
     if (jwt) {
       const data = JSON.parse(jwtDecode(jwt.split(".")[1])) as Record<
@@ -74,7 +74,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         return true;
       }
     }
-    document.cookie = 'brillion-session-wallet=';
+    document.cookie = 'brillion-session-jwt=';
     return false
   };
 
@@ -167,7 +167,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     },
 
     async disconnect() {
-      document.cookie = 'brillion-session-wallet=';
+      document.cookie = 'brillion-session-jwt=';
       this.localData.clear();
     },
 
@@ -440,7 +440,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     },
 
     onDisconnect () {
-      document.cookie = 'brillion-session-wallet=';
+      document.cookie = 'brillion-session-jwt=';
       config.emitter.emit('disconnect');
     },
   

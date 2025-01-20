@@ -1,4 +1,4 @@
-import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+import { ChainIdSchema } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { BrillionConnector } from "./wagmiConnector";
 import { BrillionTransport } from "./brillionTransports";
 
@@ -6,12 +6,7 @@ export * from "./wagmiConnector";
 export * from "./brillionTransports";
 
 export const parseChain = (chain: number) => {
-  switch (chain) {
-    case 1:
-      return SUPPORTED_CHAINS.ETHEREUM
-    default:
-      return SUPPORTED_CHAINS.ETHEREUM
-  }
+  return ChainIdSchema.parse(chain);
 }
 
 export const hexToString = (hex: string) => {
