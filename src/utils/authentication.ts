@@ -34,10 +34,8 @@ function protocolTransportEnumToInternalEnum(protocolEnum: AuthenticatorTranspor
 }
 
 export const getAuthentication = async (domain: string) => {
-  console.log("entra en el getAuthentication");
   const challenge = generateRandomBuffer();
   const authenticatorUserId = generateRandomBuffer();
-  console.log("genera challenge y authenticatorUserId");
 
   const attestation = await create({
     publicKey: {
@@ -59,7 +57,7 @@ export const getAuthentication = async (domain: string) => {
       },
     },
   });
-console.log("genera attestation");
+
   return {
     challenge: base64UrlEncode(challenge),
     attestation: {

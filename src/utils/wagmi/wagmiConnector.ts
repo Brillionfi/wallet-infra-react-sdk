@@ -69,7 +69,6 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         string
       >;
       if(Number(data.exp) * 1000 > Date.now()){
-        console.log("jwt ")
         sdk.authenticateUser(jwt);
         return true;
       }
@@ -86,11 +85,9 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     localData: {
       store: {} as Record<string, number | string | boolean | object>,
       set(key: string, value: number | string | boolean | object) {
-        console.log("setea", key, value)
         this.store[key] = value;
       },
       get(key: string) {
-        console.log("Get", key)
         return this.store[key];
       },
       remove(key: string) {
@@ -184,11 +181,8 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     },
 
     async getProvider({ chainId } = {}) {
-      console.log("triggers getProvider()")
       const connectedWallets = this.localData.get('connectedWallets') as `0x${string}`[];
       const connectedChain = this.localData.get('connectedChain') as number;
-      console.log('connectedWallets :>> ', connectedWallets);
-      console.log('connectedChain :>> ', connectedChain);
 
       const chain = config.chains.find((x) => x.id === chainId) ?? config.chains[0]
       const url = chain.rpcUrls.default.http[0]!
