@@ -1,10 +1,8 @@
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { BrillionChains } from "./brillionChains";
 import { BrillionConnector } from "./wagmiConnector";
 import { BrillionTransport } from "./brillionTransports";
 
 export * from "./wagmiConnector";
-export * from "./brillionChains";
 export * from "./brillionTransports";
 
 export const parseChain = (chain: number) => {
@@ -32,14 +30,12 @@ export type BrillionProviderProps = {
 };
 
 export const brillionWagmi = ({appId, baseUrl, defaultNetwork, WcProjectId}: BrillionProviderProps) => {
-  const brillionChains = BrillionChains(baseUrl);
   const brillionConnector = BrillionConnector({appId, baseUrl, WcProjectId, defaultNetwork});
   const brillionTransport = (chainId: number) => {
     return BrillionTransport({appId, baseUrl}, chainId || defaultNetwork || 1);
   }
 
   return {
-    brillionChains,
     brillionConnector,
     brillionTransport
   }

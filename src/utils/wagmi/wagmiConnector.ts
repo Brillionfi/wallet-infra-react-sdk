@@ -1,7 +1,7 @@
 import { AuthProvider, WalletInfra } from '@brillionfi/wallet-infra-sdk';
 import { ChainNotConfiguredError, createConnector } from '@wagmi/core'
 import { jwtDecode } from '@/utils/jwtDecode';
-import { IAuthURLParams, SUPPORTED_CHAINS, WalletFormats, WalletTypes } from '@brillionfi/wallet-infra-sdk/dist/models';
+import { IAuthURLParams, WalletFormats, WalletTypes } from '@brillionfi/wallet-infra-sdk/dist/models';
 import { 
   type EIP1193RequestFn, 
   custom, 
@@ -47,6 +47,7 @@ type eth_call = [
 export type ConnectBrillionProps = {
   provider: AuthProvider,
   redirectUrl: string,
+  walletName?: string,
   email?: string,
 };
 
@@ -115,23 +116,21 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
       this.localData.set('connectedChain', chainId! || defaultNetwork!);
       const connectedChain = this.localData.get('connectedChain') as number;
       const isLogged = checkLogged();
+      const data = rest as ConnectBrillionProps;
 
       if(isLogged){
         const wallets = await sdk.Wallet.getWallets();
         let connectedWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[];
-        console.log('connectedWallets before :>> ', connectedWallets);
-        console.log('connectedWallets.length === 0 :>> ', connectedWallets.length === 0);
-        console.log('!connectedWallets || connectedWallets.length === 0 :>> ', !connectedWallets || connectedWallets.length === 0);
+
         if(!connectedWallets || connectedWallets.length === 0) {
           await sdk.Wallet.createWallet({
-            name: "Wallet",
+            name: data.walletName ?? "Wallet",
             format: WalletFormats.ETHEREUM,
-            authentication: await getAuthentication(window.location.origin)
+            authentication: await getAuthentication(window.location.hostname)
           });
         }
-        connectedWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[];
-        console.log('connectedWallets after :>> ', connectedWallets);
 
+        connectedWallets = wallets.map((wallet) => wallet.address) as `0x${string}`[];
         this.localData.set('connectedWallets', connectedWallets);
         return {
           accounts: connectedWallets,
@@ -141,7 +140,6 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         if (!sdk) {
           throw new Error("AppId is not valid");
         }
-        const data = rest as ConnectBrillionProps;
         let uri: string | undefined
         if (data.provider === AuthProvider.WALLET_CONNECT) {
           uri = await sdk.generateWalletConnectUri(
@@ -196,11 +194,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
       const url = chain.rpcUrls.default.http[0]!
       
       const request: EIP1193RequestFn = async ({ method, params }) => {
-        console.log("triggers request")
-        console.log('request method:>> ', method);
-        console.log('request params:>> ', params);
         if(!checkLogged()) throw new Error("User not logged in");
-
         switch (method) {
           case "eth_sendTransaction":
             // "params": [
