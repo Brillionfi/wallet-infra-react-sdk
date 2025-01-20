@@ -17,7 +17,7 @@ export const BrillionTransport = (
 
       sdk.authenticateUser(jwt);
 
-      const response = await sdk.Wallet.rpcRequest({ method: body.methods, params: body.params}, { chainId: parseChain(chainId) });
+      const response = await sdk.Wallet.rpcRequest({ method: body.method, params: body.params}, { chainId: parseChain(chainId) });
       return response;
     },
   });
