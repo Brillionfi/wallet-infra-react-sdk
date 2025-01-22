@@ -13,6 +13,9 @@ import { AxiosError } from 'axios';
 import { Transaction, keccak256 } from 'ethers';
 import { getAuthentication } from '../authentication';
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from '.';
+import QRCodeModal from "@walletconnect/qrcode-modal"; 
+import MetaMaskSDK from '@metamask/sdk';
+import { BrowserProvider } from "ethers";
 
 type eth_sendTransaction = {
   from: string;
@@ -53,6 +56,13 @@ export type ConnectBrillionProps = {
 
 export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}: BrillionProviderProps) {
   const sdk = new WalletInfra(appId, baseUrl);
+  const mmSDK = new MetaMaskSDK();
+
+  const getSessionData = () => {
+    const cookies = document.cookie.split(';');
+    const rawSession = cookies.find((strings) => strings.includes('brillion-session-data'));
+    return JSON.parse(rawSession?.split('=')[1]!);
+  }
 
   const checkLogged = () =>{
     const params = new URLSearchParams(new URL(window.location.href).search);
@@ -68,7 +78,12 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         string,
         string
       >;
+      document.cookie = `brillion-session-data=${JSON.stringify(data)}`;
+
       if(Number(data.exp) * 1000 > Date.now()){
+        if(data.loggedInVia === AuthProvider.METAMASK){
+          mmSDK.connect();
+        }
         sdk.authenticateUser(jwt);
         return true;
       }
@@ -143,6 +158,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             WcProjectId,
             data.redirectUrl,
           );
+          QRCodeModal.open(uri!, () => {});
           sdk.onConnectWallet((authUrl: unknown) => {
             window.location.href = authUrl as string;
           });
@@ -156,6 +172,7 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
         }
         if(!uri) throw new Error("Error on login");
         window.location.href = uri;
+        
         return {
           accounts: [],
           chainId: Number(1)
@@ -183,13 +200,14 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     async getProvider({ chainId } = {}) {
       const connectedWallets = this.localData.get('connectedWallets') as `0x${string}`[];
       const connectedChain = this.localData.get('connectedChain') as number;
+      const sessionData = getSessionData();
 
       const chain = config.chains.find((x) => x.id === chainId) ?? config.chains[0]
       const url = chain.rpcUrls.default.http[0]!
-      
+
       const request: EIP1193RequestFn = async ({ method, params }) => {
         if(!checkLogged()) throw new Error("User not logged in");
-        switch (method) {
+          switch (method) {
           case "eth_sendTransaction":
             // "params": [
             //   {
@@ -203,6 +221,11 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             // ]
             const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
+              // await sdk.Wallet.setGasConfig(connectedWallets[0], parseChain(connectedChain), {
+              //   gasLimit: '9631345750',
+              //   maxFeePerGas: '9631345750',
+              //   maxPriorityFeePerGas: '9631345750'
+              // })
               return await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: connectedWallets[0],
@@ -390,9 +413,17 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
             if (error) throw new RpcRequestError({ body, error, url })
             return result
         }
-
       }
-      return custom({ request })({ retryCount: 1 })
+
+      if(sessionData.loggedInVia === AuthProvider.METAMASK){
+        const ethereum = mmSDK.getProvider(); 
+        if (!ethereum) {
+          throw new Error('No MetaMask provider found');
+        }
+        return ethereum;
+      }else{
+        return custom({ request })({ retryCount: 1 })
+      }
     },
 
     async isAuthorized () {
@@ -406,21 +437,32 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
     },
 
     async getSigner () {
+      const sessionData = getSessionData();
+      if(sessionData.loggedInVia === AuthProvider.METAMASK){
+        const provider = new BrowserProvider(await this.getProvider());
+        return await provider.getSigner();
+      }
       return "getSigner method not supported"
     },
 
     async switchChain ({ chainId }) {
+      this.localData.set('connectedChain', hexToString(String(chainId)));
+      this.onChainChanged(chainId.toString())
+      
       const provider = await this.getProvider();
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError())
       await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: numberToHex(chainId) }] });
+
       return chain;
     },
 
     //EVENTS
     onAccountsChanged (accounts: `0x${string}`[]) {
-      if (accounts.length === 0) this.onDisconnect()
-      else{
+      if (accounts.length === 0) {
+        this.onDisconnect();
+        this.localData.clear();
+      }else{
         this.localData.set('connectedWallets', accounts);
         config.emitter.emit('change', {
           accounts,
@@ -435,6 +477,8 @@ export function BrillionConnector({appId, baseUrl, defaultNetwork, WcProjectId}:
 
     onDisconnect () {
       document.cookie = 'brillion-session-jwt=';
+      document.cookie = 'brillion-session-data=';
+      this.localData.clear();
       config.emitter.emit('disconnect');
     },
   
