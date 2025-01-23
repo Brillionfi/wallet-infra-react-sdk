@@ -475,9 +475,8 @@ export function BrillionConnector({
           throw new Error("No MetaMask provider found");
         }
         return ethereum;
-      } else {
-        return custom({ request })({ retryCount: 1 });
       }
+      return custom({ request })({ retryCount: 1 });
     },
 
     async isAuthorized() {
