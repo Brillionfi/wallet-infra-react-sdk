@@ -236,7 +236,7 @@ export function BrillionConnector({
       const request: EIP1193RequestFn = async ({ method, params }) => {
         if (!checkLogged()) throw new Error("User not logged in");
         switch (method) {
-          case "eth_sendTransaction":
+          case "eth_sendTransaction": {
             // "params": [
             //   {
             //     "from": "0xYourAddress",
@@ -290,34 +290,40 @@ export function BrillionConnector({
               }
             }
             break;
+          }
 
-          case "eth_accounts": //Returns an array of accounts currently connected to the provider
+          case "eth_accounts": {//Returns an array of accounts currently connected to the provider
             return connectedWallets;
+          }
 
-          case "eth_chainId": //Retrieves the current chain ID of the provider.
+          case "eth_chainId": {//Retrieves the current chain ID of the provider.
             return numberToHex(connectedChain);
+          }
 
-          case "eth_blockNumber": //Returns the latest block number.
+          case "eth_blockNumber": {//Returns the latest block number.
             return await sdk.Wallet.rpcRequest(
               { method },
               { chainId: parseChain(connectedChain) },
             );
+          }
 
-          case "eth_getBalance": //Retrieves the balance of a given account.
+          case "eth_getBalance": {//Retrieves the balance of a given account.
             // "params": ["0xYourAddress", "latest"]
             return await sdk.Wallet.rpcRequest(
               { method, params: params as string[] },
               { chainId: parseChain(connectedChain) },
             );
+          }
 
-          case "eth_getTransactionCount": //Retrieves the transaction count (nonce) for an account.
+          case "eth_getTransactionCount": {//Retrieves the transaction count (nonce) for an account.
             // "params": ["0xYourAddress", "latest"]
             return await sdk.Wallet.getNonce(
               connectedWallets[0],
               parseChain(connectedChain),
             );
+          }
 
-          case "eth_call": //Executes a read-only call on a smart contract.
+          case "eth_call": {//Executes a read-only call on a smart contract.
             // "params": [
             //   {
             //     "to": "0xContractAddress",
@@ -329,39 +335,46 @@ export function BrillionConnector({
               { method, params: params as eth_call },
               { chainId: parseChain(connectedChain) },
             );
+          }
 
-          case "eth_getTransactionReceipt": //Retrieves the receipt of a specific transaction.
+          case "eth_getTransactionReceipt": {//Retrieves the receipt of a specific transaction.
             // "params": ["0xTransactionHash"]
             return await sdk.Wallet.rpcRequest(
               { method, params: params as string[] },
               { chainId: parseChain(connectedChain) },
             );
+          }
 
-          case "eth_requestAccounts": //Prompts the user to connect their wallet and returns the selected accounts
+          case "eth_requestAccounts": {//Prompts the user to connect their wallet and returns the selected accounts
             return connectedWallets;
+          }
 
-          case "wallet_switchEthereumChain": //Requests to switch the user’s wallet to a different network
+          case "wallet_switchEthereumChain": {//Requests to switch the user’s wallet to a different network
             // "params": [{ "chainId": "0x1" }]
             const chain = (params as wallet_switchEthereumChain[])[0].chainId;
             this.localData.set("connectedChain", hexToString(chain));
             this.onChainChanged(chain.toString());
             return chain;
+          }
 
-          case "net_version": //Retrieves the current network ID.
+          case "net_version": {//Retrieves the current network ID.
             return await sdk.Wallet.rpcRequest(
               { method },
               { chainId: parseChain(connectedChain) },
             );
+          }
 
-          case "web3_clientVersion": //Returns the client software version.
+          case "web3_clientVersion": {//Returns the client software version.
             return "Brillion Wallet v3";
+          }
 
-          case "web3_sha3": //Computes the Keccak-256 hash of the given data.
+          case "web3_sha3": {//Computes the Keccak-256 hash of the given data.
             // "params": ["0xYourData"]
             const hash = keccak256((params as string[])[0]);
             return hash;
+          }
 
-          case "eth_signTransaction": //Signs a transaction without sending it.
+          case "eth_signTransaction": {//Signs a transaction without sending it.
             // "params": [
             //   {
             //     "from": "0xYourAddress",
@@ -388,8 +401,8 @@ export function BrillionConnector({
             } else {
               return response.signedTransaction;
             }
-
-          case "eth_signTypedData_v4": //This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+          }
+          case "eth_signTypedData_v4": {//This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
           // "params": [
           //   "0xYourAddress", // Address of the signer
           //   JSON.stringify({
@@ -418,11 +431,17 @@ export function BrillionConnector({
           //     }
           //   })
           // ]
-          case "eth_sign": //Signs arbitrary data using the user’s private key
+            throw new Error("method not supported");
+          }
+          case "eth_sign": {//Signs arbitrary data using the user’s private key
           // "params": ["0xYourAddress", "0xYourData"]
-          case "personal_sign": //Signs a message, adding a user-readable prefix for security.
+            throw new Error("method not supported");
+          }
+          case "personal_sign": {//Signs a message, adding a user-readable prefix for security.
           // "params": ["0xYourData", "0xYourAddress"]
-          case "wallet_watchAsset": //Allows users to add custom tokens (e.g., ERC-20) to their wallet for tracking balances
+            throw new Error("method not supported");
+          }
+          case "wallet_watchAsset": {//Allows users to add custom tokens (e.g., ERC-20) to their wallet for tracking balances
           // "params": {
           //   "type": "ERC20",
           //   "options": {
@@ -432,22 +451,44 @@ export function BrillionConnector({
           //     "image": "https://example.com/token-logo.png"
           //   }
           // }
-          case "wallet_requestPermissions": //Used to gain access to specific wallet functionality or data (e.g., accounts, methods).
+            throw new Error("method not supported");
+          }
+          case "wallet_requestPermissions": {//Used to gain access to specific wallet functionality or data (e.g., accounts, methods).
           // "params": [{ "eth_accounts": {} }]
-          case "wallet_scanQRCode": //Facilitates interactions like scanning wallet addresses or connecting to other wallets.
-          case "wallet_getPermissions": //Checks what permissions the application currently has.
-          case "wallet_registerOnboarding": //Guides users to install or onboard with a specific wallet.
-          case "wallet_invokeSnap": //Extends wallet functionality using external scripts (Snaps).
+            throw new Error("method not supported");
+          }
+          case "wallet_scanQRCode": {//Facilitates interactions like scanning wallet addresses or connecting to other wallets.
+            throw new Error("method not supported");
+          }
+          case "wallet_getPermissions": {//Checks what permissions the application currently has.
+            throw new Error("method not supported");
+          }
+          case "wallet_registerOnboarding": {//Guides users to install or onboard with a specific wallet.
+            throw new Error("method not supported");
+          }
+          case "wallet_invokeSnap": {//Extends wallet functionality using external scripts (Snaps).
           // "params": {
           //   "snapId": "npm:@metamask/example-snap",
           //   "request": { "method": "exampleMethod", "params": {} }
           // }
-          case "wallet_enable": //Deprecated method for connecting to the wallet.
-          case "wallet_getCapabilities":
-          case "wallet_sendCalls":
-          case "wallet_getCallsStatus": //Likely used to retrieve the status of calls (e.g., pending, successful, or failed transactions) associated with the wallet or dApp.
-          case "wallet_showCallsStatus":
-          case "wallet_addEthereumChain": //Requests the wallet to add a new blockchain to its list of available networks
+            throw new Error("method not supported");
+          }
+          case "wallet_enable": {//Deprecated method for connecting to the wallet.
+            throw new Error("method not supported");
+          }
+          case "wallet_getCapabilities": {
+            throw new Error("method not supported");
+          }
+          case "wallet_sendCalls": {
+            throw new Error("method not supported");
+          }
+          case "wallet_getCallsStatus": {//Likely used to retrieve the status of calls (e.g., pending, successful, or failed transactions) associated with the wallet or dApp.
+            throw new Error("method not supported");
+          }
+          case "wallet_showCallsStatus": {
+            throw new Error("method not supported");
+          }
+          case "wallet_addEthereumChain": {//Requests the wallet to add a new blockchain to its list of available networks
             // "params": [
             //   {
             //     "chainId": "0x89",
@@ -461,12 +502,13 @@ export function BrillionConnector({
             //   }
             // ]
             throw new Error("method not supported");
-
-          default:
+          }
+          default: {
             const body = { method, params };
             const { error, result } = await rpc.http(url, { body });
             if (error) throw new RpcRequestError({ body, error, url });
             return result;
+          }
         }
       };
 
