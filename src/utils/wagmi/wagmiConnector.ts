@@ -72,7 +72,8 @@ export function BrillionConnector({
     const rawSession = cookies.find((strings) =>
       strings.includes("brillion-session-data"),
     );
-    return JSON.parse(rawSession?.split("=")[1]!);
+    if(rawSession) return JSON.parse(rawSession.split("=")[1]!);
+    return {};
   };
 
   const checkLogged = () => {

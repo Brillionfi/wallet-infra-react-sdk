@@ -18,6 +18,8 @@ export default [
           "allow": ["error"]
         }
       ],
+      'no-case-declarations': 'off',
+      'no-fallthrough': 'off',
       ...prettierConfig.rules,
     },
   },
