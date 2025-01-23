@@ -249,11 +249,6 @@ export function BrillionConnector({
             // ]
             const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
-              // await sdk.Wallet.setGasConfig(connectedWallets[0], parseChain(connectedChain), {
-              //   gasLimit: '9631345750',
-              //   maxFeePerGas: '9631345750',
-              //   maxPriorityFeePerGas: '9631345750'
-              // })
               return await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: connectedWallets[0],
@@ -270,15 +265,11 @@ export function BrillionConnector({
                 )
               ) {
                 // TODO - setGasConfig
-                await sdk.Wallet.setGasConfig(
-                  connectedWallets[0],
-                  parseChain(connectedChain),
-                  {
-                    gasLimit: "1",
-                    maxFeePerGas: "1",
-                    maxPriorityFeePerGas: "1",
-                  },
-                );
+                await sdk.Wallet.setGasConfig(connectedWallets[0], parseChain(connectedChain), {
+                  gasLimit: '9631345750',
+                  maxFeePerGas: '9631345750',
+                  maxPriorityFeePerGas: '9631345750'
+                })
                 return await sdk.Transaction.createTransaction({
                   transactionType: "unsigned",
                   from: connectedWallets[0],
