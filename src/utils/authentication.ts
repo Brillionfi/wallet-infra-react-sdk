@@ -1,4 +1,4 @@
-import { create } from '@brillionfi/wallet-infra-sdk/dist/utils/stampers/webAuthnStamper/webauthn-json/api.js';
+import { create } from "@brillionfi/wallet-infra-sdk/dist/utils/stampers/webAuthnStamper/webauthn-json/api.js";
 
 const generateRandomBuffer = (): ArrayBuffer => {
   const arr = new Uint8Array(32);
@@ -7,10 +7,16 @@ const generateRandomBuffer = (): ArrayBuffer => {
 };
 
 const base64UrlEncode = (challenge: ArrayBuffer): string => {
-  return Buffer.from(challenge).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return Buffer.from(challenge)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 };
 
-function protocolTransportEnumToInternalEnum(protocolEnum: AuthenticatorTransport) {
+function protocolTransportEnumToInternalEnum(
+  protocolEnum: AuthenticatorTransport,
+) {
   switch (protocolEnum) {
     case "internal": {
       return "AUTHENTICATOR_TRANSPORT_INTERNAL";
@@ -41,12 +47,12 @@ export const getAuthentication = async (domain: string) => {
     publicKey: {
       rp: {
         id: domain,
-        name: 'Wallet Passkey',
+        name: "Wallet Passkey",
       },
       challenge: base64UrlEncode(challenge),
       pubKeyCredParams: [
         {
-          type: 'public-key',
+          type: "public-key",
           alg: -7,
         },
       ],
@@ -64,7 +70,9 @@ export const getAuthentication = async (domain: string) => {
       credentialId: attestation.rawId,
       attestationObject: attestation.response.attestationObject,
       clientDataJson: attestation.response.clientDataJSON,
-      transports: attestation.response.transports.map(protocolTransportEnumToInternalEnum),
-    }
+      transports: attestation.response.transports.map(
+        protocolTransportEnumToInternalEnum,
+      ),
+    },
   };
 };
