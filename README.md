@@ -17,11 +17,11 @@ Install the Wallet Infra SDK into your project with a single command:
 npm i @brillionfi/waas-react-sdk
 ```
 
-## ⚡ Quick Start
+## ⚡ Quick Start (BrillionContext)
 
 First you must wrap your app inside `<BrillionProvider/>` in order to be able to interact with the SDK. 
 
-This providers has 3 props: 
+This providers has 4 props: 
   - `appId`: Your Brillion App ID.
   - `baseUrl`: Brillion API URL.
   - `defaultChain`: Your preferred chain to connect first.
@@ -186,6 +186,72 @@ const { sdk } = useBrillionContext();
 const authenticateUser = (jwt: string) => {
   return sdk?.authenticateUser(jwt);
 };
+```
+
+## ⚡ Quick Start (Wagmi BrillionConnector)
+
+First you need to import brillion Wagmi utils and initialize it with 4 props:
+
+  - `appId`: Your Brillion App ID.
+  - `baseUrl`: Brillion API URL.
+  - `defaultChain`: Your preferred chain to connect first.
+  - `WCProjectId`: Your walletConnect Project ID (mandatory only if you are planning to use WalletConnect as login method)
+
+```ts
+import { brillionWagmi } from "@brillionfi/waas-react-sdk";
+
+const { brillionConnector, brillionTransport } = brillionWagmi({
+  appId: process.env.NEXT_PUBLIC_DEFAULT_APPID ?? "7cd8e911-cb89-4bdf-9fa0-d5bb9563158b",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL as string,
+  defaultNetwork: sepolia.id,
+  WcProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID as string
+})
+```
+
+And then use them in wagmi createConfig:
+
+```ts
+const config = createConfig({
+  chains: [mainnet, sepolia],
+  transports: {
+    [mainnet.id]: brillionTransport(mainnet.id),
+    [sepolia.id]: brillionTransport(sepolia.id),
+  },
+  connectors: [brillionConnector]
+})
+```
+
+## 💻 Usage
+
+After wagmi configuration is done, you can start by connecting to brillion as follows:
+```ts
+const { connect } = useConnect();
+
+connect({
+  connector: connectors[0],
+  ...{
+    provider: "Google",
+    redirectUrl: `${process.env.NEXT_PUBLIC_REDIRECT_URL as string}2`,
+    email: "test@test.com", 
+    walletName: "name",
+  } as ConnectBrillionProps
+})
+```
+
+- provider:  can be `Google`, `Twitter`, `Discord`, `Email`, `Metamask`
+- email: (optional) in case you want to use Email provider
+- walletName: (first time user only) the name of the passkey that brillion needs for new user wallet
+
+Once this is done, you can just simple use native wagmi hooks:
+
+```ts
+import { useSendTransaction } from "wagmi";
+
+sendTransaction({
+  to: "wallet",
+  value: BigInt("1"),
+  data: "0x0"
+});
 ```
 
 ## 🌐 Demo
