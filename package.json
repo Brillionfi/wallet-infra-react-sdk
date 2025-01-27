@@ -1,6 +1,6 @@
 {
   "name": "@brillionfi/waas-react-sdk",
-  "version": "1.0.26",
+  "version": "1.0.26-25",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -22,11 +22,12 @@
   },
   "dependencies": {
     "@brillionfi/quill-core": "^0.0.28",
-    "@brillionfi/wallet-infra-sdk": "0.15.24-f1ddd04.0",
+    "@brillionfi/wallet-infra-sdk": "file:///Users/santiago/Desktop/Projects/ALBT/Brillion/wallet-infra-sdk",
     "@metamask/sdk": "^0.31.3",
     "@tanstack/react-query": "^5.62.2",
     "@wagmi/core": "^2.16.3",
     "@walletconnect/qrcode-modal": "^1.8.0",
+    "@walletconnect/sign-client": "^2.17.5",
     "@walletconnect/web3-provider": "^1.8.0",
     "axios": "^1.7.9",
     "ethers": "^6.13.4",

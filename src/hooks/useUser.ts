@@ -37,10 +37,10 @@ export const useUser = () => {
     let uri;
 
     if (provider === AuthProvider.WALLET_CONNECT) {
-      uri = await sdk.generateWalletConnectUri(
-        walletConnectProjectId,
+      uri = await sdk.generateWalletConnectUri({
+        projectId: walletConnectProjectId,
         redirectUrl,
-      );
+      });
       sdk.onConnectWallet((authUrl: unknown) => {
         window.location.href = authUrl as string;
       });

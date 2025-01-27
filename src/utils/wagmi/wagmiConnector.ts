@@ -12,6 +12,7 @@ import {
   createConnector,
 } from "@wagmi/core";
 import QRCodeModal from "@walletconnect/qrcode-modal";
+import Client, { SignClient } from '@walletconnect/sign-client';
 import { AxiosError } from "axios";
 import { BrowserProvider, keccak256, Listener, Transaction } from "ethers";
 import {
@@ -75,6 +76,7 @@ export function BrillionConnector({
 
   const sdk = new WalletInfra(appId, baseUrl);
   const mmSDK = new MetaMaskSDK();
+  let wcSDK: Client;
 
   const getSessionData = () => {
     const cookies = document.cookie.split(";");
@@ -85,7 +87,7 @@ export function BrillionConnector({
     return {};
   };
 
-  const checkLogged = () => {
+  const checkLogged = async () => {
     const params = new URLSearchParams(new URL(window.location.href).search);
     const code = params.get("code");
     if (code) {
@@ -106,6 +108,19 @@ export function BrillionConnector({
       if (Number(data.exp) * 1000 > Date.now()) {
         if (data.loggedInVia === AuthProvider.METAMASK) {
           mmSDK.connect();
+        }
+        if(data.loggedInVia === AuthProvider.WALLET_CONNECT) {
+          wcSDK = await SignClient.init({
+            relayUrl: 'wss://relay.walletconnect.com',
+            projectId: WcProjectId,
+            metadata: {
+              name: 'Brillion',
+              description: 'Brillion Wallet',
+              url: 'https://brillion.finance',
+              icons: [''], // TODO add brillion icon
+            },
+          });
+          await wcSDK.session.init();
         }
         sdk.authenticateUser(jwt);
         return true;
@@ -138,7 +153,7 @@ export function BrillionConnector({
 
     async setup() {
       this.localData.set("connectedChain", defaultNetwork!);
-      const isLogged = checkLogged();
+      const isLogged = await checkLogged();
       if (isLogged) {
         const wallets = await sdk.Wallet.getWallets();
         const connectedWallets = wallets.map(
@@ -156,7 +171,7 @@ export function BrillionConnector({
         this.localData.set("connectedChain", chainId! || defaultNetwork!);
         await this.switchChain?.({ chainId });
       }
-      const isLogged = checkLogged();
+      const isLogged = await checkLogged();
       const data = rest as ConnectBrillionProps;
 
       if (isLogged) {
@@ -187,10 +202,24 @@ export function BrillionConnector({
         }
         let uri: string | undefined;
         if (data.provider === AuthProvider.WALLET_CONNECT) {
-          uri = await sdk.generateWalletConnectUri(
-            WcProjectId,
-            data.redirectUrl,
-          );
+          uri = await sdk.generateWalletConnectUri({
+            projectId: WcProjectId,
+            redirectUrl: data.redirectUrl,
+            requiredNamespaces: {
+              eip155: {
+                methods: ['eth_chainId', 'eth_sendTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData', 'wallet_switchEthereumChain'],
+                chains: ['eip155:1'],
+                events: ['connect', 'disconnect', 'accountsChanged', 'chainChanged']
+              }
+            },
+            optionalNamespaces: {
+              eip155: {
+                methods: ['eth_chainId', 'eth_sendTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData', 'wallet_switchEthereumChain'],
+                chains: ['eip155:137', 'eip155:56'],
+                events: ['connect', 'disconnect', 'accountsChanged', 'chainChanged']
+              }
+            },
+          });
           QRCodeModal.open(uri!, () => {});
           sdk.onConnectWallet((authUrl: unknown) => {
             window.location.href = authUrl as string;
@@ -226,7 +255,7 @@ export function BrillionConnector({
       const url = chain.rpcUrls.default.http[0]!;
 
       const request: EIP1193RequestFn = async ({ method, params }) => {
-        if (!checkLogged()) throw new Error("User not logged in");
+        if (!(await await checkLogged())) throw new Error("User not logged in");
         switch (method) {
           case "eth_sendTransaction": {
             // "params": [
@@ -531,6 +560,26 @@ export function BrillionConnector({
         }
         return ethereum;
       }
+      if(sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
+        const wcRequest: EIP1193RequestFn = async ({ method, params }) => {
+          console.log("entra en wcRequest")
+          console.log('method :>> ', method);
+          console.log('params :>> ', params);
+          const connectedChain = this.localData.get("connectedChain") as number;
+          console.log('connectedChain :>> ', connectedChain);
+          const lastKeyIndex = wcSDK.session.getAll().length - 1;
+          const session = wcSDK.session.getAll()[lastKeyIndex];
+          return wcSDK.request({
+            topic: session.topic,
+            chainId: 'eip155:'+ connectedChain,
+            request: {
+              method,
+              params: params ?? [],
+            },
+          });
+        }
+        return custom({ request: wcRequest })({ retryCount: 1 });
+      }
       return custom({ request })({ retryCount: 1 });
     },
 
@@ -576,7 +625,7 @@ export function BrillionConnector({
     },
 
     async isAuthorized() {
-      return checkLogged();
+      return await checkLogged();
     },
 
     // ---- OPTIONALS
@@ -588,18 +637,20 @@ export function BrillionConnector({
     async getSigner() {
       const sessionData = getSessionData();
       if (sessionData.loggedInVia === AuthProvider.METAMASK) {
-        const provider = new BrowserProvider(await this.getProvider());
+        const provider = new BrowserProvider((await this.getProvider()) as SDKProvider);
         return await provider.getSigner();
       }
       return "getSigner method not supported";
     },
 
     async switchChain({ chainId }) {
-      this.localData.set("connectedChain", hexToString(String(chainId)));
-
+      console.log("switchChain");
+      console.log('chainId :>> ', chainId);
       const provider = await this.getProvider();
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
+      console.log('String(chainId)) :>> ', String(chainId));
+      this.localData.set("connectedChain", String(chainId));
 
       await provider.request({
         method: "wallet_switchEthereumChain",
@@ -624,6 +675,8 @@ export function BrillionConnector({
     },
 
     onChainChanged(chainId: string) {
+      console.log('onChainChanged');
+      console.log('chainId :>> ', chainId);
       this.localData.set("connectedChain", chainId);
       config.emitter.emit("change", { chainId: Number(chainId) });
     },
