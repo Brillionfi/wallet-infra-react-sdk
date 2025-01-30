@@ -39,7 +39,7 @@ export const brillionWagmi = ({
   });
   const brillionTransport = (chainId: number) => {
     return BrillionTransport(
-      { appId, baseUrl },
+      { appId, baseUrl, WcProjectId },
       chainId || defaultNetwork || 1,
     );
   };

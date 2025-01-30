@@ -312,6 +312,9 @@ export function BrillionConnector({
             );
           }
           case "eth_getBalance": {
+            console.log("eth_getBalance")
+            const balance = await sdk.Wallet.getPortfolio(connectedWallets[0], parseChain(connectedChain));
+            console.log('balance :>> ', balance);
             return await sdk.Wallet.rpcRequest(
               { method, params: params as string[] },
               { chainId: parseChain(connectedChain) },

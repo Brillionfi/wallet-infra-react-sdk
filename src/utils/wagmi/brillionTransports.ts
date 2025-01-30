@@ -1,15 +1,17 @@
 import { AuthProvider, WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import MetaMaskSDK from "@metamask/sdk";
 import { custom } from "wagmi";
+import Client, { SignClient } from '@walletconnect/sign-client';
 
 import { BrillionProviderProps, parseChain } from ".";
 
 export const BrillionTransport = (
-  config: Pick<BrillionProviderProps, "appId" | "baseUrl">,
+  config: Pick<BrillionProviderProps, "appId" | "baseUrl" | "WcProjectId">,
   chainId: number,
 ) => {
   const sdk = new WalletInfra(config.appId!, config.baseUrl!);
   const mmSDK = new MetaMaskSDK();
+  let wcSDK: Client;
 
   return custom({
     async request(body) {
@@ -32,11 +34,45 @@ export const BrillionTransport = (
           throw new Error("No MetaMask provider found");
         }
         return ethereum.request(body);
+      } else if (sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
+        wcSDK = await SignClient.init({
+          relayUrl: 'wss://relay.walletconnect.com',
+          projectId: config.WcProjectId!,
+          metadata: {
+            name: 'Brillion',
+            description: 'Brillion Wallet',
+            url: 'https://brillion.finance',
+            icons: [''], // TODO add brillion icon
+          },
+        });
+        await wcSDK.session.init();
+        const lastKeyIndex = wcSDK.session.getAll().length - 1;
+        const session = wcSDK.session.getAll()[lastKeyIndex];
+        return wcSDK.request({
+          topic: session.topic,
+          chainId: 'eip155:'+ chainId,
+          request: body,
+        });
       } else {
-        return await sdk.Wallet.rpcRequest(
-          { method: body.method, params: body.params },
-          { chainId: parseChain(chainId) },
-        );
+        switch (body.method) {
+          // TODO: wagmi useBalance does not support array response
+          // case "eth_getBalance": {
+          //   const response = await sdk.Wallet.getPortfolio(body.params[0], parseChain(chainId));
+          //   console.log('eth_getBalance response :>> ', response);
+          //   return response.portfolio;
+          // }
+          case "eth_getTransactionCount": {
+            return await sdk.Wallet.getNonce(
+              body.params[0],
+              parseChain(chainId),
+            );
+          }
+          default:
+            return await sdk.Wallet.rpcRequest(
+              { method: body.method, params: body.params },
+              { chainId: parseChain(chainId) },
+            );
+        }
       }
     },
   });
