@@ -312,9 +312,8 @@ export function BrillionConnector({
             );
           }
           case "eth_getBalance": {
-            console.log("eth_getBalance")
-            const balance = await sdk.Wallet.getPortfolio(connectedWallets[0], parseChain(connectedChain));
-            console.log('balance :>> ', balance);
+            // TODO: wagmi useBalance does not support array response
+            // const balance = await sdk.Wallet.getPortfolio(connectedWallets[0], parseChain(connectedChain));
             return await sdk.Wallet.rpcRequest(
               { method, params: params as string[] },
               { chainId: parseChain(connectedChain) },
