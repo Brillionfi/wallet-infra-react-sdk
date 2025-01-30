@@ -88,11 +88,14 @@ export function BrillionConnector({
   };
 
   const checkLogged = async () => {
-    const params = new URLSearchParams(new URL(window.location.href).search);
-    const code = params.get("code");
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
     if (code) {
       document.cookie = `brillion-session-jwt=${code}`;
+      url.searchParams.delete("code");
+      window.history.replaceState({}, '', url.toString());
     }
+
     const cookies = document.cookie.split(";");
     const sessionCookie = cookies.find((strings) =>
       strings.includes("brillion-session-jwt"),
@@ -215,7 +218,7 @@ export function BrillionConnector({
             optionalNamespaces: {
               eip155: {
                 methods: ['eth_chainId', 'eth_sendTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData', 'wallet_switchEthereumChain'],
-                chains: ['eip155:137', 'eip155:56'],
+                chains: ['eip155:137', 'eip155:11155111', '80002', 'eip155:1'],
                 events: ['connect', 'disconnect', 'accountsChanged', 'chainChanged']
               }
             },
@@ -275,7 +278,7 @@ export function BrillionConnector({
                 from: connectedWallets[0],
                 to: sendTransactionData.to,
                 value: hexToString(sendTransactionData.value),
-                data: hexToString(sendTransactionData.data),
+                data: sendTransactionData.data.toString(),
                 chainId: connectedChain.toString(),
               });
             } catch (error) {
@@ -300,7 +303,7 @@ export function BrillionConnector({
                   from: connectedWallets[0],
                   to: sendTransactionData.to,
                   value: hexToString(sendTransactionData.value),
-                  data: hexToString(sendTransactionData.data),
+                  data: sendTransactionData.data.toString(),
                   chainId: connectedChain.toString(),
                 });
               }
@@ -562,11 +565,7 @@ export function BrillionConnector({
       }
       if(sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
         const wcRequest: EIP1193RequestFn = async ({ method, params }) => {
-          console.log("entra en wcRequest")
-          console.log('method :>> ', method);
-          console.log('params :>> ', params);
           const connectedChain = this.localData.get("connectedChain") as number;
-          console.log('connectedChain :>> ', connectedChain);
           const lastKeyIndex = wcSDK.session.getAll().length - 1;
           const session = wcSDK.session.getAll()[lastKeyIndex];
           return wcSDK.request({
@@ -585,7 +584,6 @@ export function BrillionConnector({
 
     async disconnect() {
       const sessionData = getSessionData();
-
       if (sessionData.loggedInVia === AuthProvider.METAMASK) {
         const provider = (await this.getProvider()) as SDKProvider;
         if (chainChanged) {
@@ -604,6 +602,7 @@ export function BrillionConnector({
 
       document.cookie = "brillion-session-jwt=";
       this.localData.clear();
+      this.onDisconnect();
     },
 
     async getAccounts() {
@@ -644,12 +643,9 @@ export function BrillionConnector({
     },
 
     async switchChain({ chainId }) {
-      console.log("switchChain");
-      console.log('chainId :>> ', chainId);
       const provider = await this.getProvider();
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
-      console.log('String(chainId)) :>> ', String(chainId));
       this.localData.set("connectedChain", String(chainId));
 
       await provider.request({
@@ -675,8 +671,6 @@ export function BrillionConnector({
     },
 
     onChainChanged(chainId: string) {
-      console.log('onChainChanged');
-      console.log('chainId :>> ', chainId);
       this.localData.set("connectedChain", chainId);
       config.emitter.emit("change", { chainId: Number(chainId) });
     },
