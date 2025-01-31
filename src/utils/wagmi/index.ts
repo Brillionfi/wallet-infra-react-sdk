@@ -11,7 +11,7 @@ export const parseChain = (chain: number) => {
 };
 
 export const hexToString = (hex: string) => {
-  return parseInt(hex || "0x0", 16).toString();
+  return BigInt(hex || "0x0").toString();
 };
 
 export const numberToHex = (number: number) => {
@@ -39,7 +39,7 @@ export const brillionWagmi = ({
   });
   const brillionTransport = (chainId: number) => {
     return BrillionTransport(
-      { appId, baseUrl },
+      { appId, baseUrl, WcProjectId },
       chainId || defaultNetwork || 1,
     );
   };
