@@ -75,7 +75,13 @@ export function BrillionConnector({
   let disconnect: Connector["onDisconnect"] | undefined;
 
   const sdk = new WalletInfra(appId, baseUrl);
-  const mmSDK = new MetaMaskSDK();
+  const mmSDK = new MetaMaskSDK({
+    dappMetadata: {
+      name: 'Brillion',
+      url: 'https://brillion.finance',
+      iconUrl: '', // TODO add brillion icon
+    }
+  });
   let wcSDK: Client;
 
   const getSessionData = () => {
