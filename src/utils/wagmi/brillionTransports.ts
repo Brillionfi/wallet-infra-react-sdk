@@ -10,7 +10,13 @@ export const BrillionTransport = (
   chainId: number,
 ) => {
   const sdk = new WalletInfra(config.appId!, config.baseUrl!);
-  const mmSDK = new MetaMaskSDK();
+  const mmSDK = new MetaMaskSDK({
+    dappMetadata: {
+      name: 'Brillion',
+      url: 'https://brillion.finance',
+      iconUrl: '', // TODO add brillion icon
+    }
+  });
   let wcSDK: Client;
 
   return custom({
