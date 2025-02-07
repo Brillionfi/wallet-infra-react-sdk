@@ -1,9 +1,12 @@
 import {
   Address,
   ChainId,
+  ICreateWalletAuthenticatorResponse,
   IExecRecovery,
   ITransaction,
   IWallet,
+  IWalletAuthenticator,
+  IWalletAuthenticatorResponse,
   IWalletGasConfiguration,
   IWalletGasConfigurationAPI,
   IWalletGasEstimation,
@@ -26,6 +29,26 @@ export const useWallet = () => {
     if (wallet) changeWallet(wallet.address ?? "");
 
     return wallet;
+  };
+
+  const createWalletAuthnticator = async (
+    authenticator: IWalletAuthenticator,
+  ): Promise<ICreateWalletAuthenticatorResponse | undefined> => {
+    if (!sdk) {
+      throw new Error("AppId is not valid");
+    }
+
+    return await sdk.Wallet.createWalletAuthenticator(authenticator);
+  };
+
+  const getWalletAuthnticator = async (): Promise<
+    IWalletAuthenticatorResponse | undefined
+  > => {
+    if (!sdk) {
+      throw new Error("AppId is not valid");
+    }
+
+    return await sdk.Wallet.getWalletAuthenticator();
   };
 
   const wallets = useQuery({
@@ -198,5 +221,7 @@ export const useWallet = () => {
     approveSignTransaction,
     rejectSignTransaction,
     getNotifications,
+    getWalletAuthnticator,
+    createWalletAuthnticator,
   };
 };

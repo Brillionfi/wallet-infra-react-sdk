@@ -12,7 +12,7 @@ import {
   createConnector,
 } from "@wagmi/core";
 import QRCodeModal from "@walletconnect/qrcode-modal";
-import Client, { SignClient } from '@walletconnect/sign-client';
+import Client, { SignClient } from "@walletconnect/sign-client";
 import { AxiosError } from "axios";
 import { BrowserProvider, keccak256, Listener, Transaction } from "ethers";
 import {
@@ -77,10 +77,10 @@ export function BrillionConnector({
   const sdk = new WalletInfra(appId, baseUrl);
   const mmSDK = new MetaMaskSDK({
     dappMetadata: {
-      name: 'Brillion',
-      url: 'https://brillion.finance',
-      iconUrl: '', // TODO add brillion icon
-    }
+      name: "Brillion",
+      url: "https://brillion.finance",
+      iconUrl: "", // TODO add brillion icon
+    },
   });
   let wcSDK: Client;
 
@@ -99,7 +99,7 @@ export function BrillionConnector({
     if (code) {
       document.cookie = `brillion-session-jwt=${code}`;
       url.searchParams.delete("code");
-      window.history.replaceState({}, '', url.toString());
+      window.history.replaceState({}, "", url.toString());
     }
 
     const cookies = document.cookie.split(";");
@@ -118,15 +118,15 @@ export function BrillionConnector({
         if (data.loggedInVia === AuthProvider.METAMASK) {
           mmSDK.connect();
         }
-        if(data.loggedInVia === AuthProvider.WALLET_CONNECT) {
+        if (data.loggedInVia === AuthProvider.WALLET_CONNECT) {
           wcSDK = await SignClient.init({
-            relayUrl: 'wss://relay.walletconnect.com',
+            relayUrl: "wss://relay.walletconnect.com",
             projectId: WcProjectId,
             metadata: {
-              name: 'Brillion',
-              description: 'Brillion Wallet',
-              url: 'https://brillion.finance',
-              icons: [''], // TODO add brillion icon
+              name: "Brillion",
+              description: "Brillion Wallet",
+              url: "https://brillion.finance",
+              icons: [""], // TODO add brillion icon
             },
           });
           await wcSDK.session.init();
@@ -216,17 +216,46 @@ export function BrillionConnector({
             redirectUrl: data.redirectUrl,
             requiredNamespaces: {
               eip155: {
-                methods: ['eth_chainId', 'eth_sendTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData', 'wallet_switchEthereumChain'],
-                chains: ['eip155:11155111'],
-                events: ['connect', 'disconnect', 'accountsChanged', 'chainChanged']
-              }
+                methods: [
+                  "eth_chainId",
+                  "eth_sendTransaction",
+                  "eth_sign",
+                  "personal_sign",
+                  "eth_signTypedData",
+                  "wallet_switchEthereumChain",
+                ],
+                chains: ["eip155:11155111"],
+                events: [
+                  "connect",
+                  "disconnect",
+                  "accountsChanged",
+                  "chainChanged",
+                ],
+              },
             },
             optionalNamespaces: {
               eip155: {
-                methods: ['eth_chainId', 'eth_sendTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData', 'wallet_switchEthereumChain'],
-                chains: ['eip155:137', 'eip155:11155111', 'eip155:80002', 'eip155:1'],
-                events: ['connect', 'disconnect', 'accountsChanged', 'chainChanged']
-              }
+                methods: [
+                  "eth_chainId",
+                  "eth_sendTransaction",
+                  "eth_sign",
+                  "personal_sign",
+                  "eth_signTypedData",
+                  "wallet_switchEthereumChain",
+                ],
+                chains: [
+                  "eip155:137",
+                  "eip155:11155111",
+                  "eip155:80002",
+                  "eip155:1",
+                ],
+                events: [
+                  "connect",
+                  "disconnect",
+                  "accountsChanged",
+                  "chainChanged",
+                ],
+              },
             },
           });
           QRCodeModal.open(uri!, () => {});
@@ -444,20 +473,20 @@ export function BrillionConnector({
         }
         return ethereum;
       }
-      if(sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
+      if (sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
         const wcRequest: EIP1193RequestFn = async ({ method, params }) => {
           const connectedChain = this.localData.get("connectedChain") as number;
           const lastKeyIndex = wcSDK.session.getAll().length - 1;
           const session = wcSDK.session.getAll()[lastKeyIndex];
           return wcSDK.request({
             topic: session.topic,
-            chainId: 'eip155:'+ connectedChain,
+            chainId: "eip155:" + connectedChain,
             request: {
               method,
               params: params ?? [],
             },
           });
-        }
+        };
         return custom({ request: wcRequest })({ retryCount: 1 });
       }
       return custom({ request })({ retryCount: 1 });
@@ -517,7 +546,9 @@ export function BrillionConnector({
     async getSigner() {
       const sessionData = getSessionData();
       if (sessionData.loggedInVia === AuthProvider.METAMASK) {
-        const provider = new BrowserProvider((await this.getProvider()) as SDKProvider);
+        const provider = new BrowserProvider(
+          (await this.getProvider()) as SDKProvider,
+        );
         return await provider.getSigner();
       }
       return "getSigner method not supported";

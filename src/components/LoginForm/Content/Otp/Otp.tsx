@@ -2,6 +2,14 @@ import { LoginMethods, TLoginOption } from "interfaces";
 import { defaultStyles, TCustomStyles } from "@/components/LoginForm/Content/Otp/OtpStyles";
 import NextArrow from "@/components/icons/next-arrow";
 import { useMemo, useState } from "react";
+import styled from "styled-components";
+
+const Input = styled.input`
+  &:focus {
+    border: nonce;
+    outline: none;
+  }
+`;
 
 export const Otp = ({options, customStyles}: {options: TLoginOption[], customStyles?: TCustomStyles}) => {
 
@@ -32,7 +40,7 @@ export const Otp = ({options, customStyles}: {options: TLoginOption[], customSty
     <section style={otpButtonsContainerStyle}>
       {showEmail ? 
         <div style={otpInputContainerStyle}>
-          <input
+          <Input
             type="email"
             id="otp-email-input"
             placeholder="Email address"

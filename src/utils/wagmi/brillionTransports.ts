@@ -1,7 +1,7 @@
 import { AuthProvider, WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import MetaMaskSDK from "@metamask/sdk";
+import Client, { SignClient } from "@walletconnect/sign-client";
 import { custom } from "wagmi";
-import Client, { SignClient } from '@walletconnect/sign-client';
 
 import { BrillionProviderProps, parseChain } from ".";
 
@@ -12,10 +12,10 @@ export const BrillionTransport = (
   const sdk = new WalletInfra(config.appId!, config.baseUrl!);
   const mmSDK = new MetaMaskSDK({
     dappMetadata: {
-      name: 'Brillion',
-      url: 'https://brillion.finance',
-      iconUrl: '', // TODO add brillion icon
-    }
+      name: "Brillion",
+      url: "https://brillion.finance",
+      iconUrl: "", // TODO add brillion icon
+    },
   });
   let wcSDK: Client;
 
@@ -42,13 +42,13 @@ export const BrillionTransport = (
         return ethereum.request(body);
       } else if (sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
         wcSDK = await SignClient.init({
-          relayUrl: 'wss://relay.walletconnect.com',
+          relayUrl: "wss://relay.walletconnect.com",
           projectId: config.WcProjectId!,
           metadata: {
-            name: 'Brillion',
-            description: 'Brillion Wallet',
-            url: 'https://brillion.finance',
-            icons: [''], // TODO add brillion icon
+            name: "Brillion",
+            description: "Brillion Wallet",
+            url: "https://brillion.finance",
+            icons: [""], // TODO add brillion icon
           },
         });
         await wcSDK.session.init();
@@ -56,7 +56,7 @@ export const BrillionTransport = (
         const session = wcSDK.session.getAll()[lastKeyIndex];
         return wcSDK.request({
           topic: session.topic,
-          chainId: 'eip155:'+ chainId,
+          chainId: "eip155:" + chainId,
           request: body,
         });
       } else {

@@ -2,6 +2,7 @@ export type TCustomStyles = {
   headerStyle?: React.CSSProperties;
   headerTextStyle?: React.CSSProperties;
   headerText?: string;
+  showClose?: boolean;
   closeStyle?: React.CSSProperties;
 };
 
