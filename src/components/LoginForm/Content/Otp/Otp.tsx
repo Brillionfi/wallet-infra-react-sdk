@@ -1,17 +1,10 @@
 import { LoginMethods, TLoginOption } from "interfaces";
-import { defaultStyles, TCustomStyles } from "@/components/LoginForm/Content/Otp/OtpStyles";
+import { Button, ButtonIcon, ButtonText, InputContainer, InputNext } from "@/components/LoginForm/Content/CommonStyles";
+import { ButtonsContainer, EmailInput, TCustomClassNames } from "@/components/LoginForm/Content/Otp/OtpStyles";
 import NextArrow from "@/components/icons/next-arrow";
 import { useMemo, useState } from "react";
-import styled from "styled-components";
 
-const Input = styled.input`
-  &:focus {
-    border: nonce;
-    outline: none;
-  }
-`;
-
-export const Otp = ({options, customStyles}: {options: TLoginOption[], customStyles?: TCustomStyles}) => {
+export const Otp = ({options, customClassNames}: {options: TLoginOption[], customClassNames?: TCustomClassNames}) => {
 
   const [showEmail, setShowEmail] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
@@ -27,47 +20,41 @@ export const Otp = ({options, customStyles}: {options: TLoginOption[], customSty
     // do the same for upcoming SMS otp login
   }, [options])
 
-  const otpButtonsContainerStyle = customStyles?.otpButtonsContainerStyle ?? defaultStyles.otpButtonsContainer;
-  const otpButtonStyle = customStyles?.buttonStyle ?? defaultStyles.button;
-  const otpButtonIconStyle = customStyles?.buttonIconStyle ?? defaultStyles.buttonIcon;
-  const buttonTextStyle = customStyles?.buttonTextStyle ?? defaultStyles.buttonText;
-
-  const otpInputContainerStyle = customStyles?.inputContainerStyle ?? defaultStyles.inputContainer;
-  const otpInputStyle = customStyles?.inputStyle ?? defaultStyles.input;
-  const otpInputNextStyle = customStyles?.inputNextStyle ?? defaultStyles.inputNext;
-
   return (
-    <section style={otpButtonsContainerStyle}>
+    <ButtonsContainer className={customClassNames?.otpButtonsContainer}>
       {showEmail ? 
-        <div style={otpInputContainerStyle}>
-          <Input
+        <InputContainer className={customClassNames?.inputContainer}>
+          <EmailInput
             type="email"
             id="otp-email-input"
             placeholder="Email address"
             value={email}
-            style={otpInputStyle}
+            className={customClassNames?.input}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <div style={otpInputNextStyle} onClick={() => emailOption?.onClick!(email)}>
+          <InputNext 
+            className={customClassNames?.inputNext} 
+            onClick={() => emailOption?.onClick!(email)}
+          >
             <NextArrow />
-          </div>
-        </div>
+          </InputNext>
+        </InputContainer>
       :
-        <button
+        <Button
           key={`otp-login-option-email`}
           id={`otp-login-option-email`}
-          style={otpButtonStyle}
+          className={customClassNames?.button}
           onClick={() => setShowEmail(true)}
         >
-          <span style={otpButtonIconStyle}>
+          <ButtonIcon className={customClassNames?.buttonIcon}>
             {emailOption?.icon}
-          </span>
-          <span style={buttonTextStyle}>
+          </ButtonIcon>
+          <ButtonText className={customClassNames?.buttonText}>
             {emailOption?.label}
-          </span>
-        </button>
+          </ButtonText>
+        </Button>
       }
       {/* do the same for upcoming SMS otp login */}
-    </section>
+    </ButtonsContainer>
   );
 };

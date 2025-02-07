@@ -9,29 +9,11 @@ import WalletConnectLogo from "@/components/icons/walletconnect-logo";
 import EmailLogo from "@/components/icons/email-logo";
 import WalletLogo from "@/components/icons/wallet-logo";
 import QRCodeModal from "@walletconnect/qrcode-modal"; 
-import { defaultStyles, TCustomStyles } from "@/components/LoginForm/Content/ContentStyles";
-import { Social } from "./Social/Social";
-import { Otp } from "./Otp/Otp";
-import { Wallet } from "./Wallet/Wallet";
-import { CSSProperties } from 'react';
-
-const hrStyle: CSSProperties = {
-  width: "40%",
-  border: '1px solid #BBBBBB'
-}
-const orStyle: CSSProperties = {
-  width: "20%",
-  color: '#BBBBBB',
-  fontSize: '0.8rem'
-}
-const dividerStyle: CSSProperties = {
-  display: 'flex', 
-  justifyContent: 'center', 
-  alignItems: 'center', 
-  width: '100%', 
-  textAlign: 'center', 
-  margin: '1rem 0rem'
-}
+import { ContentContainer, DivederMiddleSection, Divider, DividerSidesSection, TCustomClassNames } from "@/components/LoginForm/Content/ContentStyles";
+import { Social } from "@/components/LoginForm/Content/Social/Social";
+import { Otp } from "@/components/LoginForm/Content/Otp/Otp";
+import { Wallet } from "@/components/LoginForm/Content/Wallet/Wallet";
+import { Button, ButtonIcon, ButtonText } from "@/components/LoginForm/Content/CommonStyles";
 
 export const Content = (
 {
@@ -40,13 +22,13 @@ export const Content = (
   setErrorText, 
   showInnerContent, 
   toggleInnerContent, 
-  customStyles
+  customClassNames
 }:{
   loginMethods: LoginMethods[], 
   redirectUrl: string, 
   setErrorText: (error: string) => void, 
   showInnerContent: boolean,
-  toggleInnerContent: () => void, customStyles?: TCustomStyles
+  toggleInnerContent: () => void, customClassNames?: TCustomClassNames
 }) => {
   const { login } = useUser();
 
@@ -122,39 +104,34 @@ export const Content = (
   const otpMethods = otpOptions.filter(option=> loginMethods.includes(option.label))
   const walletMethods = walletOptions.filter(option=> loginMethods.includes(option.label))
 
-  const contentContainerStyle = customStyles?.contentContainerStyle ?? defaultStyles.contentContainer;
-  const buttonStyle = customStyles?.buttonStyle ?? defaultStyles.button;
-  const buttonIconStyle = customStyles?.buttonIconStyle ?? defaultStyles.buttonIcon;
-  const buttonTextStyle = customStyles?.buttonTextStyle ?? defaultStyles.buttonText;
-
   return (
-    <section style={contentContainerStyle}>
+    <ContentContainer className={customClassNames?.contentContainer}>
       <div style={{
           width: !showInnerContent ? '100%' : '0%',
           opacity: !showInnerContent ? 1 : 0,
           transition: `width 500ms ease`,
         }}
       >
-        <Social options={socialMethods} customStyles={customStyles}/>
-        <Otp options={otpMethods} customStyles={customStyles}/>
+        <Social options={socialMethods} customClassNames={customClassNames}/>
+        <Otp options={otpMethods} customClassNames={customClassNames}/>
         {walletMethods.length > 0 ? 
           <>
-            <div style={dividerStyle}>
-              <hr style={hrStyle}/>
-              <span style={orStyle}>OR</span>
-              <hr style={hrStyle}/>
-            </div>
-            <button
-              style={buttonStyle}
+            <Divider>
+              <DividerSidesSection/>
+              <DivederMiddleSection>OR</DivederMiddleSection>
+              <DividerSidesSection/>
+            </Divider>
+            <Button
+              className={customClassNames?.button}
               onClick={toggleInnerContent}
             >
-              <span style={buttonIconStyle}>
+              <ButtonIcon className={customClassNames?.buttonIcon}>
                 <WalletLogo />
-              </span>
-              <span style={buttonTextStyle}>
+              </ButtonIcon>
+              <ButtonText className={customClassNames?.buttonText}>
                 Connect Wallet
-              </span>
-            </button>
+              </ButtonText>
+            </Button>
           </>
         : null}
       </div>
@@ -164,8 +141,8 @@ export const Content = (
           transition: `width 500ms ease`,
         }}
       >
-        <Wallet options={walletMethods} customStyles={customStyles}/>
+        <Wallet options={walletMethods} customClassNames={customClassNames}/>
       </div>
-    </section>
+    </ContentContainer>
   );
 };

@@ -1,38 +1,36 @@
-import {defaultStyles as defaultContentStyles, TCustomStyles as TCustomContentStyles} from '@/components/LoginForm/Content/ContentStyles';
-import {defaultStyles as defaultHeaderStyles, TCustomStyles as TCustomHeaderStyles} from '@/components/LoginForm/Header/HeaderStyles';
-import {defaultStyles as defaultFooterStyles, TCustomStyles as TCustomFooterStyles} from '@/components/LoginForm/Footer/FooterStyles';
+import { TCustomClassNames as TCustomContentClassNames } from '@/components/LoginForm/Content/ContentStyles';
+import { TCustomClassNames as TCustomHeaderClassNames } from '@/components/LoginForm/Header/HeaderStyles';
+import { TCustomClassNames as TCustomFooterClassNames } from '@/components/LoginForm/Footer/FooterStyles';
+import styled from 'styled-components';
 
-export type TCustomLoginFormStyles = {
-  containerStyle?: React.CSSProperties;
-  errorContainerStyle?: React.CSSProperties;
-  errorTextStyle?: React.CSSProperties;
-} & TCustomFooterStyles & TCustomHeaderStyles & TCustomContentStyles;
-
-const container: React.CSSProperties = {
-  backgroundColor: "#FCFCFC",
-  borderRadius: "16px",
-  border: "1px solid #E8E8E8",
-  display: "flex",
-  alignItems: "center",
-  flexDirection: "column",
-  padding: "2rem",
-  width: "314px",
-  minHeight: "436px",
-};
-
-const errorContainer: React.CSSProperties = {
-  marginTop: "1rem",
+export type TConfig = {
+  showClose?: boolean;
+  footerText?: string;
+  customClassNames: TCustomClassNames;
 }
 
-const errorStyle: React.CSSProperties = {  
-  color: "red",
-}
+export type TCustomClassNames = {
+  mainContainer?: string;
+  errorContainer?: string;
+  errorText?: string;
+} & TCustomFooterClassNames & TCustomHeaderClassNames & TCustomContentClassNames;
 
-export const defaultLoginFormStyles = {
-  ...defaultContentStyles,
-  ...defaultHeaderStyles,
-  ...defaultFooterStyles,
-  container,
-  errorContainer,
-  errorStyle,
-}
+export const MainContainer = styled.div`
+  background-color: #FCFCFC;
+  border-radius: 16px;
+  border: 1px solid #E8E8E8;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem;
+  width: 314px;
+  min-height: 436px;
+`;
+
+export const ErrorContainer = styled.section`
+  margin-top: 1rem;
+`;
+
+export const ErrorStyle = styled.span`
+  color: red;
+`;

@@ -1,26 +1,22 @@
 import { TLoginOption } from "interfaces";
-import { defaultStyles, TCustomStyles } from "@/components/LoginForm/Content/Social/SocialStyles";
+import { SocialButton, SocialButtonIcon, SocialButtonsContainer, TCustomClassNames } from "@/components/LoginForm/Content/Social/SocialStyles";
 
-export const Social = ({options, customStyles}: {options: TLoginOption[], customStyles?: TCustomStyles}) => {
-
-  const socialButtonsContainerStyle = customStyles?.socialButtonsContainerStyle ?? defaultStyles.socialButtonsContainer;
-  const socialButtonStyle = customStyles?.socialButtonStyle ?? defaultStyles.socialButton;
-  const socialButtonIconStyle = customStyles?.socialButtonIconStyle ?? defaultStyles.socialButtonIcon;
+export const Social = ({options, customClassNames}: {options: TLoginOption[], customClassNames?: TCustomClassNames}) => {
 
   return (
-    <section style={socialButtonsContainerStyle}>
+    <SocialButtonsContainer className={customClassNames?.socialButtonsContainer}>
       {options.map((option) => (
-        <button
+        <SocialButton
           key={`social-login-option-${option.label!.toLocaleLowerCase()}`}
           id={`social-login-option-${option.label!.toLocaleLowerCase()}`}
-          style={socialButtonStyle}
+          className={customClassNames?.socialButton}
           onClick={() => option.onClick!()}
         >
-          <span style={socialButtonIconStyle}>
+          <SocialButtonIcon className={customClassNames?.socialButtonIcon}>
             {option.icon}
-          </span>
-        </button>
+          </SocialButtonIcon>
+        </SocialButton>
       ))}
-    </section>
+    </SocialButtonsContainer>
   );
 };

@@ -1,18 +1,21 @@
-import {defaultStyles as defaultCommonStyles, TCustomStyles as TCustomCommonStyles} from '@/components/LoginForm/Content/CommonStyles';
+import { Input, TCustomClassNames as TCustomCommonClassNames } from '@/components/LoginForm/Content/CommonStyles';
+import styled from "styled-components";
 
-export type TCustomStyles = {
-  otpButtonsContainerStyle?: React.CSSProperties;
-}& TCustomCommonStyles;
+export type TCustomClassNames = {
+  otpButtonsContainer?: string;
+} & TCustomCommonClassNames;
 
-const otpButtonsContainer: React.CSSProperties = {
-  display: "flex",
-  width: "100%",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  gap: "16px",
-};
+export const EmailInput = styled(Input)`
+  &:focus {
+    border: none;
+    outline: none;
+  }
+`;
 
-export const defaultStyles = {
-  ...defaultCommonStyles,
-  otpButtonsContainer,
-}
+export const ButtonsContainer = styled.section`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+`;

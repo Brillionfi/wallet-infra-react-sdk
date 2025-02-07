@@ -55,37 +55,41 @@ const MyLoginPage = () => {
 
 ###  Login Form Customizations
 
-If you want to personalize this login form, you can easily put your own styles or add/override default styles. Separated by sections:
-- Main Container:
-  1) `containerStyle?: React.CSSProperties;`
-- Header:
-  1) `headerStyle?: React.CSSProperties;`
-  2) `headerTextStyle?: React.CSSProperties;`
-  3) `headerText?: string;`
-  4) `closeStyle?: React.CSSProperties;`
-- Content Container: 
-  1) `contentContainerStyle?: React.CSSProperties;`
-  2) `buttonStyle?: React.CSSProperties;`
-  3) `buttonIconStyle?: React.CSSProperties;`
-  4) `buttonTextStyle?: React.CSSProperties;`
-  5) `inputContainerStyle?: React.CSSProperties;`
-  6) `inputStyle?: React.CSSProperties;`
-  7) `inputNextStyle?: React.CSSProperties;`
-  8) `socialButtonsContainerStyle?: React.CSSProperties;`
-  9) `socialButtonStyle?: React.CSSProperties;`
-  10) `socialButtonIconStyle?: React.CSSProperties;`
-  11) `otpButtonsContainerStyle?: React.CSSProperties;`
-  12) `walletButtonsContainerStyle?: React.CSSProperties;`
-  13) `walletButtonStyle?: React.CSSProperties;`
-  14) `walletButtonIconStyle?: React.CSSProperties;`
-  15) `walletButtonTextStyle?: React.CSSProperties;`
-- Error Container: 
-  1) `errorContainerStyle?: React.CSSProperties;`
-  2) `errorTextStyle?: React.CSSProperties;`
-- Footer: 
-  1) `footerStyle?: React.CSSProperties;`
-  2) `footerTextStyle?: React.CSSProperties;`
-  3) `footerText?: string;`
+If you want to personalize this login form, you can change texts, hide content and add custom classes to use already developed CSS by your
+
+- Config:
+  - showClose: boolean, allows you to hide X to close modal
+  - footerText: string, allows you to change default footer text
+  - customClassNames: allows you to add you CSS {
+    - Main Container:
+      1) `mainContainer`
+      2) `errorContainer`
+      3) `errorText`
+    - Header:
+      1) `headerContainer`
+      2) `headerTextSection`
+      3) `headerText`
+      4) `closeSection`
+    - Content Container: 
+      1) `contentContainer`
+      2) `button`
+      3) `buttonIcon`
+      4) `buttonText`
+      5) `inputContainer`
+      6) `input`
+      7) `inputNext`
+      8) `socialButtonsContainer`
+      9) `socialButton`
+      10) `socialButtonIcon`
+      11) `otpButtonsContainer`
+      12) `walletButtonsContainer`
+      13) `walletButton`
+      14) `walletButtonIcon`
+      15) `walletButtonText`
+    - Footer: 
+      1) `footerContainer`
+      2) `footerTextSection`
+  }
 
 Note: you can leave some/all of these blank to have default styles
 
@@ -109,15 +113,11 @@ const MyLoginPage = () => {
           LoginMethods.Email
         ]} 
         redirectUrl="http://localhost:3000"
-        customStyles={{
-          containerStyle: {
-            ...defaultStyles.container,
-          },
-          headerStyle: {
-            ...defaultStyles.header,
-            textAlign: "center",
-          },
-          headerText: "Login to your wallet",
+        config={{
+          showClose: false,
+          customClassNames: {
+            contentContainer: "bg-white p-8 rounded-lg",
+          }
         }}
       />
     </BrillionProvider>
@@ -152,6 +152,7 @@ const {
 } = useBalance();
 
 const { 
+  signWithPasskey,
   createTransaction,
   getTransactionById,
   cancelTransaction,
@@ -172,7 +173,9 @@ const {
   execRecovery,
   approveSignTransaction,
   rejectSignTransaction,
-  getNotifications
+  getNotifications,
+  getWalletAuthnticator,
+  createWalletAuthnticator,
 } = useWallet();
 
 const { login, authenticateUser } = useUser();

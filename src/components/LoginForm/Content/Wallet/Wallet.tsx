@@ -1,31 +1,25 @@
 import { TLoginOption } from "interfaces";
-import { defaultStyles, TCustomStyles } from "@/components/LoginForm/Content/Wallet/WalletStyles";
+import { TCustomClassNames, WalletButton, WalletButtonIcon, WalletButtonsContainer, WalletButtonText } from "@/components/LoginForm/Content/Wallet/WalletStyles";
 
-export const Wallet = ({options, customStyles}: {options: TLoginOption[], customStyles?: TCustomStyles}) => {
-
-  const walletButtonsContainerStyle = customStyles?.walletButtonsContainerStyle ?? defaultStyles.walletButtonsContainer;
-  const walletButtonStyle = customStyles?.walletButtonStyle ?? defaultStyles.walletButton;
-  const walletButtonIconStyle = customStyles?.walletButtonIconStyle ?? defaultStyles.walletButtonIcon;
-
-  const buttonTextStyle = customStyles?.walletButtonTextStyle ?? defaultStyles.walletButtonText;
+export const Wallet = ({options, customClassNames}: {options: TLoginOption[], customClassNames?: TCustomClassNames}) => {
 
   return (
-    <section style={walletButtonsContainerStyle}>
+    <WalletButtonsContainer className={customClassNames?.walletButtonsContainer}>
       {options.map((option) => (
-        <button
+        <WalletButton
           key={`wallet-login-option-${option.label!.toLocaleLowerCase()}`}
           id={`wallet-login-option-${option.label!.toLocaleLowerCase()}`}
-          style={walletButtonStyle}
+          className={customClassNames?.walletButton}
           onClick={() => option.onClick!()}
         >
-          <span style={walletButtonIconStyle}>
+          <WalletButtonIcon className={customClassNames?.walletButtonIcon}>
             {option.icon}
-          </span>
-          <span style={buttonTextStyle}>
+          </WalletButtonIcon>
+          <WalletButtonText className={customClassNames?.walletButtonText}>
             {option.label}
-          </span>
-        </button>
+          </WalletButtonText>
+        </WalletButton>
       ))}
-    </section>
+    </WalletButtonsContainer>
   );
 };
