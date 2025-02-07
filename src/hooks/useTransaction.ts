@@ -1,10 +1,13 @@
 import {
   AuthProvider,
   ISignTransactionResponse,
+  ISignTransactionWithPasskey,
+  IStamped,
   ITransaction,
   ITransactionSigned,
   ITransactionUnsigned,
   SUPPORTED_CHAINS,
+  TransactionTypeActivityKeys,
   TransactionUnsignedSchema,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { useBrillionContext } from "components/BrillionContext";
@@ -89,11 +92,32 @@ export const useTransaction = () => {
     return await sdk.Transaction.cancelTransaction(id);
   };
 
-  const approveTransaction = async (
-    id: string,
+  const signWithPasskey = async (
+    credentialId: string,
     organizationId: string,
     fingerprint: string,
     fromOrigin: string,
+    approveOrReject: boolean,
+  ): Promise<ISignTransactionWithPasskey | undefined> => {
+
+    if (!sdk) {
+      throw new Error("AppId is not valid");
+    }
+
+    return await sdk.Transaction.signWithPasskey(
+      credentialId,
+      organizationId,
+      fingerprint,
+      fromOrigin,
+      approveOrReject ? TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY : TransactionTypeActivityKeys.ACTIVITY_TYPE_REJECT_ACTIVITY,
+    );
+  }
+
+  const approveTransaction = async (
+    id: string,
+    organizationId: string,
+    timestamp: string,
+    stamped: IStamped,
   ): Promise<ISignTransactionResponse | undefined> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
@@ -101,16 +125,16 @@ export const useTransaction = () => {
     return await sdk.Transaction.approveSignTransaction(
       id,
       organizationId,
-      fingerprint,
-      fromOrigin,
+      timestamp,
+      stamped,
     );
   };
 
   const rejectTransaction = async (
     id: string,
     organizationId: string,
-    fingerprint: string,
-    fromOrigin: string,
+    timestamp: string,
+    stamped: IStamped,
   ): Promise<ISignTransactionResponse | undefined> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
@@ -118,12 +142,13 @@ export const useTransaction = () => {
     return await sdk.Transaction.rejectSignTransaction(
       id,
       organizationId,
-      fingerprint,
-      fromOrigin,
+      timestamp,
+      stamped,
     );
   };
 
   return {
+    signWithPasskey,
     createTransaction,
     getTransactionById,
     cancelTransaction,

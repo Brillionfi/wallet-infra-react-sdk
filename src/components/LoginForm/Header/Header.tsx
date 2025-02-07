@@ -8,6 +8,7 @@ export const Header = ({onClose, customStyles}: {onClose: () => void, customStyl
   const headerTextStyle = customStyles?.headerTextStyle ?? defaultStyles.headerText;
   const headerText = customStyles?.headerText ?? "Sign in";
   const closeStyle = customStyles?.closeStyle ?? defaultStyles.close;
+  const showClose = customStyles?.showClose ?? true;
 
   const allowBackArrow = headerText !== "Sign in";
 
@@ -20,9 +21,11 @@ export const Header = ({onClose, customStyles}: {onClose: () => void, customStyl
         {allowBackArrow && <BackArrow />} {headerText}
       </span>
       <span style={closeStyle}>
-        <button onClick={onClose}>
-          <CloseX />
-        </button>
+        {showClose &&
+          <button onClick={onClose}>
+            <CloseX />
+          </button>
+        }
       </span>
     </section>
   );
