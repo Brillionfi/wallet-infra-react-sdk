@@ -1,32 +1,29 @@
-import { defaultStyles, TCustomStyles } from "@/components/LoginForm/Header/HeaderStyles";
+import { HeaderContainer, HeaderTextSection, TCustomClassNames } from "@/components/LoginForm/Header/HeaderStyles";
 import CloseX from "@/components/icons/close-x";
 import BackArrow from "@/components/icons/back-arrow";
 
-export const Header = ({onClose, customStyles}: {onClose: () => void, customStyles?: TCustomStyles}) => {
+export const Header = ({onClose, showClose, customClassNames}: {onClose: () => void, showClose: boolean, customClassNames?: TCustomClassNames}) => {
 
-  const headerStyle = customStyles?.headerStyle ?? defaultStyles.header;
-  const headerTextStyle = customStyles?.headerTextStyle ?? defaultStyles.headerText;
-  const headerText = customStyles?.headerText ?? "Sign in";
-  const closeStyle = customStyles?.closeStyle ?? defaultStyles.close;
-  const showClose = customStyles?.showClose ?? true;
+  const headerText = customClassNames?.headerText ?? "Sign in";
 
   const allowBackArrow = headerText !== "Sign in";
 
   return (
-    <section style={headerStyle}>
-      <span 
-        style={{...headerTextStyle, cursor: allowBackArrow ? "pointer" : undefined}} 
+    <HeaderContainer className={customClassNames?.headerContainer}>
+      <HeaderTextSection 
+        className={customClassNames?.headerTextSection}
+        style={{cursor: allowBackArrow ? "pointer" : undefined}} 
         onClick={allowBackArrow ? onClose : undefined}
       >
         {allowBackArrow && <BackArrow />} {headerText}
-      </span>
-      <span style={closeStyle}>
+      </HeaderTextSection>
+      <span className={customClassNames?.closeSection}>
         {showClose &&
           <button onClick={onClose}>
             <CloseX />
           </button>
         }
       </span>
-    </section>
+    </HeaderContainer>
   );
 };

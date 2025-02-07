@@ -1,23 +1,20 @@
-export type TCustomStyles = {
-  footerStyle?: React.CSSProperties;
-  footerTextStyle?: React.CSSProperties;
+import styled from "styled-components";
+
+export type TCustomClassNames = {
+  footerContainer?: string;
+  footerTextSection?: string;
   footerText?: string;
 };
 
-const footer: React.CSSProperties = {
-  display: "flex",
-  width: "100%",
-  justifyContent: "center",
-  alignItems: "center",
-  marginTop: "auto",
-};
+export const FooterContainer = styled.section`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+`;
 
-const footerText: React.CSSProperties = {
-  fontSize: "0.8rem",
-  color: "#838383",
-}
-
-export const defaultStyles = {
-  footer,
-  footerText,
-}
+export const FooterTextSection = styled.span`
+  font-size: 0.8rem;
+  color: #838383;
+`;

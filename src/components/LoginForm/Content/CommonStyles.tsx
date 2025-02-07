@@ -1,62 +1,55 @@
-export type TCustomStyles = {
-  buttonStyle?: React.CSSProperties;
-  buttonIconStyle?: React.CSSProperties;
-  buttonTextStyle?: React.CSSProperties;
-  inputContainerStyle?: React.CSSProperties;
-  inputStyle?: React.CSSProperties;
-  inputNextStyle?: React.CSSProperties;
+import styled from "styled-components";
+
+export type TCustomClassNames = {
+  button?: string;
+  buttonIcon?: string;
+  buttonText?: string;
+  inputContainer?: string;
+  input?: string;
+  inputNext?: string;
 };
 
-const button: React.CSSProperties = {
-  width: "100%",
-  border: "1px solid #0009321F",
-  background: "#fff",
-  padding: "0.5rem",
-  borderRadius: "6px",
-  cursor: "pointer",
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "left",
-  gap: "8px",
-};
+export const Button = styled.button`
+  width: 100%;
+  border: 1px solid #0009321F;
+  background: #fff;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  gap: 8px;
+`;
 
-const buttonIcon: React.CSSProperties = {
-  width: '16px', 
-  height: '16px'
-};
+export const ButtonIcon = styled.span`
+  width: 16px;
+  height: 16px;
+`;
 
-const buttonText: React.CSSProperties = {
+export const ButtonText = styled.span`
   color: "#1C2024",
-}
+`;
 
-const inputContainer: React.CSSProperties = {
-  width: "100%",
-  display: "flex",
-  padding: "0.5rem",
-  justifyContent: "space-between",
-  alignItems: "center",
-  borderRadius: "6px",
-  border: "1px solid #0009321F",
-};
+export const InputContainer = styled.div`
+  width: 100%;
+  display: flex;
+  padding: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid #0009321F;
+`;
 
-const input: React.CSSProperties = {
-  border: "none",
-};
+export const Input = styled.input`
+  border: none,
+`;
 
-const inputNext: React.CSSProperties = {
-  width: "10%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-};
-
-export const defaultStyles = {
-  button,
-  buttonIcon,
-  buttonText,
-  inputContainer,
-  input,
-  inputNext
-}
+export const InputNext = styled.div`
+  width: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;

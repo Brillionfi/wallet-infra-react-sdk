@@ -1,34 +1,30 @@
-export type TCustomStyles = {
-  headerStyle?: React.CSSProperties;
-  headerTextStyle?: React.CSSProperties;
+import styled from "styled-components";
+
+export type TCustomClassNames = {
+  headerContainer?: string;
+  headerTextSection?: string;
   headerText?: string;
   showClose?: boolean;
-  closeStyle?: React.CSSProperties;
+  closeSection?: string;
 };
 
-const header: React.CSSProperties = {
-  width: "100%",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "1rem",
-};
+export const HeaderContainer = styled.section`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
 
-const headerText: React.CSSProperties = {
-  fontSize: "1.2rem",
-  color: "#000",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "0.8rem",
-}
+export const HeaderTextSection = styled.span`
+  font-size: 1.2rem;
+  color: #000;
+  display: flex;
+  align-tems: center;
+  justify-content: center;
+  gap: 0.8rem;
+`;
 
-const close: React.CSSProperties = {
-  color: "#000",
-}
-
-export const defaultStyles = {
-  header,
-  headerText,
-  close,
-}
+export const CloseSection = styled.span`
+  color: #000;
+`;

@@ -1,37 +1,34 @@
-export type TCustomStyles = {
-  socialButtonsContainerStyle?: React.CSSProperties;
-  socialButtonStyle?: React.CSSProperties;
-  socialButtonIconStyle?: React.CSSProperties;
-};
+import { TCustomClassNames as TCustomCommonClassNames } from '@/components/LoginForm/Content/CommonStyles';
+import styled from "styled-components";
 
-const socialButtonsContainer: React.CSSProperties = {
-  display: "flex",
-  width: "100%",
-  justifyContent: "center",
-  alignItems: "center",
-  marginTop: "1rem",
-  marginBottom: "1rem",
-  gap: '10px'
-};
+export type TCustomClassNames = {
+  socialButtonsContainer?: string;
+  socialButton?: string;
+  socialButtonIcon?: string;
+} & TCustomCommonClassNames;
 
-const socialButton: React.CSSProperties = {
-  color: "#fefefe",
-  border: "1px solid #A7B3CC",
-  borderRadius: "8px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "left",
-  padding: "12px",
-  cursor: "pointer"
-};
+export const SocialButtonsContainer = styled.section`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  gap: 10px;
+`;
 
-const socialButtonIcon: React.CSSProperties = {
-  width: '25px', 
-  height: '25px'
-};
+export const SocialButton = styled.button`
+  color: #fefefe;
+  border: 1px solid #A7B3CC;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 12px;
+  cursor: pointer;
+`;
 
-export const defaultStyles = {
-  socialButtonsContainer,
-  socialButton,
-  socialButtonIcon,
-}
+export const SocialButtonIcon = styled.span`
+  width: 25px;
+  height: 25px;
+`;

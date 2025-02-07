@@ -1,26 +1,25 @@
 import { LoginMethods } from "interfaces";
 import { useState } from "react";
-import { defaultLoginFormStyles, TCustomLoginFormStyles } from "@/components/LoginForm/LoginFormStyles";
+import { MainContainer, ErrorContainer, ErrorStyle, TConfig } from "@/components/LoginForm/LoginFormStyles";
 import { Header } from "@/components/LoginForm/Header/Header";
 import { Footer } from "@/components/LoginForm/Footer/Footer";
 import { Content } from "@/components/LoginForm/Content/Content";
 
-export const LoginForm = ({loginMethods, redirectUrl, onClose, customStyles}: {loginMethods: LoginMethods[], redirectUrl: string, onClose: () => void, customStyles?: TCustomLoginFormStyles}) => {
+export const LoginForm = ({loginMethods, redirectUrl, onClose, config}: {loginMethods: LoginMethods[], redirectUrl: string, onClose: () => void, config?: TConfig}) => {
 
   const [errorText, setErrorText] = useState<string>("");
   const [showInnerContent, setShowInnerContent] = useState<boolean>(false);
 
-  const containerStyle = customStyles?.containerStyle ?? defaultLoginFormStyles.container;
-  const errorContainerStyle = customStyles?.errorContainerStyle ?? defaultLoginFormStyles.errorContainer;
-  const errorTextStyle = customStyles?.errorTextStyle ?? defaultLoginFormStyles.errorStyle;
+  const customClassNames = config?.customClassNames ?? {};
 
   return (
-    <div style={containerStyle}>
+    <MainContainer className={customClassNames?.mainContainer}>
       <Header 
         onClose={showInnerContent ? () => setShowInnerContent(false) : onClose} 
-        customStyles={
+        showClose={config?.showClose ?? true}
+        customClassNames={
           {
-            ...customStyles, 
+            ...customClassNames, 
             headerText: showInnerContent? "Select wallet" : "Sign in"
           }
         }
@@ -30,17 +29,17 @@ export const LoginForm = ({loginMethods, redirectUrl, onClose, customStyles}: {l
         loginMethods={loginMethods} 
         redirectUrl={redirectUrl} 
         setErrorText={setErrorText} 
-        customStyles={customStyles} 
+        customClassNames={customClassNames} 
         showInnerContent={showInnerContent}
         toggleInnerContent={() => setShowInnerContent(!showInnerContent)}
       />
 
-      <section style={errorContainerStyle}>
-        <span style={errorTextStyle}>
+      <ErrorContainer className={customClassNames?.errorContainer}>
+        <ErrorStyle className={customClassNames?.errorText}>
           {errorText}
-        </span>
-      </section>
-      <Footer customStyles={customStyles}/>
-    </div>
+        </ErrorStyle>
+      </ErrorContainer>
+      <Footer customClassNames={customClassNames}/>
+    </MainContainer>
   );
 };
