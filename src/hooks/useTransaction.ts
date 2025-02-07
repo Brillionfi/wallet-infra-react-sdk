@@ -99,7 +99,6 @@ export const useTransaction = () => {
     fromOrigin: string,
     approveOrReject: boolean,
   ): Promise<ISignTransactionWithPasskey | undefined> => {
-
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
@@ -109,9 +108,11 @@ export const useTransaction = () => {
       organizationId,
       fingerprint,
       fromOrigin,
-      approveOrReject ? TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY : TransactionTypeActivityKeys.ACTIVITY_TYPE_REJECT_ACTIVITY,
+      approveOrReject
+        ? TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY
+        : TransactionTypeActivityKeys.ACTIVITY_TYPE_REJECT_ACTIVITY,
     );
-  }
+  };
 
   const approveTransaction = async (
     id: string,

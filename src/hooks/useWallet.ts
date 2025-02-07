@@ -31,7 +31,9 @@ export const useWallet = () => {
     return wallet;
   };
 
-  const createWalletAuthnticator = async (authenticator: IWalletAuthenticator): Promise<ICreateWalletAuthenticatorResponse | undefined> => {
+  const createWalletAuthnticator = async (
+    authenticator: IWalletAuthenticator,
+  ): Promise<ICreateWalletAuthenticatorResponse | undefined> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
@@ -39,7 +41,9 @@ export const useWallet = () => {
     return await sdk.Wallet.createWalletAuthenticator(authenticator);
   };
 
-  const getWalletAuthnticator = async (): Promise<IWalletAuthenticatorResponse | undefined> => {
+  const getWalletAuthnticator = async (): Promise<
+    IWalletAuthenticatorResponse | undefined
+  > => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
@@ -218,6 +222,6 @@ export const useWallet = () => {
     rejectSignTransaction,
     getNotifications,
     getWalletAuthnticator,
-    createWalletAuthnticator
+    createWalletAuthnticator,
   };
 };
