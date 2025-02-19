@@ -413,45 +413,18 @@ export function BrillionConnector({
             }
           }
           case "eth_signTypedData_v4": {//This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
-            // "params": [
-            //   "0xYourAddress", // Address of the signer
-            //   JSON.stringify({
-            //     "types": {
-            //       "EIP712Domain": [
-            //         { "name": "name", "type": "string" },
-            //         { "name": "version", "type": "string" },
-            //         { "name": "chainId", "type": "uint256" },
-            //         { "name": "verifyingContract", "type": "address" }
-            //       ],
-            //       "Person": [
-            //         { "name": "name", "type": "string" },
-            //         { "name": "wallet", "type": "address" }
-            //       ]
-            //     },
-            //     "primaryType": "Person",
-            //     "domain": {
-            //       "name": "MyApp",
-            //       "version": "1",
-            //       "chainId": 1,
-            //       "verifyingContract": "0xContractAddress"
-            //     },
-            //     "message": {
-            //       "name": "John Doe",
-            //       "wallet": "0xWalletAddress"
-            //     }
-            //   })
-            // ]
-            throw new Error("method not supported");
+            const response =  await sdk.Wallet.signMessage(connectedWallets[0], {typedData: JSON.parse((params as string[])[1])})
+            return response.finalSignature
           }
           case "eth_sign": {
             //Signs arbitrary data using the user’s private key
-            // "params": ["0xYourAddress", "0xYourData"]
-            throw new Error("method not supported");
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: (params as string[])[1]})
+            return response.finalSignature
           }
           case "personal_sign": {
             //Signs a message, adding a user-readable prefix for security.
-            // "params": ["0xYourData", "0xYourAddress"]
-            throw new Error("method not supported");
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: (params as string[])[1]})
+            return response.finalSignature
           }
           case "wallet_watchAsset": {
             throw new Error("method not supported");
