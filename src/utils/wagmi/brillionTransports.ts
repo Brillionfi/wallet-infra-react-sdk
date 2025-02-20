@@ -5,6 +5,14 @@ import { custom } from "wagmi";
 
 import { BrillionProviderProps, parseChain } from ".";
 
+const hexToString = (hex: string) => {
+  return new TextDecoder().decode(
+    new Uint8Array(
+      hex.slice(2).match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+    )
+  );
+}
+
 export const BrillionTransport = (
   config: Pick<BrillionProviderProps, "appId" | "baseUrl" | "WcProjectId">,
   chainId: number,
@@ -64,7 +72,6 @@ export const BrillionTransport = (
           // TODO: wagmi useBalance does not support array response
           // case "eth_getBalance": {
           //   const response = await sdk.Wallet.getPortfolio(body.params[0], parseChain(chainId));
-          //   console.log('eth_getBalance response :>> ', response);
           //   return response.portfolio;
           // }
           case "eth_getTransactionCount": {
@@ -79,12 +86,12 @@ export const BrillionTransport = (
           }
           case "eth_sign": {
             //Signs arbitrary data using the user’s private key
-            const response = await sdk.Wallet.signMessage(body.params[0], {message: (body.params as string[])[1]})
+            const response = await sdk.Wallet.signMessage(body.params[0], {message: hexToString((body.params as `0x${string}`[])[0])})
             return response.finalSignature
           }
           case "personal_sign": {
             //Signs a message, adding a user-readable prefix for security.
-            const response = await sdk.Wallet.signMessage(body.params[0], {message: (body.params as string[])[1]})
+            const response = await sdk.Wallet.signMessage(body.params[0], {message: hexToString((body.params as `0x${string}`[])[0])})
             return response.finalSignature
           }
           default:
