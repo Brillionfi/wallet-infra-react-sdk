@@ -166,7 +166,7 @@ export function BrillionConnector({
       if (isLogged) {
         const wallets = await sdk.Wallet.getWallets();
         const connectedWallets = wallets.map(
-          (wallet) => wallet.address,
+          (wallet) => wallet.signer,
         ) as `0x${string}`[];
         this.localData.set("connectedWallets", connectedWallets);
       }
@@ -186,7 +186,7 @@ export function BrillionConnector({
       if (isLogged) {
         const wallets = await sdk.Wallet.getWallets();
         let connectedWallets = wallets.map(
-          (wallet) => wallet.address,
+          (wallet) => wallet.signer,
         ) as `0x${string}`[];
 
         if (!connectedWallets || connectedWallets.length === 0) {
@@ -198,7 +198,7 @@ export function BrillionConnector({
         }
 
         connectedWallets = wallets.map(
-          (wallet) => wallet.address,
+          (wallet) => wallet.signer,
         ) as `0x${string}`[];
         this.localData.set("connectedWallets", connectedWallets);
         return {
@@ -524,7 +524,7 @@ export function BrillionConnector({
       const wallets = await sdk.Wallet.getWallets();
       this.localData.set(
         "connectedWallets",
-        wallets.map((wallet) => wallet.address) as `0x${string}`[],
+        wallets.map((wallet) => wallet.signer) as `0x${string}`[],
       );
       const connectedWallets = this.localData.get(
         "connectedWallets",
