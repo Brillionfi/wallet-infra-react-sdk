@@ -56,6 +56,14 @@ type eth_call = [
   string,
 ];
 
+const hexToStr = (hex: string) => {
+  return new TextDecoder().decode(
+    new Uint8Array(
+      hex.slice(2).match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+    )
+  );
+}
+
 export type ConnectBrillionProps = {
   provider: AuthProvider;
   redirectUrl: string;
@@ -418,12 +426,12 @@ export function BrillionConnector({
           }
           case "eth_sign": {
             //Signs arbitrary data using the user’s private key
-            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: (params as string[])[1]})
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: hexToStr((params as `0x${string}`[])[0])})
             return response.finalSignature
           }
           case "personal_sign": {
             //Signs a message, adding a user-readable prefix for security.
-            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: (params as string[])[1]})
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: hexToStr((params as `0x${string}`[])[0])})
             return response.finalSignature
           }
           case "wallet_watchAsset": {
