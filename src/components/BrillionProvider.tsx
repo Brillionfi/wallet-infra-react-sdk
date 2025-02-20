@@ -27,6 +27,7 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   const [sdkMM, setSdkMM] = useState<MetaMaskSDK | null>(null);
   const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
   const [wallet, setWallet] = useState<string>("");
+  const [signer, setSigner] = useState<string>("");
   const [sessionInfo, setSessionInfo] = useState<Record<string,string>>({});
   const [walletConnectProjectId, setWalletConnectProjectId] = useState<string>("");
 
@@ -76,10 +77,12 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
         isReady,
         chain,
         wallet,
+        signer,
         sessionInfo,
         sdkMM,
         changeChain,
         changeWallet: (wallet: string) => setWallet(wallet),
+        changeSigner: (signer: string) => setSigner(signer),
         saveSessionInfo
       }}>
         {children}

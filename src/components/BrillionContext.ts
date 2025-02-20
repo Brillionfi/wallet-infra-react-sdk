@@ -9,11 +9,13 @@ export type BrillionContextType = {
   isReady: boolean;
   chain: SUPPORTED_CHAINS;
   wallet: string;
+  signer: string;
   sessionInfo: Record<string, string>;
   sdkMM: MetaMaskSDK | null;
   saveSessionInfo: (payload: Record<string, string>) => void;
   changeChain: (chain: SUPPORTED_CHAINS) => void;
   changeWallet: (wallet: string) => void;
+  changeSigner: (signer: string) => void;
 };
 
 export const BrillionContext = createContext<BrillionContextType>({
@@ -22,11 +24,13 @@ export const BrillionContext = createContext<BrillionContextType>({
   isReady: false,
   chain: SUPPORTED_CHAINS.ETHEREUM,
   wallet: "",
+  signer: "",
   sessionInfo: {},
   sdkMM: null,
   saveSessionInfo: () => {},
   changeChain: () => {},
   changeWallet: () => {},
+  changeSigner: () => {},
 });
 
 export const useBrillionContext = () => {

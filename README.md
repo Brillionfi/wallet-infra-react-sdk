@@ -163,6 +163,7 @@ const {
 const { 
   wallets,
   createWallet,
+  signMessage,
   signTransaction,
   getTransactionHistory,
   getGasConfig,

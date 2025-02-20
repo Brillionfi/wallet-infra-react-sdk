@@ -11,6 +11,8 @@ import {
   IWalletGasConfigurationAPI,
   IWalletGasEstimation,
   IWalletRecovery,
+  IWalletSignMessage,
+  IWalletSignMessageResponse,
   IWalletSignTransaction,
   IWalletSignTransactionResponse,
   TNotifications,
@@ -19,7 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useBrillionContext } from "components/BrillionContext";
 
 export const useWallet = () => {
-  const { sdk, changeWallet } = useBrillionContext();
+  const { sdk, changeWallet, signer, changeSigner } = useBrillionContext();
 
   const createWallet = async (data: IWallet): Promise<IWallet | undefined> => {
     if (!sdk) {
@@ -27,6 +29,7 @@ export const useWallet = () => {
     }
     const wallet = await sdk.Wallet.createWallet(data);
     if (wallet) changeWallet(wallet.address ?? "");
+    if (wallet.signer) changeSigner(wallet.signer ?? "");
 
     return wallet;
   };
@@ -60,6 +63,16 @@ export const useWallet = () => {
       return (await sdk.Wallet.getWallets()) as IWallet[];
     },
   });
+
+  const signMessage = async (
+    _address: Address,
+    data: IWalletSignMessage,
+  ): Promise<IWalletSignMessageResponse | undefined> => {
+    if (!sdk) {
+      throw new Error("AppId is not valid");
+    }
+    return await sdk.Wallet.signMessage(signer, data);
+  };
 
   const signTransaction = async (
     address: Address,
@@ -210,6 +223,7 @@ export const useWallet = () => {
   return {
     wallets,
     createWallet,
+    signMessage,
     signTransaction,
     getTransactionHistory,
     getGasConfig,

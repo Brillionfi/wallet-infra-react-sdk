@@ -73,6 +73,20 @@ export const BrillionTransport = (
               parseChain(chainId),
             );
           }
+          case "eth_signTypedData_v4": {//This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+            const response =  await sdk.Wallet.signMessage(body.params[0], {typedData: JSON.parse((body.params as string[])[1])})
+            return response.finalSignature
+          }
+          case "eth_sign": {
+            //Signs arbitrary data using the user’s private key
+            const response = await sdk.Wallet.signMessage(body.params[0], {message: (body.params as string[])[1]})
+            return response.finalSignature
+          }
+          case "personal_sign": {
+            //Signs a message, adding a user-readable prefix for security.
+            const response = await sdk.Wallet.signMessage(body.params[0], {message: (body.params as string[])[1]})
+            return response.finalSignature
+          }
           default:
             return await sdk.Wallet.rpcRequest(
               { method: body.method, params: body.params },

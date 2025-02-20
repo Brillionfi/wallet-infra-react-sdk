@@ -412,14 +412,19 @@ export function BrillionConnector({
               return response.signedTransaction;
             }
           }
-          case "eth_signTypedData_v4": {
-            throw new Error("method not supported");
+          case "eth_signTypedData_v4": {//This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+            const response =  await sdk.Wallet.signMessage(connectedWallets[0], {typedData: JSON.parse((params as string[])[1])})
+            return response.finalSignature
           }
           case "eth_sign": {
-            throw new Error("method not supported");
+            //Signs arbitrary data using the user’s private key
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: (params as string[])[1]})
+            return response.finalSignature
           }
           case "personal_sign": {
-            throw new Error("method not supported");
+            //Signs a message, adding a user-readable prefix for security.
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: (params as string[])[1]})
+            return response.finalSignature
           }
           case "wallet_watchAsset": {
             throw new Error("method not supported");
