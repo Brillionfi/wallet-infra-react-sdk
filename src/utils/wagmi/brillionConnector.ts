@@ -19,12 +19,13 @@ import {
   custom,
   RpcRequestError,
   SwitchChainError,
+  Transport,
   type EIP1193RequestFn,
 } from "viem";
 import { rpc } from "viem/utils";
-
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
 import { getAuthentication } from "../authentication";
+import { BrillionSigner } from "./brillionSigner";
 
 type eth_sendTransaction = {
   from: string;
@@ -55,6 +56,8 @@ type eth_call = [
   },
   string,
 ];
+
+export type CustomProvider = { request(...args: any): Promise<any> }
 
 const hexToStr = (hex: string) => {
   return new TextDecoder().decode(
@@ -288,7 +291,7 @@ export function BrillionConnector({
       }
     },
 
-    async getProvider({ chainId } = {}) {
+    async getProvider({ chainId } = {}): Promise<SDKProvider | CustomProvider> {
       if (chainId) await this.switchChain?.({ chainId });
       const connectedWallets = this.localData.get(
         "connectedWallets",
@@ -553,7 +556,7 @@ export function BrillionConnector({
     // ---- OPTIONALS
     async getAccount() {
       const wallets = await sdk.Wallet.getWallets();
-      return wallets[0].address as `0x${string}`;
+      return wallets[0].signer as `0x${string}`;
     },
 
     async getSigner() {
@@ -564,7 +567,8 @@ export function BrillionConnector({
         );
         return await provider.getSigner();
       }
-      return "getSigner method not supported";
+      
+      return new BrillionSigner(await this.getAccount(), await this.getProvider(), sdk)
     },
 
     async switchChain({ chainId }) {
@@ -573,12 +577,15 @@ export function BrillionConnector({
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
       this.localData.set("connectedChain", String(chainId));
 
-      await provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: numberToHex(chainId) }],
-      });
+      if (typeof provider.request === "function") {
+        await provider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: numberToHex(chainId) }],
+        });
+      } else {
+        throw new Error("Provider does not support request method");
+      }
       this.onChainChanged(chainId.toString());
-
       return chain;
     },
 
