@@ -14,7 +14,7 @@ import {
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import Client, { SignClient } from "@walletconnect/sign-client";
 import { AxiosError } from "axios";
-import { BrowserProvider, keccak256, Listener, Transaction } from "ethers";
+import { BrowserProvider, keccak256, Listener, Transaction, TransactionResponse } from "ethers";
 import {
   custom,
   RpcRequestError,
@@ -24,40 +24,8 @@ import {
 } from "viem";
 import { rpc } from "viem/utils";
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
-import { getAuthentication } from "../authentication";
 import { BrillionSigner } from "./brillionSigner";
-
-type eth_sendTransaction = {
-  from: string;
-  to: string;
-  value: string;
-  gas: string;
-  gasPrice: string;
-  data: string;
-};
-
-type eth_signTransaction = {
-  from: string;
-  to: string;
-  value: string;
-  gas: string;
-  gasPrice: string;
-  data: string;
-};
-
-type wallet_switchEthereumChain = {
-  chainId: string;
-};
-
-type eth_call = [
-  {
-    to: string;
-    data: string;
-  },
-  string,
-];
-
-export type CustomProvider = { request(...args: any): Promise<any> }
+import { CustomProvider, eth_call, eth_sendTransaction, eth_signTransaction, wallet_switchEthereumChain } from "./types";
 
 const hexToStr = (hex: string) => {
   return new TextDecoder().decode(
@@ -204,7 +172,7 @@ export function BrillionConnector({
           await sdk.Wallet.createWallet({
             name: data.walletName ?? "Wallet",
             format: WalletFormats.ETHEREUM,
-            authentication: await getAuthentication(window.location.hostname),
+            // authentication: await getAuthentication(window.location.hostname),
           });
         }
 
@@ -304,12 +272,12 @@ export function BrillionConnector({
       const url = chain.rpcUrls.default.http[0]!;
 
       const request: EIP1193RequestFn = async ({ method, params }) => {
-        if (!(await await checkLogged())) throw new Error("User not logged in");
+        if (!(await checkLogged())) throw new Error("User not logged in");
         switch (method) {
           case "eth_sendTransaction": {
             const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
-              return await sdk.Transaction.createTransaction({
+              const tx = await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: connectedWallets[0],
                 to: sendTransactionData.to,
@@ -317,6 +285,28 @@ export function BrillionConnector({
                 data: sendTransactionData.data.toString(),
                 chainId: connectedChain.toString(),
               });
+              return {
+                ...tx,
+                hash: tx.transactionHash,
+                confirmations: 0,
+                from: tx.from!,
+                wait: async () => {
+                  return new Promise((resolve, reject) => {
+                    const timer = setInterval(async () => {
+                      try {
+                        const response = await sdk.Transaction.getTransactionById(tx.transactionId);
+                        if (response.transactionHash) {
+                          clearInterval(timer);
+                          resolve(response);
+                        }
+                      } catch (error) {
+                        clearInterval(timer);
+                        reject(error);
+                      }
+                    }, 1000);
+                  });
+                },
+              } as unknown as TransactionResponse;
             } catch (error) {
               if (
                 error instanceof AxiosError &&
@@ -333,7 +323,7 @@ export function BrillionConnector({
                     maxPriorityFeePerGas: "9631345750",
                   },
                 );
-                return await sdk.Transaction.createTransaction({
+                const tx = await sdk.Transaction.createTransaction({
                   transactionType: "unsigned",
                   from: connectedWallets[0],
                   to: sendTransactionData.to,
@@ -341,6 +331,28 @@ export function BrillionConnector({
                   data: sendTransactionData.data.toString(),
                   chainId: connectedChain.toString(),
                 });
+                return {
+                  ...tx,
+                  hash: tx.transactionHash,
+                  confirmations: 0,
+                  from: tx.from!,
+                  wait: async () => {
+                    return new Promise((resolve, reject) => {
+                      const timer = setInterval(async () => {
+                        try {
+                          const response = await sdk.Transaction.getTransactionById(tx.transactionId);
+                          if (response.transactionHash) {
+                            clearInterval(timer);
+                            resolve(response);
+                          }
+                        } catch (error) {
+                          clearInterval(timer);
+                          reject(error);
+                        }
+                      }, 1000);
+                    });
+                  },
+                } as unknown as TransactionResponse;
               }
             }
             break;
@@ -388,7 +400,7 @@ export function BrillionConnector({
           }
           case "wallet_switchEthereumChain": {
             const chain = (params as wallet_switchEthereumChain[])[0].chainId;
-            this.localData.set("connectedChain", hexToString(chain));
+            this.localData.set("connectedChain", Number(chain));
             this.onChainChanged(chain.toString());
             return chain;
           }
@@ -575,7 +587,7 @@ export function BrillionConnector({
       const provider = await this.getProvider();
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
-      this.localData.set("connectedChain", String(chainId));
+      this.localData.set("connectedChain", chainId);
 
       if (typeof provider.request === "function") {
         await provider.request({
@@ -603,7 +615,7 @@ export function BrillionConnector({
     },
 
     onChainChanged(chainId: string) {
-      this.localData.set("connectedChain", chainId);
+      this.localData.set("connectedChain", Number(chainId));
       config.emitter.emit("change", { chainId: Number(chainId) });
     },
 

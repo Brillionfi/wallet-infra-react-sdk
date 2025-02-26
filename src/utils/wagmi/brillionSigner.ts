@@ -3,7 +3,8 @@ import { AxiosError } from "axios";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { SDKProvider } from "@metamask/sdk";
 import { WalletFormats, WalletTypes } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { CustomProvider, hexToString, parseChain } from ".";
+import { hexToString, parseChain } from ".";
+import { CustomProvider } from "./types";
 
 export class BrillionSigner /*implements Signer*/ {
   address: string;
@@ -39,6 +40,7 @@ export class BrillionSigner /*implements Signer*/ {
   }
 
   async sendTransaction(transaction: TransactionRequest): Promise<TransactionResponse> {
+    console.log("signer sendTransaction")
     const rawTx = Transaction.from(transaction as TransactionLike);
     try {
       const tx = await this.sdk.Transaction.createTransaction({
@@ -168,13 +170,10 @@ export class BrillionSigner /*implements Signer*/ {
   // }
 
   connect(provider: null | SDKProvider | CustomProvider): BrillionSigner {
+    console.log('signer connect ');
     return new BrillionSigner(this.address, provider || this.provider, this.sdk);
   }
   
 }
 
 export default BrillionSigner;
-
-function hexToStr(arg0: string): string | undefined {
-  throw new Error("Function not implemented.");
-}

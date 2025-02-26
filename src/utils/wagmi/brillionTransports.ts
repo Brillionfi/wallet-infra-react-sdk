@@ -96,7 +96,7 @@ export const BrillionTransport = (
           }
           default:
             return await sdk.Wallet.rpcRequest(
-              { method: body.method, params: body.params },
+              { ...body },
               { chainId: parseChain(chainId) },
             );
         }
