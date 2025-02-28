@@ -18,12 +18,10 @@ import {
   keccak256,
   Listener,
   Transaction,
-  TransactionResponse,
 } from "ethers";
 import {
   custom,
   SwitchChainError,
-  Transport,
   type EIP1193RequestFn,
 } from "viem";
 
@@ -284,6 +282,7 @@ export function BrillionConnector({
       const request: EIP1193RequestFn = async ({
         method,
         params,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }): Promise<any> => {
         if (!(await checkLogged())) throw new Error("User not logged in");
         switch (method) {
@@ -350,7 +349,7 @@ export function BrillionConnector({
                 }, 1000);
               });
             } catch (error) {
-              throw new Error("Unknown tx error");
+              throw new Error(`Unknown tx error: ${JSON.stringify(error)}`);
             }
           }
           case "eth_accounts": {
@@ -496,6 +495,7 @@ export function BrillionConnector({
           }
           default: {
             return await sdk.Wallet.rpcRequest(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               { method: method as any, params: params as any },
               { chainId: parseChain(connectedChain) },
             );

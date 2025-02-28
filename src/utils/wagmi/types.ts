@@ -36,4 +36,5 @@ export type eth_call = [
   string,
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CustomProvider = { request(...args: any): Promise<any> };

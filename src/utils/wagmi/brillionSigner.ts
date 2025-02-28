@@ -124,7 +124,7 @@ export class BrillionSigner /*implements Signer*/ {
         },
       } as unknown as TransactionResponse;
     } catch (error) {
-      throw new Error("Unknown tx error");
+      throw new Error(`Unknown tx error: ${JSON.stringify(error)}`);
     }
   }
 
@@ -154,7 +154,7 @@ export class BrillionSigner /*implements Signer*/ {
     return response.finalSignature!;
   }
 
-  async getNonce(_blockTag?: BlockTag): Promise<number> {
+  async getNonce(): Promise<number> {
     const response = await this.sdk.Wallet.getNonce(
       this.address,
       await this.provider.request({ method: "eth_chainId" }),
