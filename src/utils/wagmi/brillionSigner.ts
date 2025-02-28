@@ -5,7 +5,6 @@ import {
 } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { SDKProvider } from "@metamask/sdk";
 import {
-  BlockTag,
   Transaction,
   TransactionLike,
   TransactionRequest,
