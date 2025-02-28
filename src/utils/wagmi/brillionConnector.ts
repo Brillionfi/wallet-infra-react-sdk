@@ -13,24 +13,41 @@ import {
 } from "@wagmi/core";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import Client, { SignClient } from "@walletconnect/sign-client";
-import { BrowserProvider, keccak256, Listener, Transaction, TransactionResponse } from "ethers";
+import {
+  BrowserProvider,
+  keccak256,
+  Listener,
+  Transaction,
+  TransactionResponse,
+} from "ethers";
 import {
   custom,
   SwitchChainError,
   Transport,
   type EIP1193RequestFn,
 } from "viem";
+
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
 import { BrillionSigner } from "./brillionSigner";
-import { CustomProvider, eth_call, eth_estimateGas, eth_sendTransaction, eth_signTransaction, wallet_switchEthereumChain } from "./types";
+import {
+  CustomProvider,
+  eth_call,
+  eth_estimateGas,
+  eth_sendTransaction,
+  eth_signTransaction,
+  wallet_switchEthereumChain,
+} from "./types";
 
 const hexToStr = (hex: string) => {
   return new TextDecoder().decode(
     new Uint8Array(
-      hex.slice(2).match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
-    )
+      hex
+        .slice(2)
+        .match(/.{1,2}/g)!
+        .map((byte) => parseInt(byte, 16)),
+    ),
   );
-}
+};
 
 export type ConnectBrillionProps = {
   provider: AuthProvider;
@@ -264,24 +281,43 @@ export function BrillionConnector({
       const connectedChain = this.localData.get("connectedChain") as number;
       const sessionData = getSessionData();
 
-      const request: EIP1193RequestFn = async ({ method, params }): Promise<any> => {
+      const request: EIP1193RequestFn = async ({
+        method,
+        params,
+      }): Promise<any> => {
         if (!(await checkLogged())) throw new Error("User not logged in");
         switch (method) {
           case "eth_sendTransaction": {
             const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
-              const txData = sendTransactionData.data && sendTransactionData.data.toString() !== "0x0" ? sendTransactionData.data.toString() : "0x";
+              const txData =
+                sendTransactionData.data &&
+                sendTransactionData.data.toString() !== "0x0"
+                  ? sendTransactionData.data.toString()
+                  : "0x";
               const txValue = hexToString(sendTransactionData.value ?? "0x0");
 
-              const gasData = await sdk.Wallet.getGasFees(parseChain(connectedChain), connectedWallets[0], sendTransactionData.to, txValue, txData);
+              const gasData = await sdk.Wallet.getGasFees(
+                parseChain(connectedChain),
+                connectedWallets[0],
+                sendTransactionData.to,
+                txValue,
+                txData,
+              );
 
               await sdk.Wallet.setGasConfig(
                 connectedWallets[0],
                 parseChain(connectedChain),
                 {
-                  gasLimit: (Number(gasData.gasLimit) * Number("1.2")).toFixed(),
-                  maxFeePerGas: (Number(gasData.maxFeePerGas) * Number("1.2")).toFixed(),
-                  maxPriorityFeePerGas: (Number(gasData.maxPriorityFeePerGas) * Number("1.2")).toFixed(),
+                  gasLimit: (
+                    Number(gasData.gasLimit) * Number("1.2")
+                  ).toFixed(),
+                  maxFeePerGas: (
+                    Number(gasData.maxFeePerGas) * Number("1.2")
+                  ).toFixed(),
+                  maxPriorityFeePerGas: (
+                    Number(gasData.maxPriorityFeePerGas) * Number("1.2")
+                  ).toFixed(),
                 },
               );
 
@@ -296,12 +332,14 @@ export function BrillionConnector({
               return new Promise((resolve, reject) => {
                 const timer = setInterval(async () => {
                   try {
-                    const response = await sdk.Transaction.getTransactionById(tx.transactionId);
+                    const response = await sdk.Transaction.getTransactionById(
+                      tx.transactionId,
+                    );
                     if (response.transactionHash) {
                       clearInterval(timer);
                       resolve(response.transactionHash);
                     }
-                    if (response.reason !== ''){
+                    if (response.reason !== "") {
                       clearInterval(timer);
                       reject(response.reason);
                     }
@@ -312,7 +350,7 @@ export function BrillionConnector({
                 }, 1000);
               });
             } catch (error) {
-              throw new Error("Unknown tx error")
+              throw new Error("Unknown tx error");
             }
           }
           case "eth_accounts": {
@@ -399,19 +437,26 @@ export function BrillionConnector({
               return response.signedTransaction;
             }
           }
-          case "eth_signTypedData_v4": {//This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
-            const response =  await sdk.Wallet.signMessage(connectedWallets[0], {typedData: JSON.parse((params as string[])[1])})
-            return response.finalSignature
+          case "eth_signTypedData_v4": {
+            //This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              typedData: JSON.parse((params as string[])[1]),
+            });
+            return response.finalSignature;
           }
           case "eth_sign": {
             //Signs arbitrary data using the user’s private key
-            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: hexToStr((params as `0x${string}`[])[0])})
-            return response.finalSignature
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              message: hexToStr((params as `0x${string}`[])[0]),
+            });
+            return response.finalSignature;
           }
           case "personal_sign": {
             //Signs a message, adding a user-readable prefix for security.
-            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: hexToStr((params as `0x${string}`[])[0])})
-            return response.finalSignature
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              message: hexToStr((params as `0x${string}`[])[0]),
+            });
+            return response.finalSignature;
           }
           case "wallet_watchAsset": {
             throw new Error("method not supported");
@@ -543,8 +588,12 @@ export function BrillionConnector({
         );
         return await provider.getSigner();
       }
-      
-      return new BrillionSigner(await this.getAccount(), await this.getProvider(), sdk)
+
+      return new BrillionSigner(
+        await this.getAccount(),
+        await this.getProvider(),
+        sdk,
+      );
     },
 
     async switchChain({ chainId }) {

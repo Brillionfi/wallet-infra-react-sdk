@@ -1,7 +1,8 @@
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
-import { BrillionTransport } from "./brillionTransports";
 import { BrillionConnector } from "./brillionConnector";
+import { BrillionTransport } from "./brillionTransports";
+
 export * from "./brillionConnector";
 export * from "./brillionTransports";
 

@@ -36,4 +36,4 @@ export type eth_call = [
   string,
 ];
 
-export type CustomProvider = { request(...args: any): Promise<any> }
+export type CustomProvider = { request(...args: any): Promise<any> };

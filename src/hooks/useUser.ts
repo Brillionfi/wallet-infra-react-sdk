@@ -4,8 +4,13 @@ import { AuthProvider } from "@brillionfi/wallet-infra-sdk";
 import { IAuthURLParams } from "@brillionfi/wallet-infra-sdk/dist/models";
 
 export const useUser = () => {
-  const { sdk, walletConnectProjectId, changeWallet, changeSigner, saveSessionInfo } =
-    useBrillionContext();
+  const {
+    sdk,
+    walletConnectProjectId,
+    changeWallet,
+    changeSigner,
+    saveSessionInfo,
+  } = useBrillionContext();
 
   const authenticateUser = async (jwt: string) => {
     if (!sdk) {

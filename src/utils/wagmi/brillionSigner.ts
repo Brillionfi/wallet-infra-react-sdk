@@ -1,7 +1,19 @@
-import { BlockTag, Transaction, TransactionLike, TransactionRequest, TransactionResponse, TypedDataDomain, TypedDataField } from "ethers";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
+import {
+  WalletFormats,
+  WalletTypes,
+} from "@brillionfi/wallet-infra-sdk/dist/models";
 import { SDKProvider } from "@metamask/sdk";
-import { WalletFormats, WalletTypes } from "@brillionfi/wallet-infra-sdk/dist/models";
+import {
+  BlockTag,
+  Transaction,
+  TransactionLike,
+  TransactionRequest,
+  TransactionResponse,
+  TypedDataDomain,
+  TypedDataField,
+} from "ethers";
+
 import { hexToString, parseChain } from ".";
 import { CustomProvider, eth_estimateGas } from "./types";
 
@@ -9,14 +21,18 @@ export class BrillionSigner /*implements Signer*/ {
   address: string;
   provider: SDKProvider | CustomProvider;
   sdk: WalletInfra;
-  
-  constructor(address: string, provider: SDKProvider | CustomProvider, sdk: WalletInfra) {
+
+  constructor(
+    address: string,
+    provider: SDKProvider | CustomProvider,
+    sdk: WalletInfra,
+  ) {
     this.address = address;
     this.provider = provider;
     this.sdk = sdk;
   }
 
-  async getAddress(): Promise<string>{
+  async getAddress(): Promise<string> {
     return this.address;
   }
 
@@ -38,21 +54,36 @@ export class BrillionSigner /*implements Signer*/ {
     }
   }
 
-  async sendTransaction(transaction: TransactionRequest): Promise<TransactionResponse> {
+  async sendTransaction(
+    transaction: TransactionRequest,
+  ): Promise<TransactionResponse> {
     const rawTx = Transaction.from(transaction as TransactionLike);
     try {
-      const txData = rawTx.data && rawTx.data.toString() !== "0x0" ? rawTx.data.toString() : "0x";
+      const txData =
+        rawTx.data && rawTx.data.toString() !== "0x0"
+          ? rawTx.data.toString()
+          : "0x";
       const txValue = hexToString(rawTx.value.toString() ?? "0x0");
-      
-      const gasData = await this.sdk.Wallet.getGasFees(parseChain(Number(rawTx.chainId)), rawTx.from!, rawTx.to!, txValue, txData);
+
+      const gasData = await this.sdk.Wallet.getGasFees(
+        parseChain(Number(rawTx.chainId)),
+        rawTx.from!,
+        rawTx.to!,
+        txValue,
+        txData,
+      );
 
       await this.sdk.Wallet.setGasConfig(
         rawTx.from!,
         parseChain(Number(rawTx.chainId)),
         {
           gasLimit: (Number(gasData.gasLimit) * Number("1.2")).toFixed(),
-          maxFeePerGas: (Number(gasData.maxFeePerGas) * Number("1.2")).toFixed(),
-          maxPriorityFeePerGas: (Number(gasData.maxPriorityFeePerGas) * Number("1.2")).toFixed(),
+          maxFeePerGas: (
+            Number(gasData.maxFeePerGas) * Number("1.2")
+          ).toFixed(),
+          maxPriorityFeePerGas: (
+            Number(gasData.maxPriorityFeePerGas) * Number("1.2")
+          ).toFixed(),
         },
       );
 
@@ -73,12 +104,14 @@ export class BrillionSigner /*implements Signer*/ {
           return new Promise((resolve, reject) => {
             const timer = setInterval(async () => {
               try {
-                const response = await this.sdk.Transaction.getTransactionById(tx.transactionId);
+                const response = await this.sdk.Transaction.getTransactionById(
+                  tx.transactionId,
+                );
                 if (response.transactionHash) {
                   clearInterval(timer);
                   resolve(response);
                 }
-                if (response.reason !== ''){
+                if (response.reason !== "") {
                   clearInterval(timer);
                   reject(response.reason);
                 }
@@ -91,43 +124,55 @@ export class BrillionSigner /*implements Signer*/ {
         },
       } as unknown as TransactionResponse;
     } catch (error) {
-      throw new Error("Unknown tx error")
+      throw new Error("Unknown tx error");
     }
   }
 
-  async signMessage(message: string | Uint8Array): Promise<string>{
-    const response = await this.sdk.Wallet.signMessage(this.address, { message: typeof message === 'string' ? message : new TextDecoder().decode(message) })
-    return response.finalSignature!
+  async signMessage(message: string | Uint8Array): Promise<string> {
+    const response = await this.sdk.Wallet.signMessage(this.address, {
+      message:
+        typeof message === "string"
+          ? message
+          : new TextDecoder().decode(message),
+    });
+    return response.finalSignature!;
   }
 
-  async signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, string>): Promise<string> {
-    const response =  await this.sdk.Wallet.signMessage(
-      this.address, 
-      {
-        typedData: {
-          domain: domain as Record<string, string>, types, message: value,
-          primaryType: ""
-        }
-      }
-    )
-    return response.finalSignature!
+  async signTypedData(
+    domain: TypedDataDomain,
+    types: Record<string, Array<TypedDataField>>,
+    value: Record<string, string>,
+  ): Promise<string> {
+    const response = await this.sdk.Wallet.signMessage(this.address, {
+      typedData: {
+        domain: domain as Record<string, string>,
+        types,
+        message: value,
+        primaryType: "",
+      },
+    });
+    return response.finalSignature!;
   }
 
   async getNonce(_blockTag?: BlockTag): Promise<number> {
-    const response =  await this.sdk.Wallet.getNonce(
-      this.address, 
-      await this.provider.request({method: "eth_chainId"})
-    )
+    const response = await this.sdk.Wallet.getNonce(
+      this.address,
+      await this.provider.request({ method: "eth_chainId" }),
+    );
     return response;
   }
 
   async estimateGas(tx: TransactionRequest): Promise<bigint> {
-    return await this.sdk.Wallet.rpcRequest(
+    return (await this.sdk.Wallet.rpcRequest(
       { method: "eth_estimateGas", params: tx as eth_estimateGas },
-      { chainId: parseChain(await this.provider.request({method: "eth_chainId"})) },
-    ) as unknown as bigint;
+      {
+        chainId: parseChain(
+          await this.provider.request({ method: "eth_chainId" }),
+        ),
+      },
+    )) as unknown as bigint;
   }
-  
+
   // async populateCall(tx: TransactionRequest): Promise<TransactionLike<string>> {
 
   // }
@@ -145,9 +190,12 @@ export class BrillionSigner /*implements Signer*/ {
   // }
 
   connect(provider: null | SDKProvider | CustomProvider): BrillionSigner {
-    return new BrillionSigner(this.address, provider || this.provider, this.sdk);
+    return new BrillionSigner(
+      this.address,
+      provider || this.provider,
+      this.sdk,
+    );
   }
-  
 }
 
 export default BrillionSigner;
