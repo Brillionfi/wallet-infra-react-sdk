@@ -2,9 +2,9 @@ export type eth_sendTransaction = {
   from: string;
   to: string;
   value: string;
-  gas: string;
-  gasPrice: string;
-  data: string;
+  gas?: string;
+  gasPrice?: string;
+  data?: string;
 };
 
 export type eth_signTransaction = {
@@ -19,6 +19,14 @@ export type eth_signTransaction = {
 export type wallet_switchEthereumChain = {
   chainId: string;
 };
+
+export type eth_estimateGas = [
+  {
+    from: string;
+    to: string;
+    value: string;
+  },
+];
 
 export type eth_call = [
   {

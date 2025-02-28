@@ -1,10 +1,9 @@
-import { BlockTag, Transaction, TransactionLike, TransactionRequest, TransactionResponse, TypedDataDomain, TypedDataField, Signer } from "ethers";
-import { AxiosError } from "axios";
+import { BlockTag, Transaction, TransactionLike, TransactionRequest, TransactionResponse, TypedDataDomain, TypedDataField } from "ethers";
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { SDKProvider } from "@metamask/sdk";
 import { WalletFormats, WalletTypes } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { hexToString, parseChain } from ".";
-import { CustomProvider } from "./types";
+import { CustomProvider, eth_estimateGas } from "./types";
 
 export class BrillionSigner /*implements Signer*/ {
   address: string;
@@ -40,15 +39,29 @@ export class BrillionSigner /*implements Signer*/ {
   }
 
   async sendTransaction(transaction: TransactionRequest): Promise<TransactionResponse> {
-    console.log("signer sendTransaction")
     const rawTx = Transaction.from(transaction as TransactionLike);
     try {
+      const txData = rawTx.data && rawTx.data.toString() !== "0x0" ? rawTx.data.toString() : "0x";
+      const txValue = hexToString(rawTx.value.toString() ?? "0x0");
+      
+      const gasData = await this.sdk.Wallet.getGasFees(parseChain(Number(rawTx.chainId)), rawTx.from!, rawTx.to!, txValue, txData);
+
+      await this.sdk.Wallet.setGasConfig(
+        rawTx.from!,
+        parseChain(Number(rawTx.chainId)),
+        {
+          gasLimit: (Number(gasData.gasLimit) * Number("1.2")).toFixed(),
+          maxFeePerGas: (Number(gasData.maxFeePerGas) * Number("1.2")).toFixed(),
+          maxPriorityFeePerGas: (Number(gasData.maxPriorityFeePerGas) * Number("1.2")).toFixed(),
+        },
+      );
+
       const tx = await this.sdk.Transaction.createTransaction({
         transactionType: "unsigned",
         from: rawTx.from!,
         to: rawTx.to!,
-        value: hexToString(rawTx.value.toString()),
-        data: rawTx.data.toString(),
+        value: txValue,
+        data: txData,
         chainId: rawTx.chainId.toString(),
       });
       return {
@@ -65,6 +78,10 @@ export class BrillionSigner /*implements Signer*/ {
                   clearInterval(timer);
                   resolve(response);
                 }
+                if (response.reason !== ''){
+                  clearInterval(timer);
+                  reject(response.reason);
+                }
               } catch (error) {
                 clearInterval(timer);
                 reject(error);
@@ -74,52 +91,7 @@ export class BrillionSigner /*implements Signer*/ {
         },
       } as unknown as TransactionResponse;
     } catch (error) {
-      if (
-        error instanceof AxiosError &&
-        error.response?.data.message.includes(
-          "Gas settings are not set",
-        )
-      ) {
-        await this.sdk.Wallet.setGasConfig(
-          rawTx.from!,
-          parseChain(Number(rawTx.chainId)),
-          {
-            gasLimit: "9631345750",
-            maxFeePerGas: "9631345750",
-            maxPriorityFeePerGas: "9631345750",
-          },
-        );
-        const tx = await this.sdk.Transaction.createTransaction({
-          transactionType: "unsigned",
-          from: rawTx.from!,
-          to: rawTx.to!,
-          value: hexToString(rawTx.value.toString()),
-          data: rawTx.data.toString(),
-          chainId: rawTx.chainId.toString(),
-        });
-        return {
-          ...tx,
-          hash: tx.transactionHash,
-          confirmations: 0,
-          from: tx.from!,
-          wait: async () => {
-            return new Promise((resolve, reject) => {
-              const timer = setInterval(async () => {
-                try {
-                  const response = await this.sdk.Transaction.getTransactionById(tx.transactionId);
-                  if (response.transactionHash) {
-                    clearInterval(timer);
-                    resolve(response);
-                  }
-                } catch (error) {
-                  clearInterval(timer);
-                  reject(error);
-                }
-              }, 1000);
-            });
-          },
-        } as unknown as TransactionResponse;
-      }else throw new Error("Unknown tx error")
+      throw new Error("Unknown tx error")
     }
   }
 
@@ -148,16 +120,19 @@ export class BrillionSigner /*implements Signer*/ {
     )
     return response;
   }
+
+  async estimateGas(tx: TransactionRequest): Promise<bigint> {
+    return await this.sdk.Wallet.rpcRequest(
+      { method: "eth_estimateGas", params: tx as eth_estimateGas },
+      { chainId: parseChain(await this.provider.request({method: "eth_chainId"})) },
+    ) as unknown as bigint;
+  }
   
   // async populateCall(tx: TransactionRequest): Promise<TransactionLike<string>> {
 
   // }
 
   // async populateTransaction(tx: TransactionRequest): Promise<TransactionLike<string>> {
-
-  // }
-
-  // async estimateGas(tx: TransactionRequest): Promise<bigint> {
 
   // }
 
@@ -170,7 +145,6 @@ export class BrillionSigner /*implements Signer*/ {
   // }
 
   connect(provider: null | SDKProvider | CustomProvider): BrillionSigner {
-    console.log('signer connect ');
     return new BrillionSigner(this.address, provider || this.provider, this.sdk);
   }
   

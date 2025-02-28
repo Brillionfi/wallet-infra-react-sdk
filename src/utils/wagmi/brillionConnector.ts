@@ -13,19 +13,16 @@ import {
 } from "@wagmi/core";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import Client, { SignClient } from "@walletconnect/sign-client";
-import { AxiosError } from "axios";
 import { BrowserProvider, keccak256, Listener, Transaction, TransactionResponse } from "ethers";
 import {
   custom,
-  RpcRequestError,
   SwitchChainError,
   Transport,
   type EIP1193RequestFn,
 } from "viem";
-import { rpc } from "viem/utils";
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
 import { BrillionSigner } from "./brillionSigner";
-import { CustomProvider, eth_call, eth_sendTransaction, eth_signTransaction, wallet_switchEthereumChain } from "./types";
+import { CustomProvider, eth_call, eth_estimateGas, eth_sendTransaction, eth_signTransaction, wallet_switchEthereumChain } from "./types";
 
 const hexToStr = (hex: string) => {
   return new TextDecoder().decode(
@@ -267,101 +264,68 @@ export function BrillionConnector({
       const connectedChain = this.localData.get("connectedChain") as number;
       const sessionData = getSessionData();
 
-      const chain =
-        config.chains.find((x) => x.id === chainId) ?? config.chains[0];
-      const url = chain.rpcUrls.default.http[0]!;
-
-      const request: EIP1193RequestFn = async ({ method, params }) => {
+      const request: EIP1193RequestFn = async ({ method, params }): Promise<any> => {
         if (!(await checkLogged())) throw new Error("User not logged in");
         switch (method) {
           case "eth_sendTransaction": {
             const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
+              const txData = sendTransactionData.data && sendTransactionData.data.toString() !== "0x0" ? sendTransactionData.data.toString() : "0x";
+              const txValue = hexToString(sendTransactionData.value ?? "0x0");
+
+              const gasData = await sdk.Wallet.getGasFees(parseChain(connectedChain), connectedWallets[0], sendTransactionData.to, txValue, txData);
+
+              await sdk.Wallet.setGasConfig(
+                connectedWallets[0],
+                parseChain(connectedChain),
+                {
+                  gasLimit: (Number(gasData.gasLimit) * Number("1.2")).toFixed(),
+                  maxFeePerGas: (Number(gasData.maxFeePerGas) * Number("1.2")).toFixed(),
+                  maxPriorityFeePerGas: (Number(gasData.maxPriorityFeePerGas) * Number("1.2")).toFixed(),
+                },
+              );
+
               const tx = await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: connectedWallets[0],
                 to: sendTransactionData.to,
-                value: hexToString(sendTransactionData.value),
-                data: sendTransactionData.data.toString(),
+                value: txValue,
+                data: txData,
                 chainId: connectedChain.toString(),
               });
-              return {
-                ...tx,
-                hash: tx.transactionHash,
-                confirmations: 0,
-                from: tx.from!,
-                wait: async () => {
-                  return new Promise((resolve, reject) => {
-                    const timer = setInterval(async () => {
-                      try {
-                        const response = await sdk.Transaction.getTransactionById(tx.transactionId);
-                        if (response.transactionHash) {
-                          clearInterval(timer);
-                          resolve(response);
-                        }
-                      } catch (error) {
-                        clearInterval(timer);
-                        reject(error);
-                      }
-                    }, 1000);
-                  });
-                },
-              } as unknown as TransactionResponse;
+              return new Promise((resolve, reject) => {
+                const timer = setInterval(async () => {
+                  try {
+                    const response = await sdk.Transaction.getTransactionById(tx.transactionId);
+                    if (response.transactionHash) {
+                      clearInterval(timer);
+                      resolve(response.transactionHash);
+                    }
+                    if (response.reason !== ''){
+                      clearInterval(timer);
+                      reject(response.reason);
+                    }
+                  } catch (error) {
+                    clearInterval(timer);
+                    reject(error);
+                  }
+                }, 1000);
+              });
             } catch (error) {
-              if (
-                error instanceof AxiosError &&
-                error.response?.data.message.includes(
-                  "Gas settings are not set",
-                )
-              ) {
-                await sdk.Wallet.setGasConfig(
-                  connectedWallets[0],
-                  parseChain(connectedChain),
-                  {
-                    gasLimit: "9631345750",
-                    maxFeePerGas: "9631345750",
-                    maxPriorityFeePerGas: "9631345750",
-                  },
-                );
-                const tx = await sdk.Transaction.createTransaction({
-                  transactionType: "unsigned",
-                  from: connectedWallets[0],
-                  to: sendTransactionData.to,
-                  value: hexToString(sendTransactionData.value),
-                  data: sendTransactionData.data.toString(),
-                  chainId: connectedChain.toString(),
-                });
-                return {
-                  ...tx,
-                  hash: tx.transactionHash,
-                  confirmations: 0,
-                  from: tx.from!,
-                  wait: async () => {
-                    return new Promise((resolve, reject) => {
-                      const timer = setInterval(async () => {
-                        try {
-                          const response = await sdk.Transaction.getTransactionById(tx.transactionId);
-                          if (response.transactionHash) {
-                            clearInterval(timer);
-                            resolve(response);
-                          }
-                        } catch (error) {
-                          clearInterval(timer);
-                          reject(error);
-                        }
-                      }, 1000);
-                    });
-                  },
-                } as unknown as TransactionResponse;
-              }
+              throw new Error("Unknown tx error")
             }
-            break;
           }
           case "eth_accounts": {
             return connectedWallets;
           }
           case "eth_chainId": {
             return numberToHex(connectedChain);
+          }
+          case "eth_estimateGas": {
+            return await sdk.Wallet.rpcRequest(
+              { method, params: params as eth_estimateGas },
+              { chainId: parseChain(connectedChain) },
+            );
           }
           case "eth_blockNumber": {
             return await sdk.Wallet.rpcRequest(
@@ -486,10 +450,10 @@ export function BrillionConnector({
             throw new Error("method not supported");
           }
           default: {
-            const body = { method, params };
-            const { error, result } = await rpc.http(url, { body });
-            if (error) throw new RpcRequestError({ body, error, url });
-            return result;
+            return await sdk.Wallet.rpcRequest(
+              { method: method as any, params: params as any },
+              { chainId: parseChain(connectedChain) },
+            );
           }
         }
       };
