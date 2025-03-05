@@ -13,56 +13,39 @@ import {
 } from "@wagmi/core";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import Client, { SignClient } from "@walletconnect/sign-client";
-import { AxiosError } from "axios";
-import { BrowserProvider, keccak256, Listener, Transaction } from "ethers";
+import {
+  BrowserProvider,
+  keccak256,
+  Listener,
+  Transaction,
+} from "ethers";
 import {
   custom,
-  RpcRequestError,
   SwitchChainError,
   type EIP1193RequestFn,
 } from "viem";
-import { rpc } from "viem/utils";
 
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
-import { getAuthentication } from "../authentication";
-
-type eth_sendTransaction = {
-  from: string;
-  to: string;
-  value: string;
-  gas: string;
-  gasPrice: string;
-  data: string;
-};
-
-type eth_signTransaction = {
-  from: string;
-  to: string;
-  value: string;
-  gas: string;
-  gasPrice: string;
-  data: string;
-};
-
-type wallet_switchEthereumChain = {
-  chainId: string;
-};
-
-type eth_call = [
-  {
-    to: string;
-    data: string;
-  },
-  string,
-];
+import { BrillionSigner } from "./brillionSigner";
+import {
+  CustomProvider,
+  eth_call,
+  eth_estimateGas,
+  eth_sendTransaction,
+  eth_signTransaction,
+  wallet_switchEthereumChain,
+} from "./types";
 
 const hexToStr = (hex: string) => {
   return new TextDecoder().decode(
     new Uint8Array(
-      hex.slice(2).match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
-    )
+      hex
+        .slice(2)
+        .match(/.{1,2}/g)!
+        .map((byte) => parseInt(byte, 16)),
+    ),
   );
-}
+};
 
 export type ConnectBrillionProps = {
   provider: AuthProvider;
@@ -201,7 +184,7 @@ export function BrillionConnector({
           await sdk.Wallet.createWallet({
             name: data.walletName ?? "Wallet",
             format: WalletFormats.ETHEREUM,
-            authentication: await getAuthentication(window.location.hostname),
+            // authentication: await getAuthentication(window.location.hostname),
           });
         }
 
@@ -288,7 +271,7 @@ export function BrillionConnector({
       }
     },
 
-    async getProvider({ chainId } = {}) {
+    async getProvider({ chainId } = {}): Promise<SDKProvider | CustomProvider> {
       if (chainId) await this.switchChain?.({ chainId });
       const connectedWallets = this.localData.get(
         "connectedWallets",
@@ -296,57 +279,90 @@ export function BrillionConnector({
       const connectedChain = this.localData.get("connectedChain") as number;
       const sessionData = getSessionData();
 
-      const chain =
-        config.chains.find((x) => x.id === chainId) ?? config.chains[0];
-      const url = chain.rpcUrls.default.http[0]!;
-
-      const request: EIP1193RequestFn = async ({ method, params }) => {
-        if (!(await await checkLogged())) throw new Error("User not logged in");
+      const request: EIP1193RequestFn = async ({
+        method,
+        params,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }): Promise<any> => {
+        if (!(await checkLogged())) throw new Error("User not logged in");
         switch (method) {
           case "eth_sendTransaction": {
             const sendTransactionData = (params as eth_sendTransaction[])[0];
             try {
-              return await sdk.Transaction.createTransaction({
+              const txData =
+                sendTransactionData.data &&
+                sendTransactionData.data.toString() !== "0x0"
+                  ? sendTransactionData.data.toString()
+                  : "0x";
+              const txValue = hexToString(sendTransactionData.value ?? "0x0");
+
+              const gasData = await sdk.Wallet.getGasFees(
+                parseChain(connectedChain),
+                connectedWallets[0],
+                sendTransactionData.to,
+                txValue,
+                txData,
+              );
+
+              await sdk.Wallet.setGasConfig(
+                connectedWallets[0],
+                parseChain(connectedChain),
+                {
+                  gasLimit: (
+                    Number(gasData.gasLimit) * Number("1.2")
+                  ).toFixed(),
+                  maxFeePerGas: (
+                    Number(gasData.maxFeePerGas) * Number("1.2")
+                  ).toFixed(),
+                  maxPriorityFeePerGas: (
+                    Number(gasData.maxPriorityFeePerGas) * Number("1.2")
+                  ).toFixed(),
+                },
+              );
+
+              const tx = await sdk.Transaction.createTransaction({
                 transactionType: "unsigned",
                 from: connectedWallets[0],
                 to: sendTransactionData.to,
-                value: hexToString(sendTransactionData.value),
-                data: sendTransactionData.data.toString(),
+                value: txValue,
+                data: txData,
                 chainId: connectedChain.toString(),
               });
+              return new Promise((resolve, reject) => {
+                const timer = setInterval(async () => {
+                  try {
+                    const response = await sdk.Transaction.getTransactionById(
+                      tx.transactionId,
+                    );
+                    if (response.transactionHash) {
+                      clearInterval(timer);
+                      resolve(response.transactionHash);
+                    }
+                    if (response.reason !== "") {
+                      clearInterval(timer);
+                      reject(response.reason);
+                    }
+                  } catch (error) {
+                    clearInterval(timer);
+                    reject(error);
+                  }
+                }, 1000);
+              });
             } catch (error) {
-              if (
-                error instanceof AxiosError &&
-                error.response?.data.message.includes(
-                  "Gas settings are not set",
-                )
-              ) {
-                await sdk.Wallet.setGasConfig(
-                  connectedWallets[0],
-                  parseChain(connectedChain),
-                  {
-                    gasLimit: "9631345750",
-                    maxFeePerGas: "9631345750",
-                    maxPriorityFeePerGas: "9631345750",
-                  },
-                );
-                return await sdk.Transaction.createTransaction({
-                  transactionType: "unsigned",
-                  from: connectedWallets[0],
-                  to: sendTransactionData.to,
-                  value: hexToString(sendTransactionData.value),
-                  data: sendTransactionData.data.toString(),
-                  chainId: connectedChain.toString(),
-                });
-              }
+              throw new Error(`Unknown tx error: ${JSON.stringify(error)}`);
             }
-            break;
           }
           case "eth_accounts": {
             return connectedWallets;
           }
           case "eth_chainId": {
             return numberToHex(connectedChain);
+          }
+          case "eth_estimateGas": {
+            return await sdk.Wallet.rpcRequest(
+              { method, params: params as eth_estimateGas },
+              { chainId: parseChain(connectedChain) },
+            );
           }
           case "eth_blockNumber": {
             return await sdk.Wallet.rpcRequest(
@@ -385,7 +401,7 @@ export function BrillionConnector({
           }
           case "wallet_switchEthereumChain": {
             const chain = (params as wallet_switchEthereumChain[])[0].chainId;
-            this.localData.set("connectedChain", hexToString(chain));
+            this.localData.set("connectedChain", Number(chain));
             this.onChainChanged(chain.toString());
             return chain;
           }
@@ -420,19 +436,26 @@ export function BrillionConnector({
               return response.signedTransaction;
             }
           }
-          case "eth_signTypedData_v4": {//This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
-            const response =  await sdk.Wallet.signMessage(connectedWallets[0], {typedData: JSON.parse((params as string[])[1])})
-            return response.finalSignature
+          case "eth_signTypedData_v4": {
+            //This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              typedData: JSON.parse((params as string[])[1]),
+            });
+            return response.finalSignature;
           }
           case "eth_sign": {
             //Signs arbitrary data using the user’s private key
-            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: hexToStr((params as `0x${string}`[])[0])})
-            return response.finalSignature
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              message: hexToStr((params as `0x${string}`[])[0]),
+            });
+            return response.finalSignature;
           }
           case "personal_sign": {
             //Signs a message, adding a user-readable prefix for security.
-            const response = await sdk.Wallet.signMessage(connectedWallets[0], {message: hexToStr((params as `0x${string}`[])[0])})
-            return response.finalSignature
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              message: hexToStr((params as `0x${string}`[])[0]),
+            });
+            return response.finalSignature;
           }
           case "wallet_watchAsset": {
             throw new Error("method not supported");
@@ -471,10 +494,11 @@ export function BrillionConnector({
             throw new Error("method not supported");
           }
           default: {
-            const body = { method, params };
-            const { error, result } = await rpc.http(url, { body });
-            if (error) throw new RpcRequestError({ body, error, url });
-            return result;
+            return await sdk.Wallet.rpcRequest(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              { method: method as any, params: params as any },
+              { chainId: parseChain(connectedChain) },
+            );
           }
         }
       };
@@ -553,7 +577,7 @@ export function BrillionConnector({
     // ---- OPTIONALS
     async getAccount() {
       const wallets = await sdk.Wallet.getWallets();
-      return wallets[0].address as `0x${string}`;
+      return wallets[0].signer as `0x${string}`;
     },
 
     async getSigner() {
@@ -564,21 +588,29 @@ export function BrillionConnector({
         );
         return await provider.getSigner();
       }
-      return "getSigner method not supported";
+
+      return new BrillionSigner(
+        await this.getAccount(),
+        await this.getProvider(),
+        sdk,
+      );
     },
 
     async switchChain({ chainId }) {
       const provider = await this.getProvider();
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
-      this.localData.set("connectedChain", String(chainId));
+      this.localData.set("connectedChain", chainId);
 
-      await provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: numberToHex(chainId) }],
-      });
+      if (typeof provider.request === "function") {
+        await provider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: numberToHex(chainId) }],
+        });
+      } else {
+        throw new Error("Provider does not support request method");
+      }
       this.onChainChanged(chainId.toString());
-
       return chain;
     },
 
@@ -596,7 +628,7 @@ export function BrillionConnector({
     },
 
     onChainChanged(chainId: string) {
-      this.localData.set("connectedChain", chainId);
+      this.localData.set("connectedChain", Number(chainId));
       config.emitter.emit("change", { chainId: Number(chainId) });
     },
 

@@ -1,9 +1,9 @@
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
+import { BrillionConnector } from "./brillionConnector";
 import { BrillionTransport } from "./brillionTransports";
-import { BrillionConnector } from "./wagmiConnector";
 
-export * from "./wagmiConnector";
+export * from "./brillionConnector";
 export * from "./brillionTransports";
 
 export const parseChain = (chain: number) => {
