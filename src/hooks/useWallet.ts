@@ -10,6 +10,7 @@ import {
   IWalletGasConfiguration,
   IWalletGasConfigurationAPI,
   IWalletGasEstimation,
+  IWalletNotifications,
   IWalletRecovery,
   IWalletSignMessage,
   IWalletSignMessageResponse,
@@ -182,13 +183,11 @@ export const useWallet = () => {
     return await sdk.Wallet.getNonce(address, chainId);
   };
 
-  const initRecovery = async (
-    address: Address,
-  ): Promise<IWalletRecovery | undefined> => {
+  const initRecovery = async (): Promise<IWalletRecovery | undefined> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return await sdk.Wallet.initRecovery(address);
+    return await sdk.Wallet.initRecovery();
   };
 
   const execRecovery = async (
@@ -210,14 +209,11 @@ export const useWallet = () => {
     );
   };
 
-  const getNotifications = async (
-    address: Address,
-    chainId: ChainId,
-  ): Promise<TNotifications> => {
+  const getActivities = async (): Promise<IWalletNotifications> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return await sdk.Notifications.getNotifications(address, chainId);
+    return await sdk.Wallet.getNotifications();
   };
 
   return {
@@ -234,8 +230,8 @@ export const useWallet = () => {
     execRecovery,
     approveSignTransaction,
     rejectSignTransaction,
-    getNotifications,
     getWalletAuthnticator,
     createWalletAuthnticator,
+    getActivities,
   };
 };
