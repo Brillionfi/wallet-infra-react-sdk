@@ -9,6 +9,7 @@ import TelosLogo from "@/components/icons/telos-logo";
 import TronLogo from "@/components/icons/tron-logo";
 import VanarLogo from "@/components/icons/vanar-logo";
 import ZilliqaLogo from "@/components/icons/zilliqa-logo";
+import TangleLogo from "@/components/icons/tangle-logo";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
 export interface IChainSelectorProps {
@@ -132,6 +133,16 @@ export const CHAINS_INFO: Record<SUPPORTED_CHAINS, TChainInfo> = {
     name: "Cosmos",
     chainId: SUPPORTED_CHAINS.COSMOS,
     icon: CosmosLogo(),
+  },
+  [SUPPORTED_CHAINS.TANGLE]: {
+    name: "Tangle",
+    chainId: SUPPORTED_CHAINS.TANGLE,
+    icon: TangleLogo(),
+  },
+  [SUPPORTED_CHAINS.TANGLE_TESTNET]: {
+    name: "Tangle Testnet",
+    chainId: SUPPORTED_CHAINS.TANGLE_TESTNET,
+    icon: TangleLogo(),
   },
 };
 

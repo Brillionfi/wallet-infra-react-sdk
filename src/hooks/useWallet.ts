@@ -15,7 +15,7 @@ import {
   IWalletSignMessageResponse,
   IWalletSignTransaction,
   IWalletSignTransactionResponse,
-  TNotifications,
+  TWalletActivities,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { useQuery } from "@tanstack/react-query";
 import { useBrillionContext } from "components/BrillionContext";
@@ -182,13 +182,11 @@ export const useWallet = () => {
     return await sdk.Wallet.getNonce(address, chainId);
   };
 
-  const initRecovery = async (
-    address: Address,
-  ): Promise<IWalletRecovery | undefined> => {
+  const initRecovery = async (): Promise<IWalletRecovery | undefined> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return await sdk.Wallet.initRecovery(address);
+    return await sdk.Wallet.initRecovery();
   };
 
   const execRecovery = async (
@@ -211,13 +209,11 @@ export const useWallet = () => {
   };
 
   const getNotifications = async (
-    address: Address,
-    chainId: ChainId,
-  ): Promise<TNotifications> => {
+  ): Promise<TWalletActivities> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
-    return await sdk.Notifications.getNotifications(address, chainId);
+    return await sdk.Notifications.getNotifications();
   };
 
   return {
