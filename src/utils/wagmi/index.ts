@@ -1,10 +1,11 @@
+export * from "./brillionConnector";
+export * from "./brillionProvider";
+export * from "./brillionTransports";
+
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
 import { BrillionConnector } from "./brillionConnector";
 import { BrillionTransport } from "./brillionTransports";
-
-export * from "./brillionConnector";
-export * from "./brillionTransports";
 
 export const parseChain = (chain: number) => {
   return String(chain) as SUPPORTED_CHAINS;
