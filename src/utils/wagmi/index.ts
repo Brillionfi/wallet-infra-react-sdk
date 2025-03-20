@@ -1,6 +1,8 @@
-export * from "./brillionConnector";
-export * from "./brillionProvider";
-export * from "./brillionTransports";
+export * as CustomConnector from "./brillionConnector";
+export * as CustomEip1193Bridge from "./brillionEip1193Bridge";
+export * as CustomProvider from "./brillionProvider";
+export * as CustomSigner from "./brillionSigner";
+export * as CustomTransport from "./brillionTransports";
 
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 

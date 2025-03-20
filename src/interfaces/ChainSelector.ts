@@ -5,6 +5,7 @@ import CosmosLogo from "@/components/icons/cosmos-logo";
 import EthereumLogo from "@/components/icons/ethereum-logo";
 import PolygonLogo from "@/components/icons/polygon-logo";
 import SolanaLogo from "@/components/icons/solana-logo";
+import TangleLogo from "@/components/icons/tangle-logo";
 import TelosLogo from "@/components/icons/telos-logo";
 import TronLogo from "@/components/icons/tron-logo";
 import VanarLogo from "@/components/icons/vanar-logo";
@@ -132,6 +133,16 @@ export const CHAINS_INFO: Record<SUPPORTED_CHAINS, TChainInfo> = {
     name: "Cosmos",
     chainId: SUPPORTED_CHAINS.COSMOS,
     icon: CosmosLogo(),
+  },
+  [SUPPORTED_CHAINS.TANGLE]: {
+    name: "Tangle",
+    chainId: SUPPORTED_CHAINS.TANGLE,
+    icon: TangleLogo(),
+  },
+  [SUPPORTED_CHAINS.TANGLE_TESTNET]: {
+    name: "Tangle Testnet",
+    chainId: SUPPORTED_CHAINS.TANGLE_TESTNET,
+    icon: TangleLogo(),
   },
 };
 
