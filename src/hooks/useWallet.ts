@@ -15,7 +15,6 @@ import {
   IWalletSignMessageResponse,
   IWalletSignTransaction,
   IWalletSignTransactionResponse,
-  TNotifications,
   TWalletActivities,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { useQuery } from "@tanstack/react-query";
@@ -209,7 +208,8 @@ export const useWallet = () => {
     );
   };
 
-  const getNotifications = async (): Promise<TWalletActivities> => {
+  const getNotifications = async (
+  ): Promise<TWalletActivities> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
