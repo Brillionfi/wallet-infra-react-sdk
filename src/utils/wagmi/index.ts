@@ -1,13 +1,13 @@
+import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+
+import { BrillionConnector } from "./brillionConnector";
+import { BrillionTransport } from "./brillionTransports";
+
 export * as CustomConnector from "./brillionConnector";
 export * as CustomEip1193Bridge from "./brillionEip1193Bridge";
 export * as CustomProvider from "./brillionProvider";
 export * as CustomSigner from "./brillionSigner";
 export * as CustomTransport from "./brillionTransports";
-
-import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
-
-import { BrillionConnector } from "./brillionConnector";
-import { BrillionTransport } from "./brillionTransports";
 
 export const parseChain = (chain: number) => {
   return String(chain) as SUPPORTED_CHAINS;

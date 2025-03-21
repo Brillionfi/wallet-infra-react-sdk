@@ -4,12 +4,10 @@ import {
   WalletTypes,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { SDKProvider } from "@metamask/sdk";
-import {
-  keccak256,
-  Transaction,
-} from "ethers";
-import { hexToString, numberToHex, parseChain } from ".";
+import { keccak256, Transaction } from "ethers";
 import { custom } from "viem";
+
+import { hexToString, numberToHex, parseChain } from ".";
 import {
   CustomProvider,
   eth_call,
@@ -36,11 +34,7 @@ export class BrillionEip1193Bridge {
   provider: SDKProvider | CustomProvider;
   sdk: WalletInfra;
 
-  constructor(
-    address: string,
-    chain: number,
-    sdk: WalletInfra,
-  ) {
+  constructor(address: string, chain: number, sdk: WalletInfra) {
     this.address = address;
     this.chainId = chain;
     this.sdk = sdk;
@@ -49,9 +43,9 @@ export class BrillionEip1193Bridge {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async send(method: string, params?: Array<any>): Promise<any> {
-    console.log("provider send")
-    console.log('method :>> ', method);
-    console.log('params :>> ', params);
+    console.log("provider send");
+    console.log("method :>> ", method);
+    console.log("params :>> ", params);
     switch (method) {
       case "eth_sendTransaction": {
         const sendTransactionData = (params as eth_sendTransaction[])[0];
@@ -75,10 +69,12 @@ export class BrillionEip1193Bridge {
             this.address,
             parseChain(this.chainId),
             {
-              gasLimit: (
-                Number(gasData.gasLimit) * Number("1.2")
+              gasLimit: (Number(gasData.gasLimit) * Number("1.2")).toFixed(),
+              baseFee: (
+                (Number(gasData.maxFeePerGas) -
+                  Number(gasData.maxPriorityFeePerGas)) *
+                Number("1.2")
               ).toFixed(),
-              baseFee: ((Number(gasData.maxFeePerGas) - Number(gasData.maxPriorityFeePerGas)) * Number("1.2")).toFixed(),
               maxFeePerGas: (
                 Number(gasData.maxFeePerGas) * Number("1.2")
               ).toFixed(),
@@ -191,9 +187,13 @@ export class BrillionEip1193Bridge {
           const txDetails = Transaction.from({
             value: hexToString(signTransactionData.value ?? "0"),
             to: signTransactionData.to,
-            data: signTransactionData.data
+            data: signTransactionData.data,
           });
-          const unsignedTransaction = txDetails.unsignedSerialized.startsWith("0x") ? txDetails.unsignedSerialized.slice(2) : txDetails.unsignedSerialized
+          const unsignedTransaction = txDetails.unsignedSerialized.startsWith(
+            "0x",
+          )
+            ? txDetails.unsignedSerialized.slice(2)
+            : txDetails.unsignedSerialized;
           const response = await this.sdk.Wallet.signTransaction(
             signTransactionData.from,
             {
@@ -206,7 +206,7 @@ export class BrillionEip1193Bridge {
           if (response.needsApproval) {
             return "Transaction created, but needs another approval";
           } else {
-            return "0x"+response.signedTransaction;
+            return "0x" + response.signedTransaction;
           }
         } catch (error) {
           throw new Error(`eth_signTransaction error :>> ${error}`);
@@ -221,7 +221,10 @@ export class BrillionEip1193Bridge {
       }
       case "eth_sign": {
         //Signs arbitrary data using the user’s private key
-        const data = (params as `0x${string}`[])[0].length === 42 ? (params as `0x${string}`[])[1] : (params as `0x${string}`[])[0]
+        const data =
+          (params as `0x${string}`[])[0].length === 42
+            ? (params as `0x${string}`[])[1]
+            : (params as `0x${string}`[])[0];
         const response = await this.sdk.Wallet.signMessage(this.address, {
           message: hexToText(data),
         });
@@ -229,7 +232,10 @@ export class BrillionEip1193Bridge {
       }
       case "personal_sign": {
         //Signs a message, adding a user-readable prefix for security.
-        const data = (params as `0x${string}`[])[0].length === 42 ? (params as `0x${string}`[])[1] : (params as `0x${string}`[])[0]
+        const data =
+          (params as `0x${string}`[])[0].length === 42
+            ? (params as `0x${string}`[])[1]
+            : (params as `0x${string}`[])[0];
         const response = await this.sdk.Wallet.signMessage(this.address, {
           message: hexToText(data),
         });
@@ -280,13 +286,11 @@ export class BrillionEip1193Bridge {
       }
     }
   }
-  
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  request(request: { method: string, params?: Array<any>}): Promise<any> {
+  request(request: { method: string; params?: Array<any> }): Promise<any> {
     return this.send(request.method, request.params || []);
-  };
-
+  }
 }
-
 
 export default BrillionEip1193Bridge;

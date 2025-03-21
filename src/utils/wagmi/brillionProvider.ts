@@ -1,9 +1,8 @@
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { SDKProvider } from "@metamask/sdk";
-import {
-  CustomProvider,
-} from "./types";
+
 import BrillionEip1193Bridge from "./brillionEip1193Bridge";
+import { CustomProvider } from "./types";
 
 export class BrillionProvider {
   address: string;
@@ -11,11 +10,7 @@ export class BrillionProvider {
   provider: SDKProvider | CustomProvider;
   sdk: WalletInfra;
 
-  constructor(
-    address: string,
-    chain: number,
-    sdk: WalletInfra,
-  ) {
+  constructor(address: string, chain: number, sdk: WalletInfra) {
     this.address = address;
     this.chainId = chain;
     this.sdk = sdk;
