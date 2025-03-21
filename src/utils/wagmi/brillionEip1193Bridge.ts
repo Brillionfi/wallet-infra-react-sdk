@@ -18,7 +18,6 @@ import {
   eth_signTransaction,
   wallet_switchEthereumChain,
 } from "./types";
-// import { Eip1193Bridge } from "@ethersproject/experimental";
 
 const hexToStr = (hex: string) => {
   return new TextDecoder().decode(
