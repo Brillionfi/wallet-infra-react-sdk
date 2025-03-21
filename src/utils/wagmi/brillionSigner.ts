@@ -77,7 +77,11 @@ export class BrillionSigner /*implements Signer*/ {
         parseChain(Number(rawTx.chainId)),
         {
           gasLimit: (Number(gasData.gasLimit) * Number("1.2")).toFixed(),
-          baseFee: ((Number(gasData.maxFeePerGas) - Number(gasData.maxPriorityFeePerGas)) * Number("1.2")).toFixed(),
+          baseFee: (
+            (Number(gasData.maxFeePerGas) -
+              Number(gasData.maxPriorityFeePerGas)) *
+            Number("1.2")
+          ).toFixed(),
           maxFeePerGas: (
             Number(gasData.maxFeePerGas) * Number("1.2")
           ).toFixed(),

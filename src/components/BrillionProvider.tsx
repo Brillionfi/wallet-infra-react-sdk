@@ -4,6 +4,8 @@ import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 import MetaMaskSDK from "@metamask/sdk";
+import { Core } from "@walletconnect/core";
+import Client, { WalletKit } from "@reown/walletkit";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   const [isReady, setIsReady] = useState<boolean>(false);
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
   const [sdkMM, setSdkMM] = useState<MetaMaskSDK | null>(null);
+  const [wcClient, setWcClient] = useState<Client | null>(null)
+  
   const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
   const [wallet, setWallet] = useState<string>("");
   const [signer, setSigner] = useState<string>("");
@@ -38,7 +42,26 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   }, [appId, baseUrl]);
 
   useEffect(() => {
-    if(WCProjectId) setWalletConnectProjectId(WCProjectId);
+    const init = async () => {
+      const core = new Core({
+        projectId: WCProjectId,
+      });
+      
+      setWcClient(await WalletKit.init({
+        core,
+        metadata: {
+          name: 'Brillion',
+          description: 'Brillion Wallet',
+          url: 'https://brillion.finance',
+          icons: [''], // TODO add brillion icon
+        },
+      }))
+    }
+
+    if(WCProjectId) {
+      setWalletConnectProjectId(WCProjectId)
+      void init();
+    }
   }, [WCProjectId]);
 
   useEffect(() => {
@@ -74,6 +97,7 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
       <BrillionContext.Provider value={{
         sdk, 
         walletConnectProjectId,
+        wcClient,
         isReady,
         chain,
         wallet,

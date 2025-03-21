@@ -13,17 +13,8 @@ import {
 } from "@wagmi/core";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import Client, { SignClient } from "@walletconnect/sign-client";
-import {
-  BrowserProvider,
-  keccak256,
-  Listener,
-  Transaction,
-} from "ethers";
-import {
-  custom,
-  SwitchChainError,
-  type EIP1193RequestFn,
-} from "viem";
+import { BrowserProvider, keccak256, Listener, Transaction } from "ethers";
+import { custom, SwitchChainError, type EIP1193RequestFn } from "viem";
 
 import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
 import { BrillionSigner } from "./brillionSigner";
@@ -282,7 +273,7 @@ export function BrillionConnector({
       const request: EIP1193RequestFn = async ({
         method,
         params,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }): Promise<any> => {
         if (!(await checkLogged())) throw new Error("User not logged in");
         switch (method) {
@@ -311,7 +302,11 @@ export function BrillionConnector({
                   gasLimit: (
                     Number(gasData.gasLimit) * Number("1.2")
                   ).toFixed(),
-                  baseFee: ((Number(gasData.maxFeePerGas) - Number(gasData.maxPriorityFeePerGas)) * Number("1.2")).toFixed(),
+                  baseFee: (
+                    (Number(gasData.maxFeePerGas) -
+                      Number(gasData.maxPriorityFeePerGas)) *
+                    Number("1.2")
+                  ).toFixed(),
                   maxFeePerGas: (
                     Number(gasData.maxFeePerGas) * Number("1.2")
                   ).toFixed(),

@@ -5,11 +5,11 @@ import CosmosLogo from "@/components/icons/cosmos-logo";
 import EthereumLogo from "@/components/icons/ethereum-logo";
 import PolygonLogo from "@/components/icons/polygon-logo";
 import SolanaLogo from "@/components/icons/solana-logo";
+import TangleLogo from "@/components/icons/tangle-logo";
 import TelosLogo from "@/components/icons/telos-logo";
 import TronLogo from "@/components/icons/tron-logo";
 import VanarLogo from "@/components/icons/vanar-logo";
 import ZilliqaLogo from "@/components/icons/zilliqa-logo";
-import TangleLogo from "@/components/icons/tangle-logo";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
 export interface IChainSelectorProps {
