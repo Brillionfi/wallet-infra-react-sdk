@@ -46,6 +46,24 @@ export const useWalletConnect = () => {
         "personal_sign",
       ];
       const events = ["connect", "disconnect"];
+
+      // // TODO show modal to approve/reject request
+      // const approved = await showPrompt({
+      //   title: `Request: ${label}`,
+      //   message: `Would you like to approve this request?`,
+      //   actionList: [
+      //     {
+      //       id: "APPROVE",
+      //       title: "Approve",
+      //       type: "default",
+      //     },
+      //     {
+      //       id: "REJECT",
+      //       title: "Reject",
+      //       type: "cancel",
+      //     },
+      //   ],
+      // });
       await wcClient.approveSession({
         id: proposal.id,
         namespaces: {
@@ -60,11 +78,27 @@ export const useWalletConnect = () => {
 
     wcClient.on("session_request", async (requestEvent) => {
       try {
-        console.log("session_request", requestEvent);
+        // TODO show modal to approve/reject request
+        // const approved = await showPrompt({
+        //   title: `Request: ${label}`,
+        //   message: `Would you like to approve this request?`,
+        //   actionList: [
+        //     {
+        //       id: "APPROVE",
+        //       title: "Approve",
+        //       type: "default",
+        //     },
+        //     {
+        //       id: "REJECT",
+        //       title: "Reject",
+        //       type: "cancel",
+        //     },
+        //   ],
+        // });
+
         const { params } = requestEvent;
         const { request } = params;
         const response = await eip1193.send(request.method, request.params);
-        console.log("response :>> ", response);
         await wcClient.respondSessionRequest({
           topic: requestEvent.topic,
           response: {
@@ -86,6 +120,23 @@ export const useWalletConnect = () => {
     });
 
     wcClient.on("session_delete", (data) => {
+      // TODO show modal to approve/reject rdisplay disconnected
+      // const approved = await showPrompt({
+      //   title: `Request: ${label}`,
+      //   message: `Would you like to approve this request?`,
+      //   actionList: [
+      //     {
+      //       id: "APPROVE",
+      //       title: "Approve",
+      //       type: "default",
+      //     },
+      //     {
+      //       id: "REJECT",
+      //       title: "Reject",
+      //       type: "cancel",
+      //     },
+      //   ],
+      // });
       console.log("session_delete", data);
     });
 

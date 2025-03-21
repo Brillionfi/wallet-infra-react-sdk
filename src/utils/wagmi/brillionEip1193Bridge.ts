@@ -43,9 +43,6 @@ export class BrillionEip1193Bridge {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async send(method: string, params?: Array<any>): Promise<any> {
-    console.log("provider send");
-    console.log("method :>> ", method);
-    console.log("params :>> ", params);
     switch (method) {
       case "eth_sendTransaction": {
         const sendTransactionData = (params as eth_sendTransaction[])[0];
