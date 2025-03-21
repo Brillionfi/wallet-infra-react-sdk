@@ -119,7 +119,7 @@ export const useWalletConnect = () => {
       }
     });
 
-    wcClient.on("session_delete", (data) => {
+    wcClient.on("session_delete", (_data) => {
       // TODO show modal to approve/reject rdisplay disconnected
       // const approved = await showPrompt({
       //   title: `Request: ${label}`,
