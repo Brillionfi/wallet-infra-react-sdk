@@ -1,6 +1,7 @@
 import { useBrillionContext } from "components/BrillionContext";
 import BrillionEip1193Bridge from "@/utils/wagmi/brillionEip1193Bridge";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+import { ErrorResponse } from "@walletconnect/jsonrpc-types/dist/types/jsonrpc";
 
 export const EIP155_SIGNING_METHODS = {
   PERSONAL_SIGN: 'personal_sign',
@@ -43,15 +44,35 @@ export const useWalletConnect = () => {
     });
 
     wcClient.on('session_request', async (requestEvent) => {
-      console.log('session_request', requestEvent)
-      const { params } = requestEvent
-      const { request } = params
-      const response = await eip1193.send(request.method, request.params);
-      console.log('response :>> ', response);
-      return response;
+      try {
+        console.log('session_request', requestEvent)
+        const { params } = requestEvent
+        const { request } = params
+        const response = await eip1193.send(request.method, request.params);
+        console.log('response :>> ', response);
+        await wcClient.respondSessionRequest({
+          topic: requestEvent.topic,
+          response: {
+            id: requestEvent.id,
+            jsonrpc: "2.0",
+            result: response
+          }
+        })
+      } catch (error) {
+        await wcClient.respondSessionRequest({
+          topic: requestEvent.topic,
+          response: {
+            id: requestEvent.id,
+            jsonrpc: "2.0",
+            error: error as ErrorResponse
+          }
+        })
+      }
     })
 
-    wcClient.on('session_delete', data => console.log('delete', data))
+    wcClient.on('session_delete', data => {
+      console.log('session_delete', data)
+    })
 
     await wcClient.pair({ uri });
   }

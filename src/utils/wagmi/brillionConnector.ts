@@ -3,6 +3,7 @@ import { AuthProvider, WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import {
   IAuthURLParams,
   WalletFormats,
+  WalletTypes,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
 import MetaMaskSDK, { SDKProvider } from "@metamask/sdk";
 import {
@@ -14,7 +15,9 @@ import QRCodeModal from "@walletconnect/qrcode-modal";
 import Client, { SignClient } from "@walletconnect/sign-client";
 import {
   BrowserProvider,
+  keccak256,
   Listener,
+  Transaction,
 } from "ethers";
 import {
   custom,
@@ -22,12 +25,27 @@ import {
   type EIP1193RequestFn,
 } from "viem";
 
-import { BrillionProviderProps, numberToHex } from ".";
+import { BrillionProviderProps, hexToString, numberToHex, parseChain } from ".";
 import { BrillionSigner } from "./brillionSigner";
 import {
   CustomProvider,
+  eth_call,
+  eth_estimateGas,
+  eth_sendTransaction,
+  eth_signTransaction,
+  wallet_switchEthereumChain,
 } from "./types";
-import BrillionEip1193Bridge from "./brillionEip1193Bridge";
+
+const hexToStr = (hex: string) => {
+  return new TextDecoder().decode(
+    new Uint8Array(
+      hex
+        .slice(2)
+        .match(/.{1,2}/g)!
+        .map((byte) => parseInt(byte, 16)),
+    ),
+  );
+};
 
 export type ConnectBrillionProps = {
   provider: AuthProvider;
@@ -260,7 +278,231 @@ export function BrillionConnector({
       ) as `0x${string}`[];
       const connectedChain = this.localData.get("connectedChain") as number;
       const sessionData = getSessionData();
-      if (!(await checkLogged())) throw new Error("User not logged in");
+
+      const request: EIP1193RequestFn = async ({
+        method,
+        params,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }): Promise<any> => {
+        if (!(await checkLogged())) throw new Error("User not logged in");
+        switch (method) {
+          case "eth_sendTransaction": {
+            const sendTransactionData = (params as eth_sendTransaction[])[0];
+            try {
+              const txData =
+                sendTransactionData.data &&
+                sendTransactionData.data.toString() !== "0x0"
+                  ? sendTransactionData.data.toString()
+                  : "0x";
+              const txValue = hexToString(sendTransactionData.value ?? "0x0");
+
+              const gasData = await sdk.Wallet.getGasFees(
+                parseChain(connectedChain),
+                connectedWallets[0],
+                sendTransactionData.to,
+                txValue,
+                txData,
+              );
+
+              await sdk.Wallet.setGasConfig(
+                connectedWallets[0],
+                parseChain(connectedChain),
+                {
+                  gasLimit: (
+                    Number(gasData.gasLimit) * Number("1.2")
+                  ).toFixed(),
+                  baseFee: ((Number(gasData.maxFeePerGas) - Number(gasData.maxPriorityFeePerGas)) * Number("1.2")).toFixed(),
+                  maxFeePerGas: (
+                    Number(gasData.maxFeePerGas) * Number("1.2")
+                  ).toFixed(),
+                  maxPriorityFeePerGas: (
+                    Number(gasData.maxPriorityFeePerGas) * Number("1.2")
+                  ).toFixed(),
+                },
+              );
+
+              const tx = await sdk.Transaction.createTransaction({
+                transactionType: "unsigned",
+                from: connectedWallets[0],
+                to: sendTransactionData.to,
+                value: txValue,
+                data: txData,
+                chainId: connectedChain.toString(),
+              });
+              return new Promise((resolve, reject) => {
+                const timer = setInterval(async () => {
+                  try {
+                    const response = await sdk.Transaction.getTransactionById(
+                      tx.transactionId,
+                    );
+                    if (response.transactionHash) {
+                      clearInterval(timer);
+                      resolve(response.transactionHash);
+                    }
+                    if (response.reason !== "") {
+                      clearInterval(timer);
+                      reject(response.reason);
+                    }
+                  } catch (error) {
+                    clearInterval(timer);
+                    reject(error);
+                  }
+                }, 1000);
+              });
+            } catch (error) {
+              throw new Error(`Unknown tx error: ${JSON.stringify(error)}`);
+            }
+          }
+          case "eth_accounts": {
+            return connectedWallets;
+          }
+          case "eth_chainId": {
+            return numberToHex(connectedChain);
+          }
+          case "eth_estimateGas": {
+            return await sdk.Wallet.rpcRequest(
+              { method, params: params as eth_estimateGas },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+          case "eth_blockNumber": {
+            return await sdk.Wallet.rpcRequest(
+              { method },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+          case "eth_getBalance": {
+            // TODO: wagmi useBalance does not support array response
+            // const balance = await sdk.Wallet.getPortfolio(connectedWallets[0], parseChain(connectedChain));
+            return await sdk.Wallet.rpcRequest(
+              { method, params: params as string[] },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+          case "eth_getTransactionCount": {
+            return await sdk.Wallet.getNonce(
+              connectedWallets[0],
+              parseChain(connectedChain),
+            );
+          }
+          case "eth_call": {
+            return await sdk.Wallet.rpcRequest(
+              { method, params: params as eth_call },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+          case "eth_getTransactionReceipt": {
+            return await sdk.Wallet.rpcRequest(
+              { method, params: params as string[] },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+          case "eth_requestAccounts": {
+            return connectedWallets;
+          }
+          case "wallet_switchEthereumChain": {
+            const chain = (params as wallet_switchEthereumChain[])[0].chainId;
+            this.localData.set("connectedChain", Number(chain));
+            this.onChainChanged(chain.toString());
+            return chain;
+          }
+          case "net_version": {
+            return await sdk.Wallet.rpcRequest(
+              { method },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+          case "web3_clientVersion": {
+            return "Brillion Wallet v3";
+          }
+          case "web3_sha3": {
+            const hash = keccak256((params as string[])[0]);
+            return hash;
+          }
+          case "eth_signTransaction": {
+            const signTransactionData = (params as eth_signTransaction[])[0];
+            const txDetails = Transaction.from(signTransactionData);
+            const response = await sdk.Wallet.signTransaction(
+              signTransactionData.from,
+              {
+                walletFormat: WalletFormats.ETHEREUM,
+                walletType: WalletTypes.EOA,
+                unsignedTransaction: txDetails.serialized,
+              },
+              window.location.origin,
+            );
+            if (response.needsApproval) {
+              return "Transaction created, but needs another approval";
+            } else {
+              return response.signedTransaction;
+            }
+          }
+          case "eth_signTypedData_v4": {
+            //This is a standardized Ethereum JSON-RPC method for signing typed data using the user’s private key
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              typedData: JSON.parse((params as string[])[1]),
+            });
+            return response.finalSignature;
+          }
+          case "eth_sign": {
+            //Signs arbitrary data using the user’s private key
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              message: hexToStr((params as `0x${string}`[])[0]),
+            });
+            return response.finalSignature;
+          }
+          case "personal_sign": {
+            //Signs a message, adding a user-readable prefix for security.
+            const response = await sdk.Wallet.signMessage(connectedWallets[0], {
+              message: hexToStr((params as `0x${string}`[])[0]),
+            });
+            return response.finalSignature;
+          }
+          case "wallet_watchAsset": {
+            throw new Error("method not supported");
+          }
+          case "wallet_requestPermissions": {
+            throw new Error("method not supported");
+          }
+          case "wallet_scanQRCode": {
+            throw new Error("method not supported");
+          }
+          case "wallet_getPermissions": {
+            throw new Error("method not supported");
+          }
+          case "wallet_registerOnboarding": {
+            throw new Error("method not supported");
+          }
+          case "wallet_invokeSnap": {
+            throw new Error("method not supported");
+          }
+          case "wallet_enable": {
+            throw new Error("method not supported");
+          }
+          case "wallet_getCapabilities": {
+            throw new Error("method not supported");
+          }
+          case "wallet_sendCalls": {
+            throw new Error("method not supported");
+          }
+          case "wallet_getCallsStatus": {
+            throw new Error("method not supported");
+          }
+          case "wallet_showCallsStatus": {
+            throw new Error("method not supported");
+          }
+          case "wallet_addEthereumChain": {
+            throw new Error("method not supported");
+          }
+          default: {
+            return await sdk.Wallet.rpcRequest(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              { method: method as any, params: params as any },
+              { chainId: parseChain(connectedChain) },
+            );
+          }
+        }
+      };
 
       if (sessionData.loggedInVia === AuthProvider.METAMASK) {
         const ethereum = mmSDK.getProvider();
@@ -269,7 +511,6 @@ export function BrillionConnector({
         }
         return ethereum;
       }
-
       if (sessionData.loggedInVia === AuthProvider.WALLET_CONNECT) {
         const wcRequest: EIP1193RequestFn = async ({ method, params }) => {
           const connectedChain = this.localData.get("connectedChain") as number;
@@ -286,8 +527,7 @@ export function BrillionConnector({
         };
         return custom({ request: wcRequest })({ retryCount: 1 });
       }
-
-      return new BrillionEip1193Bridge(connectedWallets[0], connectedChain, sdk).provider;
+      return custom({ request })({ retryCount: 1 });
     },
 
     async disconnect() {

@@ -19,7 +19,7 @@ import {
   wallet_switchEthereumChain,
 } from "./types";
 
-const hexToStr = (hex: string) => {
+const hexToText = (hex: string) => {
   return new TextDecoder().decode(
     new Uint8Array(
       hex
@@ -30,7 +30,7 @@ const hexToStr = (hex: string) => {
   );
 };
 
-export class BrillionEip1193Bridge /*implements Eip1193Bridge*/ {
+export class BrillionEip1193Bridge {
   address: string;
   chainId: number;
   provider: SDKProvider | CustomProvider;
@@ -49,6 +49,9 @@ export class BrillionEip1193Bridge /*implements Eip1193Bridge*/ {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async send(method: string, params?: Array<any>): Promise<any> {
+    console.log("provider send")
+    console.log('method :>> ', method);
+    console.log('params :>> ', params);
     switch (method) {
       case "eth_sendTransaction": {
         const sendTransactionData = (params as eth_sendTransaction[])[0];
@@ -184,20 +187,29 @@ export class BrillionEip1193Bridge /*implements Eip1193Bridge*/ {
       }
       case "eth_signTransaction": {
         const signTransactionData = (params as eth_signTransaction[])[0];
-        const txDetails = Transaction.from(signTransactionData);
-        const response = await this.sdk.Wallet.signTransaction(
-          signTransactionData.from,
-          {
-            walletFormat: WalletFormats.ETHEREUM,
-            walletType: WalletTypes.EOA,
-            unsignedTransaction: txDetails.serialized,
-          },
-          window.location.origin,
-        );
-        if (response.needsApproval) {
-          return "Transaction created, but needs another approval";
-        } else {
-          return response.signedTransaction;
+        try {
+          const txDetails = Transaction.from({
+            value: hexToString(signTransactionData.value ?? "0"),
+            to: signTransactionData.to,
+            data: signTransactionData.data
+          });
+          const unsignedTransaction = txDetails.unsignedSerialized.startsWith("0x") ? txDetails.unsignedSerialized.slice(2) : txDetails.unsignedSerialized
+          const response = await this.sdk.Wallet.signTransaction(
+            signTransactionData.from,
+            {
+              walletFormat: WalletFormats.ETHEREUM,
+              walletType: WalletTypes.EOA,
+              unsignedTransaction,
+            },
+            window.location.origin,
+          );
+          if (response.needsApproval) {
+            return "Transaction created, but needs another approval";
+          } else {
+            return "0x"+response.signedTransaction;
+          }
+        } catch (error) {
+          throw new Error(`eth_signTransaction error :>> ${error}`);
         }
       }
       case "eth_signTypedData_v4": {
@@ -209,15 +221,17 @@ export class BrillionEip1193Bridge /*implements Eip1193Bridge*/ {
       }
       case "eth_sign": {
         //Signs arbitrary data using the user’s private key
+        const data = (params as `0x${string}`[])[0].length === 42 ? (params as `0x${string}`[])[1] : (params as `0x${string}`[])[0]
         const response = await this.sdk.Wallet.signMessage(this.address, {
-          message: hexToStr((params as `0x${string}`[])[0]),
+          message: hexToText(data),
         });
         return response.finalSignature;
       }
       case "personal_sign": {
         //Signs a message, adding a user-readable prefix for security.
+        const data = (params as `0x${string}`[])[0].length === 42 ? (params as `0x${string}`[])[1] : (params as `0x${string}`[])[0]
         const response = await this.sdk.Wallet.signMessage(this.address, {
-          message: hexToStr((params as `0x${string}`[])[0]),
+          message: hexToText(data),
         });
         return response.finalSignature;
       }
