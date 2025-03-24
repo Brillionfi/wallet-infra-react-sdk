@@ -5,7 +5,7 @@ import { custom } from "wagmi";
 
 import { BrillionProviderProps, parseChain } from ".";
 
-const hexToString = (hex: string) => {
+const hexToText = (hex: string) => {
   return new TextDecoder().decode(
     new Uint8Array(
       hex
@@ -93,14 +93,14 @@ export const BrillionTransport = (
           case "eth_sign": {
             //Signs arbitrary data using the user’s private key
             const response = await sdk.Wallet.signMessage(body.params[0], {
-              message: hexToString((body.params as `0x${string}`[])[0]),
+              message: hexToText((body.params as `0x${string}`[])[0]),
             });
             return response.finalSignature;
           }
           case "personal_sign": {
             //Signs a message, adding a user-readable prefix for security.
             const response = await sdk.Wallet.signMessage(body.params[0], {
-              message: hexToString((body.params as `0x${string}`[])[0]),
+              message: hexToText((body.params as `0x${string}`[])[0]),
             });
             return response.finalSignature;
           }

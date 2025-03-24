@@ -208,8 +208,7 @@ export const useWallet = () => {
     );
   };
 
-  const getNotifications = async (
-  ): Promise<TWalletActivities> => {
+  const getNotifications = async (): Promise<TWalletActivities> => {
     if (!sdk) {
       throw new Error("AppId is not valid");
     }
