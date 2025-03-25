@@ -1,6 +1,6 @@
+import { useBrillionContext } from "@/components/BrillionContext";
 import BrillionEip1193Bridge from "@/utils/wagmi/brillionEip1193Bridge";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { useBrillionContext } from "@/components/BrillionContext";
 
 export const EIP155_SIGNING_METHODS = {
   PERSONAL_SIGN: "personal_sign",
@@ -15,7 +15,7 @@ export const EIP155_SIGNING_METHODS = {
 
 export const useWalletConnect = () => {
   const { sdk, signer, chain, wcClient, showWCPrompt } = useBrillionContext();
-  
+
   if (!sdk || !signer || !chain) {
     throw new Error("Missing configuration");
   }
@@ -23,13 +23,11 @@ export const useWalletConnect = () => {
   const eip1193 = new BrillionEip1193Bridge(signer, Number(chain), sdk);
 
   const connect = async (uri: string) => {
-
     if (!wcClient) {
       throw new Error("Client not initialized");
     }
 
     wcClient.on("session_proposal", async (proposal) => {
-      console.log('session_proposal proposal:>> ', proposal);
       const accounts = Object.values(SUPPORTED_CHAINS).map(
         (chain) => `eip155:${chain}:${signer}`,
       );
@@ -49,7 +47,6 @@ export const useWalletConnect = () => {
       ];
       const events = ["connect", "disconnect"];
       const display = proposal?.params?.proposer?.metadata;
-      console.log('display :>> ', display);
       showWCPrompt({
         tittle: `Connect Request: ${display.name}`,
         message: `
@@ -62,9 +59,9 @@ export const useWalletConnect = () => {
             id: proposal.id,
             reason: {
               code: 5000,
-              message: "User rejected the request"
-            }
-          })
+              message: "User rejected the request",
+            },
+          });
         },
         approveAction: async () => {
           await wcClient.approveSession({
@@ -76,15 +73,13 @@ export const useWalletConnect = () => {
                 events,
               },
             },
-          })
-        }
+          });
+        },
       });
     });
 
     wcClient.on("session_request", async (requestEvent) => {
-      console.log('session_request requestEvent :>> ', requestEvent);
-      const display = requestEvent?.params?.request
-      console.log('display :>> ', display);
+      const display = requestEvent?.params?.request;
       showWCPrompt({
         tittle: `Action requested: ${display.method}`,
         message: `
@@ -98,13 +93,12 @@ export const useWalletConnect = () => {
               jsonrpc: "2.0",
               error: {
                 code: 5001,
-                message: "User rejected this request"
+                message: "User rejected this request",
               },
             },
-          })
+          });
         },
         approveAction: async () => {
-          console.log("approveAction")
           const { params } = requestEvent;
           const { request } = params;
           const response = await eip1193.send(request.method, request.params);
@@ -116,13 +110,11 @@ export const useWalletConnect = () => {
               result: response,
             },
           });
-        }
+        },
       });
     });
 
-    wcClient.on("session_delete", (_data) => {
-
-    });
+    wcClient.on("session_delete", (_data) => {});
 
     await wcClient.pair({ uri });
   };

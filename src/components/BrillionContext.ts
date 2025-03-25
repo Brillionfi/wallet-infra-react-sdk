@@ -3,6 +3,7 @@ import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 import MetaMaskSDK from "@metamask/sdk";
 import Client from "@reown/walletkit";
+
 import { PromptData } from "./WalletConnectPopUp/WalletConnectPopUpStyles";
 
 export type BrillionContextType = {
