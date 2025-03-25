@@ -274,6 +274,7 @@ export class BrillionEip1193Bridge {
             approvedData.stamped,
           );
           const contructedSignature = constructSignature(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (approvedResponse.data as any).signRawPayloadResult,
           );
           return contructedSignature?.signature;
