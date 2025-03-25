@@ -113,7 +113,6 @@ export class BrillionEip1193Bridge {
             data: txData,
             chainId: this.chainId.toString(),
           });
-          console.log("tx :>> ", tx);
           return new Promise((resolve, reject) => {
             const timer = setInterval(async () => {
               try {
@@ -241,11 +240,8 @@ export class BrillionEip1193Bridge {
               approvedData.timestamp,
               approvedData.stamped,
             );
-            console.log(
-              "eth_signTransaction approvedResponse :>> ",
-              approvedResponse,
-            );
             const contructedSignature = constructSignature(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (approvedResponse.data as any).signRawPayloadResult,
             );
             return contructedSignature?.signature;
@@ -276,10 +272,6 @@ export class BrillionEip1193Bridge {
             response.organizationId,
             approvedData.timestamp,
             approvedData.stamped,
-          );
-          console.log(
-            "eth_signTypedData_v4 approvedResponse :>> ",
-            approvedResponse,
           );
           const contructedSignature = constructSignature(
             (approvedResponse.data as any).signRawPayloadResult,
@@ -314,6 +306,7 @@ export class BrillionEip1193Bridge {
             approvedData.stamped,
           );
           const contructedSignature = constructSignature(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (approvedResponse.data as any).signRawPayloadResult,
           );
           return contructedSignature?.signature;
@@ -346,6 +339,7 @@ export class BrillionEip1193Bridge {
             approvedData.stamped,
           );
           const contructedSignature = constructSignature(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (approvedResponse.data as any).signRawPayloadResult,
           );
           return contructedSignature?.signature;

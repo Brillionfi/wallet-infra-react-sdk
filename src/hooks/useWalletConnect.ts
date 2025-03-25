@@ -114,7 +114,7 @@ export const useWalletConnect = () => {
       });
     });
 
-    wcClient.on("session_delete", (_data) => {});
+    wcClient.on("session_delete", () => {});
 
     await wcClient.pair({ uri });
   };
