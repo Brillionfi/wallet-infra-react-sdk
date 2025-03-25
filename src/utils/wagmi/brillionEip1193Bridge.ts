@@ -1,5 +1,6 @@
 import { WalletInfra } from "@brillionfi/wallet-infra-sdk";
 import {
+  TransactionTypeActivityKeys,
   WalletFormats,
   WalletTypes,
 } from "@brillionfi/wallet-infra-sdk/dist/models";
@@ -16,6 +17,29 @@ import {
   eth_signTransaction,
   wallet_switchEthereumChain,
 } from "./types";
+
+const constructSignature = (
+  data:
+    | {
+        r: string;
+        s: string;
+        v: string;
+      }
+    | undefined,
+) => {
+  // Ensure r and s are 32 bytes (64 hex chars)
+  if (!data) return undefined;
+
+  const { r, s, v } = data;
+  if (r.length !== 64 || s.length !== 64) {
+    throw new Error('r and s must be 32-byte hex strings with 0x prefix');
+  }
+
+  return {
+    rawSignature: { r: `0x${r}`, s: `0x${s}`, v: `0x${v}` },
+    signature: `0x${r}${s}${parseInt(v) + 27}`,
+  };
+}
 
 const hexToText = (hex: string) => {
   return new TextDecoder().decode(
@@ -89,6 +113,7 @@ export class BrillionEip1193Bridge {
             data: txData,
             chainId: this.chainId.toString(),
           });
+          console.log('tx :>> ', tx);
           return new Promise((resolve, reject) => {
             const timer = setInterval(async () => {
               try {
@@ -200,8 +225,24 @@ export class BrillionEip1193Bridge {
             },
             window.location.origin,
           );
-          if (response.needsApproval) {
-            return "Transaction created, but needs another approval";
+          if(response.needsApproval === true && response.fingerprint){
+            const { authenticators } = await this.sdk.Wallet.getWalletAuthenticator();
+            const approvedData = await this.sdk.Transaction.signWithPasskey(
+              authenticators[0].credentialId,
+              response.organizationId, 
+              response.fingerprint, 
+              window.location.hostname, 
+              TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY
+            )
+            const approvedResponse = await this.sdk.Wallet.approveActivity(
+              response.fingerprint,
+              response.organizationId,
+              approvedData.timestamp,
+              approvedData.stamped
+            )
+            console.log('eth_signTransaction approvedResponse :>> ', approvedResponse);
+            const contructedSignature = constructSignature((approvedResponse.data as any).signRawPayloadResult);
+            return contructedSignature?.signature;
           } else {
             return "0x" + response.signedTransaction;
           }
@@ -214,6 +255,25 @@ export class BrillionEip1193Bridge {
         const response = await this.sdk.Wallet.signMessage(this.address, {
           typedData: JSON.parse((params as string[])[1]),
         });
+        if(response.needsApproval === true && response.fingerprint){
+          const { authenticators } = await this.sdk.Wallet.getWalletAuthenticator();
+          const approvedData = await this.sdk.Transaction.signWithPasskey(
+            authenticators[0].credentialId,
+            response.organizationId, 
+            response.fingerprint, 
+            window.location.hostname, 
+            TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY
+          )
+          const approvedResponse = await this.sdk.Wallet.approveActivity(
+            response.fingerprint,
+            response.organizationId,
+            approvedData.timestamp,
+            approvedData.stamped
+          )
+          console.log('eth_signTypedData_v4 approvedResponse :>> ', approvedResponse);
+          const contructedSignature = constructSignature((approvedResponse.data as any).signRawPayloadResult);
+          return contructedSignature?.signature;
+        }
         return response.finalSignature;
       }
       case "eth_sign": {
@@ -225,6 +285,24 @@ export class BrillionEip1193Bridge {
         const response = await this.sdk.Wallet.signMessage(this.address, {
           message: hexToText(data),
         });
+        if(response.needsApproval === true && response.fingerprint){
+          const { authenticators } = await this.sdk.Wallet.getWalletAuthenticator();
+          const approvedData = await this.sdk.Transaction.signWithPasskey(
+            authenticators[0].credentialId,
+            response.organizationId, 
+            response.fingerprint, 
+            window.location.hostname, 
+            TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY
+          )
+          const approvedResponse = await this.sdk.Wallet.approveActivity(
+            response.fingerprint,
+            response.organizationId,
+            approvedData.timestamp,
+            approvedData.stamped
+          )
+          const contructedSignature = constructSignature((approvedResponse.data as any).signRawPayloadResult);
+          return contructedSignature?.signature;
+        }
         return response.finalSignature;
       }
       case "personal_sign": {
@@ -236,6 +314,24 @@ export class BrillionEip1193Bridge {
         const response = await this.sdk.Wallet.signMessage(this.address, {
           message: hexToText(data),
         });
+        if(response.needsApproval === true && response.fingerprint){
+          const { authenticators } = await this.sdk.Wallet.getWalletAuthenticator();
+          const approvedData = await this.sdk.Transaction.signWithPasskey(
+            authenticators[0].credentialId,
+            response.organizationId, 
+            response.fingerprint, 
+            window.location.hostname, 
+            TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY
+          )
+          const approvedResponse = await this.sdk.Wallet.approveActivity(
+            response.fingerprint,
+            response.organizationId,
+            approvedData.timestamp,
+            approvedData.stamped
+          )
+          const contructedSignature = constructSignature((approvedResponse.data as any).signRawPayloadResult);
+          return contructedSignature?.signature;
+        }
         return response.finalSignature;
       }
       case "wallet_watchAsset": {

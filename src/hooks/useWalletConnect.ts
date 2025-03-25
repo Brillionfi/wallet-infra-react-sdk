@@ -1,7 +1,6 @@
 import BrillionEip1193Bridge from "@/utils/wagmi/brillionEip1193Bridge";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
-import { ErrorResponse } from "@walletconnect/jsonrpc-types/dist/types/jsonrpc";
-import { useBrillionContext } from "components/BrillionContext";
+import { useBrillionContext } from "@/components/BrillionContext";
 
 export const EIP155_SIGNING_METHODS = {
   PERSONAL_SIGN: "personal_sign",
@@ -15,7 +14,8 @@ export const EIP155_SIGNING_METHODS = {
 };
 
 export const useWalletConnect = () => {
-  const { sdk, signer, chain, wcClient } = useBrillionContext();
+  const { sdk, signer, chain, wcClient, showWCPrompt } = useBrillionContext();
+  
   if (!sdk || !signer || !chain) {
     throw new Error("Missing configuration");
   }
@@ -23,11 +23,13 @@ export const useWalletConnect = () => {
   const eip1193 = new BrillionEip1193Bridge(signer, Number(chain), sdk);
 
   const connect = async (uri: string) => {
+
     if (!wcClient) {
       throw new Error("Client not initialized");
     }
 
     wcClient.on("session_proposal", async (proposal) => {
+      console.log('session_proposal proposal:>> ', proposal);
       const accounts = Object.values(SUPPORTED_CHAINS).map(
         (chain) => `eip155:${chain}:${signer}`,
       );
@@ -46,97 +48,80 @@ export const useWalletConnect = () => {
         "personal_sign",
       ];
       const events = ["connect", "disconnect"];
-
-      // // TODO show modal to approve/reject request
-      // const approved = await showPrompt({
-      //   title: `Request: ${label}`,
-      //   message: `Would you like to approve this request?`,
-      //   actionList: [
-      //     {
-      //       id: "APPROVE",
-      //       title: "Approve",
-      //       type: "default",
-      //     },
-      //     {
-      //       id: "REJECT",
-      //       title: "Reject",
-      //       type: "cancel",
-      //     },
-      //   ],
-      // });
-      await wcClient.approveSession({
-        id: proposal.id,
-        namespaces: {
-          eip155: {
-            accounts,
-            methods,
-            events,
-          },
+      const display = proposal?.params?.proposer?.metadata;
+      console.log('display :>> ', display);
+      showWCPrompt({
+        tittle: `Connect Request: ${display.name}`,
+        message: `
+          ${display.description}
+          \n
+          from: ${display.url}
+        `,
+        rejectAction: async () => {
+          await wcClient.rejectSession({
+            id: proposal.id,
+            reason: {
+              code: 5000,
+              message: "User rejected the request"
+            }
+          })
         },
+        approveAction: async () => {
+          await wcClient.approveSession({
+            id: proposal.id,
+            namespaces: {
+              eip155: {
+                accounts,
+                methods,
+                events,
+              },
+            },
+          })
+        }
       });
     });
 
     wcClient.on("session_request", async (requestEvent) => {
-      try {
-        // TODO show modal to approve/reject request
-        // const approved = await showPrompt({
-        //   title: `Request: ${label}`,
-        //   message: `Would you like to approve this request?`,
-        //   actionList: [
-        //     {
-        //       id: "APPROVE",
-        //       title: "Approve",
-        //       type: "default",
-        //     },
-        //     {
-        //       id: "REJECT",
-        //       title: "Reject",
-        //       type: "cancel",
-        //     },
-        //   ],
-        // });
-
-        const { params } = requestEvent;
-        const { request } = params;
-        const response = await eip1193.send(request.method, request.params);
-        await wcClient.respondSessionRequest({
-          topic: requestEvent.topic,
-          response: {
-            id: requestEvent.id,
-            jsonrpc: "2.0",
-            result: response,
-          },
-        });
-      } catch (error) {
-        await wcClient.respondSessionRequest({
-          topic: requestEvent.topic,
-          response: {
-            id: requestEvent.id,
-            jsonrpc: "2.0",
-            error: error as ErrorResponse,
-          },
-        });
-      }
+      console.log('session_request requestEvent :>> ', requestEvent);
+      const display = requestEvent?.params?.request
+      console.log('display :>> ', display);
+      showWCPrompt({
+        tittle: `Action requested: ${display.method}`,
+        message: `
+          ${JSON.stringify(display.params)}
+        `,
+        rejectAction: async () => {
+          await wcClient.respondSessionRequest({
+            topic: requestEvent.topic,
+            response: {
+              id: requestEvent.id,
+              jsonrpc: "2.0",
+              error: {
+                code: 5001,
+                message: "User rejected this request"
+              },
+            },
+          })
+        },
+        approveAction: async () => {
+          console.log("approveAction")
+          const { params } = requestEvent;
+          const { request } = params;
+          const response = await eip1193.send(request.method, request.params);
+          await wcClient.respondSessionRequest({
+            topic: requestEvent.topic,
+            response: {
+              id: requestEvent.id,
+              jsonrpc: "2.0",
+              result: response,
+            },
+          });
+        }
+      });
     });
 
     wcClient.on("session_delete", (_data) => {
-      // TODO show modal to approve/reject rdisplay disconnected
-      // const approved = await showPrompt({
-      //   title: `Request: ${label}`,
-      //   message: `Would you like to approve this request?`,
-      //   actionList: [
-      //     {
-      //       id: "APPROVE",
-      //       title: "Approve",
-      //       type: "default",
-      //     },
-      //     {
-      //       id: "REJECT",
-      //       title: "Reject",
-      //       type: "cancel",
-      //     },
-      //   ],
-      // });
+
     });
 
     await wcClient.pair({ uri });

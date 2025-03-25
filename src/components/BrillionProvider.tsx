@@ -6,6 +6,8 @@ import { AuthProvider, SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dis
 import MetaMaskSDK from "@metamask/sdk";
 import { Core } from "@walletconnect/core";
 import Client, { WalletKit } from "@reown/walletkit";
+import { PromptData } from "./WalletConnectPopUp/WalletConnectPopUpStyles";
+import { WalletConnectPopUp } from "./WalletConnectPopUp/WalletConnectPopUp";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,7 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
   const [sdk, setSdk] = useState<WalletInfra | null>(null);
   const [sdkMM, setSdkMM] = useState<MetaMaskSDK | null>(null);
   const [wcClient, setWcClient] = useState<Client | null>(null)
+  const [showWCPrompt, setShowWCPrompt] = useState<PromptData | null>(null)
   
   const [chain, setChain] = useState<SUPPORTED_CHAINS>(SUPPORTED_CHAINS.ETHEREUM);
   const [wallet, setWallet] = useState<string>("");
@@ -107,9 +110,11 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
         changeChain,
         changeWallet: (wallet: string) => setWallet(wallet),
         changeSigner: (signer: string) => setSigner(signer),
-        saveSessionInfo
+        saveSessionInfo,
+        showWCPrompt: (data: PromptData) => setShowWCPrompt(data)
       }}>
         {children}
+        {showWCPrompt && <WalletConnectPopUp data={showWCPrompt} afterApproval={()=>setShowWCPrompt(null)}/>}
       </BrillionContext.Provider>
     </QueryClientProvider>
   );
