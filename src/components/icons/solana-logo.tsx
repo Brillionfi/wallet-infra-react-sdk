@@ -11,17 +11,17 @@ export default function SolanaLogo() {
     </g>
     <defs>
       <linearGradient id="b" x1="10.81" x2="98.89" y1="98.29" y2="-1.01" gradientUnits="userSpaceOnUse">
-      <stop offset=".08" stop-color="#9945FF">
+      <stop offset=".08" stopColor="#9945FF">
       </stop>
-    <stop offset=".3" stop-color="#8752F3">
+    <stop offset=".3" stopColor="#8752F3">
       </stop>
-    <stop offset=".5" stop-color="#5497D5">
+    <stop offset=".5" stopColor="#5497D5">
       </stop>
-    <stop offset=".6" stop-color="#43B4CA">
+    <stop offset=".6" stopColor="#43B4CA">
       </stop>
-    <stop offset=".72" stop-color="#28E0B9">
+    <stop offset=".72" stopColor="#28E0B9">
       </stop>
-    <stop offset=".97" stop-color="#19FB9B">
+    <stop offset=".97" stopColor="#19FB9B">
       </stop>
     </linearGradient>
     </defs>

@@ -324,7 +324,7 @@ export function BrillionConnector({
                 data: txData,
                 chainId: connectedChain.toString(),
               });
-              return new Promise((resolve, reject) => {
+              const txResponse = await new Promise((resolve, reject) => {
                 const timer = setInterval(async () => {
                   try {
                     const response = await sdk.Transaction.getTransactionById(
@@ -339,11 +339,13 @@ export function BrillionConnector({
                       reject(response.reason);
                     }
                   } catch (error) {
+                    console.log("error :>> ", error);
                     clearInterval(timer);
                     reject(error);
                   }
-                }, 1000);
+                }, 5000);
               });
+              return txResponse;
             } catch (error) {
               throw new Error(`Unknown tx error: ${JSON.stringify(error)}`);
             }

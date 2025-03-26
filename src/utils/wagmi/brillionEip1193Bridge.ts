@@ -113,12 +113,13 @@ export class BrillionEip1193Bridge {
             data: txData,
             chainId: this.chainId.toString(),
           });
-          return new Promise((resolve, reject) => {
+          const txResponse = await new Promise((resolve, reject) => {
             const timer = setInterval(async () => {
               try {
                 const response = await this.sdk.Transaction.getTransactionById(
                   tx.transactionId,
                 );
+                console.log("response :>> ", response);
                 if (response.transactionHash) {
                   clearInterval(timer);
                   resolve(response.transactionHash);
@@ -128,11 +129,13 @@ export class BrillionEip1193Bridge {
                   reject(response.reason);
                 }
               } catch (error) {
+                console.log("error :>> ", error);
                 clearInterval(timer);
                 reject(error);
               }
-            }, 1000);
+            }, 5000);
           });
+          return txResponse;
         } catch (error) {
           throw new Error(`Unknown tx error: ${JSON.stringify(error)}`);
         }

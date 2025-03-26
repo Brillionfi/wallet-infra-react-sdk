@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export type PromptData = {
   tittle: string;
@@ -15,7 +15,9 @@ export type TPopUpCustomClassNames = {
   wcPopUpContainer?: string;
   wcPopUpCard?: string;
   wcPopUpCardHeader?: string;
+  wcPopUpCardHeaderText?: string;
   wcPopUpCardBody?: string;
+  wcPopUpCardBodyText?: string;
   wcPopUpCardButtons?: string;
   wcPopUpCardButtonApprove?: string;
   wcPopUpCardButtonReject?: string;
@@ -43,11 +45,23 @@ export const WcPopUpCard = styled.div`
 `;
 
 export const WcPopUpCardHeader = styled.div`
-  margin-bottom: auto;
+  margin-bottom: 1rem;
+  text-align: center;
+`;
+
+export const WcPopUpCardHeaderText = styled.span`
 `;
 
 export const WcPopUpCardBody = styled.div`
-  margin: auto 0px;
+  background-color: lightgray;
+  padding: 1rem;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  margin: auto;
+  margin-bottom: 1rem;
+`;
+
+export const WcPopUpCardBodyText = styled.span`
 `;
 
 export const WcPopUpCardButtons = styled.div`
@@ -63,6 +77,10 @@ export const WcPopUpCardButtonApprove = styled.button`
   color: white;
   background-color: green;
   border-radius: 20px;
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 export const WcPopUpCardButtonReject = styled.button`
@@ -71,4 +89,24 @@ export const WcPopUpCardButtonReject = styled.button`
   color: white;
   background-color: red;
   border-radius: 20px;
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
+`;
+
+const spin = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+export const Spinner = styled.span`
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: ${spin} 0.8s linear infinite;
 `;
