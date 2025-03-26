@@ -27,9 +27,11 @@ This providers has 4 props:
   - `defaultChain`: Your preferred chain to connect first.
   - `WCProjectId`: Your walletConnect Project ID (mandatory only if you are planning to use WalletConnect as login method)
 
-In a React or NextJS project, you can start by importing the LoginForm component:
+In a React or NextJS project, you can start by importing the LoginForm component and styles:
 
 ```tsx
+import "@brillionfi/waas-react-sdk/dist/styles/index.css";
+
 import { BrillionProvider, LoginForm, LoginMethods } from "@brillionfi/waas-react-sdk";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
@@ -94,6 +96,8 @@ If you want to personalize this login form, you can change texts, hide content a
 Note: you can leave some/all of these blank to have default styles
 
 ```tsx
+import "@brillionfi/waas-react-sdk/dist/styles/index.css";
+
 import { BrillionProvider, LoginForm, LoginMethods, defaultStyles } from "@brillionfi/waas-react-sdk";
 
 const MyLoginPage = () => {
