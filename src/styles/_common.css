@@ -1,0 +1,44 @@
+.brlkit_button {
+  width: 100%;
+  border: 1px solid #0009321F;
+  background: #fff;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  gap: 8px;
+}
+
+.brlkit_button_icon {
+  width: 16px;
+  height: 16px;
+}
+
+.brlkit_button_text {
+  color: "#1C2024";
+}
+
+.brlkit_input_container {
+  width: 100%;
+  display: flex;
+  padding: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid #0009321F;
+}
+
+.brlkit_input {
+  border: none;
+}
+
+.brlkit_input_next {
+  width: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}

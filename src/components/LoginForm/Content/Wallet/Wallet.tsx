@@ -1,25 +1,25 @@
 import { TLoginOption } from "interfaces";
-import { TCustomClassNames, WalletButton, WalletButtonIcon, WalletButtonsContainer, WalletButtonText } from "@/components/LoginForm/Content/Wallet/WalletStyles";
+import { TCustomClassNames } from "@/components/LoginForm/Content/Wallet/WalletStyles";
 
 export const Wallet = ({options, customClassNames}: {options: TLoginOption[], customClassNames?: TCustomClassNames}) => {
 
   return (
-    <WalletButtonsContainer className={customClassNames?.walletButtonsContainer}>
+    <section className={`brlkit_wallet_buttons_container ${customClassNames?.walletButtonsContainer ?? ""}`}>
       {options.map((option) => (
-        <WalletButton
+        <button
           key={`wallet-login-option-${option.label!.toLocaleLowerCase()}`}
           id={`wallet-login-option-${option.label!.toLocaleLowerCase()}`}
-          className={customClassNames?.walletButton}
+          className={`brlkit_wallet_button ${customClassNames?.walletButton ?? ""}`}
           onClick={() => option.onClick!()}
         >
-          <WalletButtonIcon className={customClassNames?.walletButtonIcon}>
+          <span className={`brlkit_wallet_button_icon ${customClassNames?.walletButtonIcon ?? ""}`}>
             {option.icon}
-          </WalletButtonIcon>
-          <WalletButtonText className={customClassNames?.walletButtonText}>
+          </span>
+          <span className={`brlkit_wallet_button_text ${customClassNames?.walletButtonText ?? ""}`}>
             {option.label}
-          </WalletButtonText>
-        </WalletButton>
+          </span>
+        </button>
       ))}
-    </WalletButtonsContainer>
+    </section>
   );
 };

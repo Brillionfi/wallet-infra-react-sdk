@@ -9,11 +9,10 @@ import WalletConnectLogo from "@/components/icons/walletconnect-logo";
 import EmailLogo from "@/components/icons/email-logo";
 import WalletLogo from "@/components/icons/wallet-logo";
 import QRCodeModal from "@walletconnect/qrcode-modal"; 
-import { ContentContainer, DivederMiddleSection, Divider, DividerSidesSection, TCustomClassNames } from "@/components/LoginForm/Content/ContentStyles";
+import { TCustomClassNames } from "@/components/LoginForm/Content/ContentStyles";
 import { Social } from "@/components/LoginForm/Content/Social/Social";
 import { Otp } from "@/components/LoginForm/Content/Otp/Otp";
 import { Wallet } from "@/components/LoginForm/Content/Wallet/Wallet";
-import { Button, ButtonIcon, ButtonText } from "@/components/LoginForm/Content/CommonStyles";
 
 export const Content = (
 {
@@ -105,7 +104,7 @@ export const Content = (
   const walletMethods = walletOptions.filter(option=> loginMethods.includes(option.label))
 
   return (
-    <ContentContainer className={customClassNames?.contentContainer}>
+    <section className={`brlkit_content_container ${customClassNames?.contentContainer ?? ""}`}>
       <div style={{
           width: !showInnerContent ? '100%' : '0%',
           opacity: !showInnerContent ? 1 : 0,
@@ -116,22 +115,22 @@ export const Content = (
         <Otp options={otpMethods} customClassNames={customClassNames}/>
         {walletMethods.length > 0 ? 
           <>
-            <Divider>
-              <DividerSidesSection/>
-              <DivederMiddleSection>OR</DivederMiddleSection>
-              <DividerSidesSection/>
-            </Divider>
-            <Button
-              className={customClassNames?.button}
+            <div className="brlkit_divider">
+              <hr className="brlkit_divider_sides_section"/>
+              <span className="brlkit_divider_middle_section">OR</span>
+              <hr className="brlkit_divider_sides_section"/>
+            </div>
+            <button
+              className={`brlkit_button ${customClassNames?.button ?? ""}`}
               onClick={toggleInnerContent}
             >
-              <ButtonIcon className={customClassNames?.buttonIcon}>
+              <span className={`brlkit_button_icon ${customClassNames?.buttonIcon ?? ""}`}>
                 <WalletLogo />
-              </ButtonIcon>
-              <ButtonText className={customClassNames?.buttonText}>
+              </span>
+              <span className={`brlkit_button_text ${customClassNames?.buttonText ?? ""}`}>
                 Connect Wallet
-              </ButtonText>
-            </Button>
+              </span>
+            </button>
           </>
         : null}
       </div>
@@ -143,6 +142,6 @@ export const Content = (
       >
         <Wallet options={walletMethods} customClassNames={customClassNames}/>
       </div>
-    </ContentContainer>
+    </section>
   );
 };
