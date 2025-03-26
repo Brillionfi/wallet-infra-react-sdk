@@ -119,6 +119,7 @@ export const useWalletConnect = () => {
       }
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     wcClient.on("session_delete", (_data) => {
       // TODO show modal to approve/reject rdisplay disconnected
       // const approved = await showPrompt({
