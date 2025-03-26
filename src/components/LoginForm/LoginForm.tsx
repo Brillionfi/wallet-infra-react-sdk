@@ -1,6 +1,6 @@
 import { LoginMethods } from "interfaces";
 import { useState } from "react";
-import { MainContainer, ErrorContainer, ErrorStyle, TConfig } from "@/components/LoginForm/LoginFormStyles";
+import { TConfig } from "@/components/LoginForm/LoginFormStyles";
 import { Header } from "@/components/LoginForm/Header/Header";
 import { Footer } from "@/components/LoginForm/Footer/Footer";
 import { Content } from "@/components/LoginForm/Content/Content";
@@ -13,7 +13,7 @@ export const LoginForm = ({loginMethods, redirectUrl, onClose, config}: {loginMe
   const customClassNames = config?.customClassNames ?? {};
 
   return (
-    <MainContainer className={customClassNames?.mainContainer}>
+    <div className={`brlkit_login_main_container ${customClassNames?.mainContainer ?? ""}`}>
       <Header 
         onClose={showInnerContent ? () => setShowInnerContent(false) : onClose} 
         showClose={config?.showClose ?? true}
@@ -34,12 +34,12 @@ export const LoginForm = ({loginMethods, redirectUrl, onClose, config}: {loginMe
         toggleInnerContent={() => setShowInnerContent(!showInnerContent)}
       />
 
-      <ErrorContainer className={customClassNames?.errorContainer}>
-        <ErrorStyle className={customClassNames?.errorText}>
+      <section className={`brlkit_login_error_container ${customClassNames?.errorContainer ?? ""}`}>
+        <span className={`brlkit_login_error_style ${customClassNames?.errorText}`}>
           {errorText}
-        </ErrorStyle>
-      </ErrorContainer>
+        </span>
+      </section>
       <Footer customClassNames={customClassNames}/>
-    </MainContainer>
+    </div>
   );
 };

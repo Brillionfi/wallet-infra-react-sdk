@@ -1,6 +1,5 @@
 import { LoginMethods, TLoginOption } from "interfaces";
-import { Button, ButtonIcon, ButtonText, InputContainer, InputNext } from "@/components/LoginForm/Content/CommonStyles";
-import { ButtonsContainer, EmailInput, TCustomClassNames } from "@/components/LoginForm/Content/Otp/OtpStyles";
+import { TCustomClassNames } from "@/components/LoginForm/Content/Otp/OtpStyles";
 import NextArrow from "@/components/icons/next-arrow";
 import { useMemo, useState } from "react";
 
@@ -21,40 +20,40 @@ export const Otp = ({options, customClassNames}: {options: TLoginOption[], custo
   }, [options])
 
   return (
-    <ButtonsContainer className={customClassNames?.otpButtonsContainer}>
+    <section className={`brlkit_buttons_container ${customClassNames?.otpButtonsContainer ?? ""}`}>
       {showEmail ? 
-        <InputContainer className={customClassNames?.inputContainer}>
-          <EmailInput
+        <div className={`brlkit_input_container ${customClassNames?.inputContainer ?? ""}`}>
+          <input
             type="email"
             id="otp-email-input"
             placeholder="Email address"
             value={email}
-            className={customClassNames?.input}
+            className={`brlkit_input brlkit_input_focus ${customClassNames?.input ?? ""}`}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <InputNext 
-            className={customClassNames?.inputNext} 
+          <div 
+            className={`brlkit_input_next ${customClassNames?.inputNext ?? ""}`} 
             onClick={() => emailOption?.onClick!(email)}
           >
             <NextArrow />
-          </InputNext>
-        </InputContainer>
+          </div>
+        </div>
       :
-        <Button
+        <button
           key={`otp-login-option-email`}
           id={`otp-login-option-email`}
-          className={customClassNames?.button}
+          className={`brlkit_button ${customClassNames?.button ?? ""}`}
           onClick={() => setShowEmail(true)}
         >
-          <ButtonIcon className={customClassNames?.buttonIcon}>
+          <span className={`brlkit_button_icon ${customClassNames?.buttonIcon ?? ""}`}>
             {emailOption?.icon}
-          </ButtonIcon>
-          <ButtonText className={customClassNames?.buttonText}>
+          </span>
+          <span className={`brlkit_button_text ${customClassNames?.buttonText ?? ""}`}>
             {emailOption?.label}
-          </ButtonText>
-        </Button>
+          </span>
+        </button>
       }
       {/* do the same for upcoming SMS otp login */}
-    </ButtonsContainer>
+    </section>
   );
 };

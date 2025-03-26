@@ -1,0 +1,20 @@
+.brlkit_header_container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.brlkit_header_text_container {
+  font-size: 1.2rem;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.brlkit_close_section {
+  color: #000;
+}
