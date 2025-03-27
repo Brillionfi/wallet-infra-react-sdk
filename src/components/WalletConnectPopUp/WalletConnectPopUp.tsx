@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { PromptData, Spinner, WcPopUpCardBodyText, WcPopUpCardHeaderText } from "./WalletConnectPopUpStyles";
-import { WcPopUpContainer, TPopUpConfig, WcPopUpCard, WcPopUpCardHeader, WcPopUpCardBody, WcPopUpCardButtons, WcPopUpCardButtonApprove, WcPopUpCardButtonReject } from "./WalletConnectPopUpStyles";
+import { PromptData, Spinner } from "./WalletConnectPopUpStyles";
+import { TPopUpConfig } from "./WalletConnectPopUpStyles";
 
 export const WalletConnectPopUp = ({data, afterApproval, config}: { data: PromptData | undefined, afterApproval: () => void, config?: TPopUpConfig }) => {
   if(!data) throw Error("WalletConnectPopUp: Missing request data");
@@ -26,27 +26,27 @@ export const WalletConnectPopUp = ({data, afterApproval, config}: { data: Prompt
   }
 
   return (
-    <WcPopUpContainer className={customClassNames?.wcPopUpContainer}>
-      <WcPopUpCard className={customClassNames?.wcPopUpCard}>
-        <WcPopUpCardHeader className={customClassNames?.wcPopUpCardHeader}>
-          <WcPopUpCardHeaderText>
+    <div className={`brlkit_wallet_connect_popup_container ${customClassNames?.wcPopUpContainer}`}>
+      <div className={`brlkit_wallet_connect_card ${customClassNames?.wcPopUpCard}`}>
+        <div className={`brlkit_wallet_connect_card_header ${customClassNames?.wcPopUpCardHeader}`}>
+          <div className={`${customClassNames?.wcPopUpCardHeader}`}>
             {data.tittle}
-          </WcPopUpCardHeaderText>
-        </WcPopUpCardHeader>
-        <WcPopUpCardBody className={customClassNames?.wcPopUpCardBody}>
-          <WcPopUpCardBodyText>
+          </div>
+        </div>
+        <div className={`brlkit_wallet_connect_card_body ${customClassNames?.wcPopUpCardBody}`}>
+          <div className={`${customClassNames?.wcPopUpCardHeader}`}>
             {data.message}
-          </WcPopUpCardBodyText>
-        </WcPopUpCardBody>
-        <WcPopUpCardButtons className={customClassNames?.wcPopUpCardButtons}>
-          <WcPopUpCardButtonApprove disabled={loadingApprove} className={customClassNames?.wcPopUpCardButtonApprove} onClick={()=>action(true)}>
+          </div>
+        </div>
+        <div className={`brlkit_wallet_connect_card_buttons ${customClassNames?.wcPopUpCardButtons}`}>
+          <button disabled={loadingApprove} className={`brlkit_wallet_connect_card_button_approve ${customClassNames?.wcPopUpCardButtonApprove}`} onClick={()=>action(true)}>
             {loadingApprove ? <Spinner /> : "Approve"}
-          </WcPopUpCardButtonApprove>
-          <WcPopUpCardButtonReject disabled={loadingReject} className={customClassNames?.wcPopUpCardButtonReject} onClick={()=>action(false)}>
+          </button>
+          <button disabled={loadingReject} className={`brlkit_wallet_connect_card_button_reject ${customClassNames?.wcPopUpCardButtonReject}`} onClick={()=>action(false)}>
             {loadingReject ? <Spinner /> : "Reject"}
-          </WcPopUpCardButtonReject>
-        </WcPopUpCardButtons>
-      </WcPopUpCard>
-    </WcPopUpContainer>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };

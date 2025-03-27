@@ -13,7 +13,7 @@ export const useWalletConnect = () => {
 
   const eip1193 = useMemo(() => {
     return new BrillionEip1193Bridge(signer, Number(chain), sdk);
-  }, [chain])
+  }, [chain]);
 
   const handleProposal = async (proposal: {
     params: { proposer: { metadata: any } };

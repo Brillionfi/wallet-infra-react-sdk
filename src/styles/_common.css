@@ -1,6 +1,6 @@
 .brlkit_button {
   width: 100%;
-  border: 1px solid #0009321F;
+  border: 1px solid #0009321f;
   background: #fff;
   padding: 0.5rem;
   border-radius: 6px;
@@ -28,7 +28,7 @@
   justify-content: space-between;
   align-items: center;
   border-radius: 6px;
-  border: 1px solid #0009321F;
+  border: 1px solid #0009321f;
 }
 
 .brlkit_input {

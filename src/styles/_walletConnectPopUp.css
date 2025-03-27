@@ -1,0 +1,65 @@
+.brlkit_wallet_connect_popup_container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.brlkit_wallet_connect_card {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  display: grid;
+  min-width: 300px;
+  min-height: 300px;
+  max-width: 400px;
+  max-height: 600px;
+}
+
+.brlkit_wallet_connect_card_header {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.brlkit_wallet_connect_card_body {
+  background-color: lightgray;
+  padding: 1rem;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  margin: auto;
+  margin-bottom: 1rem;
+}
+
+.brlkit_wallet_connect_card_buttons {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brlkit_wallet_connect_card_button_approve {
+  padding: 0.5rem 0.8rem;
+  min-width: 100px;
+  color: white;
+  background-color: green;
+  border-radius: 20px;
+}
+
+.brlkit_wallet_connect_card_button_approve:disabled {
+  cursor: not-allowed;
+}
+
+.brlkit_wallet_connect_card_button_reject {
+  padding: 0.5rem 0.8rem;
+  min-width: 100px;
+  color: white;
+  background-color: red;
+  border-radius: 20px;
+}
+
+.brlkit_wallet_connect_card_button_reject:disabled {
+  cursor: not-allowed;
+}
