@@ -339,7 +339,6 @@ export function BrillionConnector({
                       reject(response.reason);
                     }
                   } catch (error) {
-                    console.log("error :>> ", error);
                     clearInterval(timer);
                     reject(error);
                   }

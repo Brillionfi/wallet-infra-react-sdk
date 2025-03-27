@@ -9,25 +9,103 @@ export const useWalletConnect = () => {
   if (!sdk || !signer || !chain) {
     throw new Error("Missing configuration");
   }
-
   if (!wcClient) return;
 
-  const { handleRequest, handleProposal, handleLogout } = useMemo(() => {
-    const eip1193 = new BrillionEip1193Bridge(signer, Number(chain), sdk);
+  const eip1193 = useMemo(() => {
+    return new BrillionEip1193Bridge(signer, Number(chain), sdk);
+  }, [chain])
 
-    const handleRequest = async (requestEvent: {
-      params: any;
-      topic?: any;
-      id?: any;
-    }) => {
-      console.log("eip1193.chainId :>> ", eip1193.chainId);
-      const display = requestEvent?.params?.request;
-      showWCPrompt({
-        tittle: `Action requested: ${display.method}`,
-        message: `
-          ${JSON.stringify(display.params)}
-        `,
-        rejectAction: async () => {
+  const handleProposal = async (proposal: {
+    params: { proposer: { metadata: any } };
+    id: any;
+  }) => {
+    const accounts = Object.values(SUPPORTED_CHAINS).map(
+      (chain) => `eip155:${chain}:${signer}`,
+    );
+    const methods = [
+      "eth_sendTransaction",
+      "eth_accounts",
+      "eth_chainId",
+      "eth_estimateGas",
+      "eth_blockNumber",
+      "eth_getBalance",
+      "eth_getTransactionCount",
+      "wallet_switchEthereumChain",
+      "eth_signTransaction",
+      "eth_signTypedData_v4",
+      "eth_sign",
+      "personal_sign",
+    ];
+    const events = ["connect", "disconnect"];
+    const display = proposal?.params?.proposer?.metadata;
+    showWCPrompt({
+      tittle: `Connect Request: ${display.name}`,
+      message: `
+        ${display.description}
+        \n
+        from: ${display.url}
+      `,
+      rejectAction: async () => {
+        await wcClient.rejectSession({
+          id: proposal.id,
+          reason: {
+            code: 5000,
+            message: "User rejected the request",
+          },
+        });
+      },
+      approveAction: async () => {
+        await wcClient.approveSession({
+          id: proposal.id,
+          namespaces: {
+            eip155: {
+              accounts,
+              methods,
+              events,
+            },
+          },
+        });
+      },
+    });
+  };
+  const handleRequest = async (requestEvent: {
+    params: any;
+    topic?: any;
+    id?: any;
+  }) => {
+    const display = requestEvent?.params?.request;
+    showWCPrompt({
+      tittle: `Action requested: ${display.method}`,
+      message: `
+        ${JSON.stringify(display.params)}
+      `,
+      rejectAction: async () => {
+        await wcClient.respondSessionRequest({
+          topic: requestEvent.topic,
+          response: {
+            id: requestEvent.id,
+            jsonrpc: "2.0",
+            error: {
+              code: 5001,
+              message: "User rejected this request",
+            },
+          },
+        });
+      },
+      approveAction: async () => {
+        const { params } = requestEvent;
+        const { request } = params;
+        try {
+          const response = await eip1193.send(request.method, request.params);
+          await wcClient.respondSessionRequest({
+            topic: requestEvent.topic,
+            response: {
+              id: requestEvent.id,
+              jsonrpc: "2.0",
+              result: response,
+            },
+          });
+        } catch (error) {
           await wcClient.respondSessionRequest({
             topic: requestEvent.topic,
             response: {
@@ -35,106 +113,18 @@ export const useWalletConnect = () => {
               jsonrpc: "2.0",
               error: {
                 code: 5001,
-                message: "User rejected this request",
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : "An unknown error occurred",
               },
             },
           });
-        },
-        approveAction: async () => {
-          const { params } = requestEvent;
-          const { request } = params;
-          try {
-            const response = await eip1193.send(request.method, request.params);
-            await wcClient.respondSessionRequest({
-              topic: requestEvent.topic,
-              response: {
-                id: requestEvent.id,
-                jsonrpc: "2.0",
-                result: response,
-              },
-            });
-          } catch (error) {
-            await wcClient.respondSessionRequest({
-              topic: requestEvent.topic,
-              response: {
-                id: requestEvent.id,
-                jsonrpc: "2.0",
-                error: {
-                  code: 5001,
-                  message:
-                    error instanceof Error
-                      ? error.message
-                      : "An unknown error occurred",
-                },
-              },
-            });
-          }
-        },
-      });
-    };
-
-    const handleProposal = async (proposal: {
-      params: { proposer: { metadata: any } };
-      id: any;
-    }) => {
-      const accounts = Object.values(SUPPORTED_CHAINS).map(
-        (chain) => `eip155:${chain}:${signer}`,
-      );
-      const methods = [
-        "eth_sendTransaction",
-        "eth_accounts",
-        "eth_chainId",
-        "eth_estimateGas",
-        "eth_blockNumber",
-        "eth_getBalance",
-        "eth_getTransactionCount",
-        "wallet_switchEthereumChain",
-        "eth_signTransaction",
-        "eth_signTypedData_v4",
-        "eth_sign",
-        "personal_sign",
-      ];
-      const events = ["connect", "disconnect"];
-      const display = proposal?.params?.proposer?.metadata;
-      showWCPrompt({
-        tittle: `Connect Request: ${display.name}`,
-        message: `
-          ${display.description}
-          \n
-          from: ${display.url}
-        `,
-        rejectAction: async () => {
-          await wcClient.rejectSession({
-            id: proposal.id,
-            reason: {
-              code: 5000,
-              message: "User rejected the request",
-            },
-          });
-        },
-        approveAction: async () => {
-          await wcClient.approveSession({
-            id: proposal.id,
-            namespaces: {
-              eip155: {
-                accounts,
-                methods,
-                events,
-              },
-            },
-          });
-        },
-      });
-    };
-
-    const handleLogout = () => {};
-
-    return {
-      handleRequest,
-      handleProposal,
-      handleLogout,
-    };
-  }, [chain]);
+        }
+      },
+    });
+  };
+  const handleLogout = () => {};
 
   useEffect(() => {
     wcClient.removeListener("session_proposal", handleProposal);
@@ -144,7 +134,7 @@ export const useWalletConnect = () => {
     wcClient.on("session_proposal", handleProposal);
     wcClient.on("session_request", handleRequest);
     wcClient.on("session_delete", handleLogout);
-  }, [chain, wcClient]);
+  }, [eip1193]);
 
   const connect = async (uri: string) => {
     await wcClient.pair({ uri });

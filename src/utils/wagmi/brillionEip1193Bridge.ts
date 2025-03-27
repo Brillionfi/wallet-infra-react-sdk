@@ -119,7 +119,6 @@ export class BrillionEip1193Bridge {
                 const response = await this.sdk.Transaction.getTransactionById(
                   tx.transactionId,
                 );
-                console.log("response :>> ", response);
                 if (response.transactionHash) {
                   clearInterval(timer);
                   resolve(response.transactionHash);
@@ -129,7 +128,6 @@ export class BrillionEip1193Bridge {
                   reject(response.reason);
                 }
               } catch (error) {
-                console.log("error :>> ", error);
                 clearInterval(timer);
                 reject(error);
               }
