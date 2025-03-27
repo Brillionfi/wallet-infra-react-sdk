@@ -8,20 +8,20 @@
 
 .brlkit_divider_sides_section {
   width: 40%;
-  border: 1px solid #BBBBBB;
+  border: 1px solid #bbbbbb;
 }
 
 .brlkit_divider_middle_section {
   width: 20%;
-  color: #BBBBBB;
+  color: #bbbbbb;
   font-size: 0.8rem;
 }
 
 .brlkit_divider {
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  width: 100%; 
-  text-align: center; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
   margin: 1rem 0rem;
 }

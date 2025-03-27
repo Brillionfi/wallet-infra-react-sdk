@@ -4,6 +4,8 @@ import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 import MetaMaskSDK from "@metamask/sdk";
 import Client from "@reown/walletkit";
 
+import { PromptData } from "./WalletConnectPopUp/WalletConnectPopUpStyles";
+
 export type BrillionContextType = {
   sdk: WalletInfra | null;
   walletConnectProjectId: string;
@@ -18,6 +20,7 @@ export type BrillionContextType = {
   changeChain: (chain: SUPPORTED_CHAINS) => void;
   changeWallet: (wallet: string) => void;
   changeSigner: (signer: string) => void;
+  showWCPrompt: (data: PromptData) => void;
 };
 
 export const BrillionContext = createContext<BrillionContextType>({
@@ -34,6 +37,7 @@ export const BrillionContext = createContext<BrillionContextType>({
   changeChain: () => {},
   changeWallet: () => {},
   changeSigner: () => {},
+  showWCPrompt: () => {},
 });
 
 export const useBrillionContext = () => {
