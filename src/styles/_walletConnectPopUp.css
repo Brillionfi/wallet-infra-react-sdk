@@ -1,5 +1,7 @@
 .brlkit_wallet_connect_popup_container {
   position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
   display: flex;
@@ -25,6 +27,8 @@
 }
 
 .brlkit_wallet_connect_card_body {
+  overflow: auto;
+  max-height: 400px;
   background-color: lightgray;
   padding: 1rem;
   border-radius: 10px;
