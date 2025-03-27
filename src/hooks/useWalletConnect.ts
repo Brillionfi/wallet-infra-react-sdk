@@ -16,7 +16,9 @@ export const useWalletConnect = () => {
   }, [chain]);
 
   const handleProposal = async (proposal: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: { proposer: { metadata: any } };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     id: any;
   }) => {
     const accounts = Object.values(SUPPORTED_CHAINS).map(
@@ -69,8 +71,11 @@ export const useWalletConnect = () => {
     });
   };
   const handleRequest = async (requestEvent: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     topic?: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     id?: any;
   }) => {
     const display = requestEvent?.params?.request;

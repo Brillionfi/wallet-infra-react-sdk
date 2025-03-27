@@ -11,11 +11,12 @@ export const WalletConnectPopUp = ({data, afterApproval, config}: { data: Prompt
   const customClassNames = config?.customClassNames ?? {};
 
   const action = async (approved: boolean) => {
-    approved ? setLoadingApprove(true) : setLoadingReject(true)
 
     if(approved){
+      setLoadingApprove(true)
       await data.approveAction();
     }else{
+      setLoadingReject(true)
       await data.rejectAction();
     }
 
