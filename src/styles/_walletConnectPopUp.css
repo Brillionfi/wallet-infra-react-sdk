@@ -27,6 +27,8 @@
 }
 
 .brlkit_wallet_connect_card_body {
+  overflow: auto;
+  max-height: 400px;
   background-color: lightgray;
   padding: 1rem;
   border-radius: 10px;

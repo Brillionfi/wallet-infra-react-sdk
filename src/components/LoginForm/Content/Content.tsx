@@ -107,7 +107,7 @@ export const Content = (
     <section className={`brlkit_content_container ${customClassNames?.contentContainer ?? ""}`}>
       <div style={{
           width: !showInnerContent ? '100%' : '0%',
-          position: !showInnerContent ? undefined : 'relative',
+          position: !showInnerContent ? undefined : 'absolute',
           right: !showInnerContent ? undefined : '100%',
           opacity: !showInnerContent ? 1 : 0,
           transition: `width 500ms ease`,
@@ -139,7 +139,7 @@ export const Content = (
       <div style={{
           width: showInnerContent ? '100%' : '0%',
           opacity: showInnerContent ? 1 : 0,
-          position: showInnerContent ? undefined : 'relative',
+          position: showInnerContent ? undefined : 'absolute',
           right: showInnerContent ? undefined : '100%',
           transition: `width 500ms ease`,
         }}
