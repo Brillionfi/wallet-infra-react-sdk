@@ -1,0 +1,19 @@
+.brlkit_login_main_container {
+  background-color: #FCFCFC;
+  border-radius: 16px;
+  border: 1px solid #E8E8E8;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem;
+  width: 314px;
+  min-height: 436px;
+}
+
+.brlkit_login_error_container {
+  margin-top: 1rem;
+}
+
+.brlkit_login_error_style {
+  color: red;
+}

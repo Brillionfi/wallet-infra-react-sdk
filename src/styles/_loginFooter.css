@@ -1,0 +1,12 @@
+.brlkit_login_footer_container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+}
+
+.brlkit_text_section {
+  font-size: 0.8rem;
+  color: #838383;
+}

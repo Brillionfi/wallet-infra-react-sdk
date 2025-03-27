@@ -1,0 +1,26 @@
+.brlkit_wallet_buttons_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.brlkit_wallet_button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  height: 48px;
+  gap: 11px;
+}
+
+.brlkit_wallet_button_icon {
+  height: 48px;
+  width: 48px;
+  border-radius: 8px;
+}
+
+.brlkit_wallet_button_text {
+  color: #1C2024;
+}
