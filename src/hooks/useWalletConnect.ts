@@ -3,7 +3,14 @@ import { useBrillionContext } from "@/components/BrillionContext";
 import BrillionEip1193Bridge from "@/utils/wagmi/brillionEip1193Bridge";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
 
-export const useWalletConnect = () => {
+export const useWalletConnect = ({
+  onError,
+  onSuccess,
+}: {
+  onError: (message: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSuccess: (response: any) => void;
+}) => {
   const { sdk, signer, chain, wcClient, showWCPrompt } = useBrillionContext();
 
   if (!sdk || !signer || !chain) {
@@ -55,6 +62,7 @@ export const useWalletConnect = () => {
             message: "User rejected the request",
           },
         });
+        onError("User rejected this request");
       },
       approveAction: async () => {
         await wcClient.approveSession({
@@ -67,6 +75,7 @@ export const useWalletConnect = () => {
             },
           },
         });
+        onSuccess("Approved");
       },
     });
   };
@@ -96,6 +105,7 @@ export const useWalletConnect = () => {
             },
           },
         });
+        onError("User rejected this request");
       },
       approveAction: async () => {
         const { params } = requestEvent;
@@ -110,6 +120,7 @@ export const useWalletConnect = () => {
               result: response,
             },
           });
+          onSuccess(response);
         } catch (error) {
           await wcClient.respondSessionRequest({
             topic: requestEvent.topic,
@@ -125,6 +136,11 @@ export const useWalletConnect = () => {
               },
             },
           });
+          onError(
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+          );
         }
       },
     });
