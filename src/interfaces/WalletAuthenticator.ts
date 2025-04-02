@@ -19,3 +19,32 @@ export interface IWalletAuthenticatorProvider {
     authenticatorName?: string,
   ) => Promise<string | undefined>;
 };
+
+export interface IMnemonicInputProps {
+  phrase?: string[];
+  type?: "copy" | "input";
+  onChange?: (mnemonic: string[]) => void;
+}
+
+export interface IMnemonicModal extends IMnemonicInputProps {
+  isVisible: boolean;
+  onHide: () => void;
+  onFinish: (mnemonic: string[]) => void;
+  authenticatorName?: string;
+  isLoading?: boolean;
+}
+
+interface IWalletAuthenticatorModal {
+  isVisible: boolean;
+  onClick: () => void;
+  onHide: () => void;
+}
+
+
+export interface IApproveApproveWalletAuthenticatorModal
+  extends IWalletAuthenticatorModal {
+  authenticatorSelected: IWalletAuthenticatorOpt | null;
+  onAuthenticatorChange: (auth: IWalletAuthenticatorOpt) => void;
+  isLoading?: boolean;
+  disableButton?: boolean;
+}

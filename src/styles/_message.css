@@ -1,0 +1,31 @@
+.message {
+  padding: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message.info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-left: 4px solid #93c5fd;
+}
+
+.message.warn {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-left: 4px solid #fcd34d;
+}
+
+.message.error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #fca5a5;
+}
+
+.message.success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #6ee7b7;
+}

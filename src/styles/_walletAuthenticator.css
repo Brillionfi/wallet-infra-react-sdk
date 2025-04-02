@@ -1,0 +1,163 @@
+/* Mnemonic Input Styles */
+.mnemonic-input-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.mnemonic-input-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Space between input items */
+}
+
+.mnemonic-input-item {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between label and input */
+  width: 48%; /* Default width for smaller screens */
+
+  /* Adjust width for medium screens */
+  @media (min-width: 768px) {
+    width: 30%;
+  }
+}
+
+.mnemonic-input-label {
+  padding-left: 8px; /* Default padding for labels */
+}
+
+.mnemonic-input-label.pl-1 {
+  padding-left: 4px; /* Reduced padding for specific labels */
+}
+
+.mnemonic-input-field {
+  width: 100%; /* Full width for input fields */
+}
+
+/* Mnemonic modal */
+.mnemonic-modal {
+  width: 50%; /* Default width for medium screens */
+  max-width: 40%; /* For larger screens */
+  min-height: 135px;
+  padding-bottom: 0;
+}
+
+/* Description paragraph */
+.mnemonic-modal-description {
+  margin-bottom: 16px; /* Equivalent to mb-4 */
+}
+
+/* Message container */
+.mnemonic-modal-message {
+  border: 1px solid var(--primary-color); /* Equivalent to border-primary */
+  margin-bottom: 16px; /* Equivalent to mb-4 */
+  width: 100%;
+  justify-content: flex-start;
+  padding: 16px; /* Equivalent to p-4 */
+  display: none; /* Hidden by default */
+}
+
+.mnemonic-modal-message.sm-visible {
+  display: block; /* Visible on small screens */
+}
+
+.mnemonic-modal-message.sm-hidden {
+  display: none; /* Hidden on small screens */
+}
+
+/* Mnemonic input container */
+.mnemonic-modal-input-container {
+  margin-top: 16px; /* Equivalent to mt-4 */
+  display: flex;
+  justify-content: center;
+  gap: 16px; /* Equivalent to gap-4 */
+}
+
+/* File interaction links */
+.mnemonic-modal-file-link {
+  width: fit-content;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Equivalent to space-x-2 */
+}
+
+/* Message content container */
+.mnemonic-modal-message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Equivalent to space-y-2 */
+}
+
+/* Header of the message */
+.mnemonic-modal-message-header {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Equivalent to gap-2 */
+}
+
+/* Icon in the message header */
+.mnemonic-modal-message-icon {
+  font-size: 16px;
+}
+
+/* Bold text in the message header */
+.mnemonic-modal-message-title {
+  margin-left: 8px; /* Equivalent to ml-2 */
+  font-weight: bold;
+}
+
+/* List of warning messages */
+.mnemonic-modal-message-list {
+  margin-left: 16px; /* Equivalent to ml-4 */
+  list-style-type: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Equivalent to space-y-2 */
+}
+
+/* Individual list item */
+.mnemonic-modal-message-item {
+  font-size: 14px; /* Equivalent to text-sm */
+  color: white;
+}
+
+/* Bold text in the list item */
+.mnemonic-modal-message-item-bold {
+  font-weight: bold;
+}
+
+/* Container for the authenticator options */
+.approve-wallet-authenticator-container {
+  max-height: 8rem; /* Equivalent to max-h-32 */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Equivalent to space-y-4 */
+  overflow-y: auto; /* Add scroll if content overflows */
+}
+
+/* Flex container for each authenticator option */
+.approve-wallet-authenticator-item {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Equivalent to gap-2 */
+}
+
+/* Label for the radio button */
+.approve-wallet-authenticator-label {
+  margin-left: 8px; /* Equivalent to ml-2 */
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 16px; /* Equivalent to pr-4 */
+}
+
+/* Flex container for the authenticator name and icon */
+.approve-wallet-authenticator-name {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Equivalent to gap-2 */
+}

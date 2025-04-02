@@ -18,7 +18,7 @@ import type {
 } from "@/interfaces";
 import { ethers } from "ethers";
 
-import { useBrillionContext } from "@/components";
+import { ApproveWalletAuthenticatorModal, MnemonicModal, useBrillionContext } from "@/components";
 import { useWalletAuthenticatorOptions } from "@/hooks";
 
 /* Default Values */

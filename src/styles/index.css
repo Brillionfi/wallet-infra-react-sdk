@@ -1,9 +1,13 @@
+@import "./_button.css";
 @import "./_common.css";
 @import "./_content.css";
 @import "./_loginFooter.css";
 @import "./_loginForm.css";
 @import "./_loginHeader.css";
+@import "./_message.css";
+@import "./_modal.css";
 @import "./_otp.css";
 @import "./_social.css";
 @import "./_wallet.css";
 @import "./_walletConnectPopUp.css";
+@import "./_walletAuthenticator.css";
