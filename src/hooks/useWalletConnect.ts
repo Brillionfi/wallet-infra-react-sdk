@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useBrillionContext } from "@/components/BrillionContext";
 import BrillionEip1193Bridge from "@/utils/wagmi/brillionEip1193Bridge";
 import { SUPPORTED_CHAINS } from "@brillionfi/wallet-infra-sdk/dist/models";
+import { useApproveWalletAuthenticator } from "./useApproveWalletAuthenticator";
 
 export const useWalletConnect = ({
   onError,
@@ -12,6 +13,9 @@ export const useWalletConnect = ({
   onSuccess: (response: any) => void;
 }) => {
   const { sdk, signer, chain, wcClient, showWCPrompt } = useBrillionContext();
+  const { signWalletAuthenticator } = useApproveWalletAuthenticator({
+    onError,
+  });
 
   if (!sdk || !signer || !chain) {
     throw new Error("Missing configuration");
@@ -19,7 +23,7 @@ export const useWalletConnect = ({
   if (!wcClient) return;
 
   const eip1193 = useMemo(() => {
-    return new BrillionEip1193Bridge(signer, Number(chain), sdk);
+    return new BrillionEip1193Bridge(signer, Number(chain), sdk, signWalletAuthenticator);
   }, [chain]);
 
   const handleProposal = async (proposal: {
