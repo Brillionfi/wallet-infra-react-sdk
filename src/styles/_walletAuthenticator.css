@@ -37,8 +37,6 @@
 
 /* Mnemonic modal */
 .mnemonic-modal {
-  width: 50%; /* Default width for medium screens */
-  max-width: 40%; /* For larger screens */
   min-height: 135px;
   padding-bottom: 0;
 }
@@ -58,12 +56,22 @@
   display: none; /* Hidden by default */
 }
 
-.mnemonic-modal-message.sm-visible {
-  display: block; /* Visible on small screens */
+@media (min-width: 769px) {
+  .mnemonic-modal-message.sm-visible {
+    display: none !important; /* Visible on small screens */
+  }
+  .mnemonic-modal-message.sm-hidden {
+    display: block !important; /* Hidden on small screens */
+  }
 }
 
-.mnemonic-modal-message.sm-hidden {
-  display: none; /* Hidden on small screens */
+@media (max-width: 768px) {
+  .mnemonic-modal-message.sm-visible {
+    display: block !important; /* Visible on small screens */
+  }
+  .mnemonic-modal-message.sm-hidden {
+    display: none !important; /* Hidden on small screens */
+  }
 }
 
 /* Mnemonic input container */
@@ -120,7 +128,7 @@
 /* Individual list item */
 .mnemonic-modal-message-item {
   font-size: 14px; /* Equivalent to text-sm */
-  color: white;
+  color: black;
 }
 
 /* Bold text in the list item */
@@ -130,7 +138,7 @@
 
 /* Container for the authenticator options */
 .approve-wallet-authenticator-container {
-  max-height: 8rem; /* Equivalent to max-h-32 */
+  max-height: 12rem; /* Equivalent to 192px */
   display: flex;
   flex-direction: column;
   gap: 16px; /* Equivalent to space-y-4 */

@@ -8,6 +8,7 @@ import { Core } from "@walletconnect/core";
 import Client, { WalletKit } from "@reown/walletkit";
 import { PromptData } from "./WalletConnectPopUp/WalletConnectPopUpStyles";
 import { WalletConnectPopUp } from "./WalletConnectPopUp/WalletConnectPopUp";
+import { WalletAuthenticatorProvider } from "@/providers";
 
 const queryClient = new QueryClient();
 
@@ -113,8 +114,10 @@ export const BrillionProvider: React.FC<BrillionProviderProps> = ({
         saveSessionInfo,
         showWCPrompt: (data: PromptData) => setShowWCPrompt(data)
       }}>
-        {children}
-        {showWCPrompt && <WalletConnectPopUp data={showWCPrompt} afterApproval={()=>setShowWCPrompt(null)}/>}
+        <WalletAuthenticatorProvider>
+          {children}
+          {showWCPrompt && <WalletConnectPopUp data={showWCPrompt} afterApproval={()=>setShowWCPrompt(null)}/>}
+        </WalletAuthenticatorProvider>
       </BrillionContext.Provider>
     </QueryClientProvider>
   );

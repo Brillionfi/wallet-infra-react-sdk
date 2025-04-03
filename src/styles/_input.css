@@ -8,13 +8,13 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  color: black;
   flex: 1;
 }
 
 .toggle-mask {
   background: none;
   border: none;
-  color: #007bff;
   cursor: pointer;
 }
 

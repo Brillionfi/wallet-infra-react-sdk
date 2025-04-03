@@ -1,8 +1,8 @@
 import { CenterModal } from "@/components";
-import { IApproveApproveWalletAuthenticatorModal, IWalletAuthenticatorOpt } from "@/interfaces";
+import { IApproveApproveWalletAuthenticatorModal } from "@/interfaces";
 
-import { useWalletAuthenticatorOptions } from "../../hooks";
 import { RadioButton } from "../Input";
+import { useWalletAuthenticator } from "@/providers";
 
 export const ApproveWalletAuthenticatorModal = ({
   isVisible,
@@ -13,7 +13,7 @@ export const ApproveWalletAuthenticatorModal = ({
   onClick,
   onHide,
 }: IApproveApproveWalletAuthenticatorModal) => {
-  const { userWalletAuthenticators } = useWalletAuthenticatorOptions();
+  const { userWalletAuthenticators } = useWalletAuthenticator();
 
   return (
     <CenterModal
@@ -39,9 +39,9 @@ export const ApproveWalletAuthenticatorModal = ({
               <RadioButton
                 inputId={authId}
                 name="authentication"
-                value={auth}
+                value={auth.authenticatorName}
                 onChange={(e) =>
-                  onAuthenticatorChange(e.target.value as IWalletAuthenticatorOpt)
+                  onAuthenticatorChange(e.target.value as string)
                 }
                 checked={
                   authenticatorSelected?.authenticatorName ===

@@ -8,12 +8,6 @@ const styleInputs = `
   }
   @media (max-width: 1280px) {
     input {
-      max-width: 8rem;
-    }
-  }
-  
-  @media (max-width: 1024px) {
-    input {
       max-width: 7rem;
     }
   }

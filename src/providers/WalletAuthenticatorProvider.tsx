@@ -85,7 +85,8 @@ export const WalletAuthenticatorProvider = ({
     }
   }, [walletAuthenticator, sdk]);
 
-  const handleWalletAthenticator = (walletAuth: IWalletAuthenticatorOpt) => {
+  const handleWalletAthenticator = (authName: string) => {
+    const walletAuth = userWalletAuthenticators.find(auth => auth.authenticatorName === authName) ?? null;
     setWalletAuthenticator(walletAuth);
   };
 
@@ -171,14 +172,6 @@ export const WalletAuthenticatorProvider = ({
         openMnemonicModal,
       }}
     >
-      <MnemonicModal
-        authenticatorName={authenticatorName}
-        isVisible={isMnemonicModalOpen}
-        phrase={mnemonicPhrase}
-        onFinish={onFinishMnemonicFlow}
-        onHide={onHideMnemonicModal}
-        type={mnemonicType}
-      />
       <ApproveWalletAuthenticatorModal
         onAuthenticatorChange={handleWalletAthenticator}
         onClick={onApprove}
@@ -187,6 +180,14 @@ export const WalletAuthenticatorProvider = ({
         authenticatorSelected={walletAuthenticator}
         disableButton={!canApprove}
         isLoading={isLoading}
+      />
+      <MnemonicModal
+        authenticatorName={authenticatorName}
+        isVisible={isMnemonicModalOpen}
+        phrase={mnemonicPhrase}
+        onFinish={onFinishMnemonicFlow}
+        onHide={onHideMnemonicModal}
+        type={mnemonicType}
       />
       {children}
     </WalletAuthenticatorContext.Provider>

@@ -44,7 +44,7 @@ interface IWalletAuthenticatorModal {
 export interface IApproveApproveWalletAuthenticatorModal
   extends IWalletAuthenticatorModal {
   authenticatorSelected: IWalletAuthenticatorOpt | null;
-  onAuthenticatorChange: (auth: IWalletAuthenticatorOpt) => void;
+  onAuthenticatorChange: (authName: string) => void;
   isLoading?: boolean;
   disableButton?: boolean;
 }

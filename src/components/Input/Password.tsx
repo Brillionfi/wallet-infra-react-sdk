@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import EyeIcon from "@/components/icons/eye";
+import EyeOffIcon from "@/components/icons/eye-off";
 
 interface PasswordProps {
   id?: string;
@@ -34,7 +36,7 @@ export const Password: React.FC<PasswordProps> = ({
           onClick={() => setIsMasked(!isMasked)}
           className="toggle-mask"
         >
-          {isMasked ? "Show" : "Hide"}
+          {isMasked ? <EyeIcon/> : <EyeOffIcon/>}
         </button>
       )}
       {feedback && value.length < 8 && (

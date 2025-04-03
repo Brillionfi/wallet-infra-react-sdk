@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { env, getDomain } from "@/lib";
 import {
   useWalletAuthenticator,
 } from "@/providers";
 import { ITransaction } from "@brillionfi/wallet-infra-sdk";
 import { TransactionTypeActivityKeys } from "@brillionfi/wallet-infra-sdk/dist/models";
 import { useBrillionContext } from "@/components";
+import { getDomain } from "@/utils/authentication";
 
 export interface ISignWithPassKey
   extends Pick<ITransaction, "organizationId" | "fingerprint"> {
@@ -38,10 +38,10 @@ export const useApproveWalletAuthenticator = (props?: {
         return;
       }
 
-      const domain = getDomain(env.NEXT_PUBLIC_BASE_URL);
+      const domain = getDomain(window.location.hostname);
       let signTx;
 
-      if (authenticator.id === "passkey") {
+      if (authenticator.type === "passkey") {
         signTx = await sdk.Transaction.signWithPasskey(
           authenticator.credentialId,
           approveData.organizationId,
