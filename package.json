@@ -1,6 +1,6 @@
 {
   "name": "@brillionfi/waas-react-sdk",
-  "version": "1.0.42-25",
+  "version": "1.0.42-27",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

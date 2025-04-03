@@ -7,7 +7,7 @@ import { TransactionTypeActivityKeys } from "@brillionfi/wallet-infra-sdk/dist/m
 import { useBrillionContext } from "@/components";
 import { getDomain } from "@/utils/authentication";
 
-export interface ISignWithPassKey
+export interface ISignWalletAuthenticator
   extends Pick<ITransaction, "organizationId" | "fingerprint"> {
   type: TransactionTypeActivityKeys;
 }
@@ -24,7 +24,7 @@ export const useApproveWalletAuthenticator = (props?: {
     [userWalletAuthenticators],
   );
 
-  const signWalletAuthenticator = async (approveData: ISignWithPassKey) => {
+  const signWalletAuthenticator = async (approveData: ISignWalletAuthenticator) => {
     if (!isReady || !sdk) {
       props?.onError("SDK not initialized");
       return;

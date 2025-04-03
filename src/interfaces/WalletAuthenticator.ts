@@ -1,4 +1,5 @@
 import { WALLET_AUTHENTICATOR_TYPE } from "@/constants";
+import { ISignWalletAuthenticator } from "@/hooks";
 
 export interface IWalletAuthenticatorOpt {
   icon: JSX.Element;
@@ -48,3 +49,11 @@ export interface IApproveApproveWalletAuthenticatorModal
   isLoading?: boolean;
   disableButton?: boolean;
 }
+
+export type SignWalletAuthenticator = (approveData: ISignWalletAuthenticator) => Promise<{
+  timestamp: string;
+  stamped: {
+      stampHeaderName: string;
+      stampHeaderValue: string;
+  };
+} | undefined>;
