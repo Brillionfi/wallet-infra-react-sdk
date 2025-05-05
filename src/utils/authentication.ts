@@ -76,3 +76,10 @@ export const getAuthentication = async (domain: string) => {
     },
   };
 };
+
+export const NO_URL_VALIDATION = /(^\w+:|^)\/\//;
+
+export const getDomain = (url: string): string => {
+  const domain = url.replace(NO_URL_VALIDATION, "");
+  return domain.includes("localhost") ? "localhost" : domain;
+};

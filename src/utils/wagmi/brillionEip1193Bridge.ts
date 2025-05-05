@@ -17,6 +17,7 @@ import {
   eth_signTransaction,
   wallet_switchEthereumChain,
 } from "./types";
+import { SignWalletAuthenticator } from "@/interfaces";
 
 const constructSignature = (
   data:
@@ -57,11 +58,13 @@ export class BrillionEip1193Bridge {
   chainId: number;
   provider: SDKProvider | CustomProvider;
   sdk: WalletInfra;
+  private signWalletAuthenticator: SignWalletAuthenticator;
 
-  constructor(address: string, chain: number, sdk: WalletInfra) {
+  constructor(address: string, chain: number, sdk: WalletInfra, signWalletAuthenticator: SignWalletAuthenticator) {
     this.address = address;
     this.chainId = chain;
     this.sdk = sdk;
+    this.signWalletAuthenticator = signWalletAuthenticator;
     this.provider = custom({ request: this.request })({ retryCount: 1 });
   }
 
@@ -226,15 +229,14 @@ export class BrillionEip1193Bridge {
             window.location.origin,
           );
           if (response.needsApproval === true && response.fingerprint) {
-            const { authenticators } =
-              await this.sdk.Wallet.getWalletAuthenticator();
-            const approvedData = await this.sdk.Transaction.signWithPasskey(
-              authenticators[0].credentialId,
-              response.organizationId,
-              response.fingerprint,
-              window.location.hostname,
-              TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
-            );
+            const approvedData = await this.signWalletAuthenticator({
+              organizationId: response.organizationId,
+              fingerprint: response.fingerprint,
+              type: TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
+            });
+  
+            if (!approvedData) throw new Error("Wallet authenticator not found");
+
             const approvedResponse = await this.sdk.Wallet.approveActivity(
               response.fingerprint,
               response.organizationId,
@@ -259,15 +261,14 @@ export class BrillionEip1193Bridge {
           typedData: JSON.parse((params as string[])[1]),
         });
         if (response.needsApproval === true && response.fingerprint) {
-          const { authenticators } =
-            await this.sdk.Wallet.getWalletAuthenticator();
-          const approvedData = await this.sdk.Transaction.signWithPasskey(
-            authenticators[0].credentialId,
-            response.organizationId,
-            response.fingerprint,
-            window.location.hostname,
-            TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
-          );
+          const approvedData = await this.signWalletAuthenticator({
+            organizationId: response.organizationId,
+            fingerprint: response.fingerprint,
+            type: TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
+          });
+
+          if (!approvedData) throw new Error("Wallet authenticator not found");
+
           const approvedResponse = await this.sdk.Wallet.approveActivity(
             response.fingerprint,
             response.organizationId,
@@ -292,15 +293,14 @@ export class BrillionEip1193Bridge {
           message: hexToText(data),
         });
         if (response.needsApproval === true && response.fingerprint) {
-          const { authenticators } =
-            await this.sdk.Wallet.getWalletAuthenticator();
-          const approvedData = await this.sdk.Transaction.signWithPasskey(
-            authenticators[0].credentialId,
-            response.organizationId,
-            response.fingerprint,
-            window.location.hostname,
-            TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
-          );
+          const approvedData = await this.signWalletAuthenticator({
+            organizationId: response.organizationId,
+            fingerprint: response.fingerprint,
+            type: TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
+          });
+
+          if (!approvedData) throw new Error("Wallet authenticator not found");
+
           const approvedResponse = await this.sdk.Wallet.approveActivity(
             response.fingerprint,
             response.organizationId,
@@ -325,15 +325,14 @@ export class BrillionEip1193Bridge {
           message: hexToText(data),
         });
         if (response.needsApproval === true && response.fingerprint) {
-          const { authenticators } =
-            await this.sdk.Wallet.getWalletAuthenticator();
-          const approvedData = await this.sdk.Transaction.signWithPasskey(
-            authenticators[0].credentialId,
-            response.organizationId,
-            response.fingerprint,
-            window.location.hostname,
-            TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
-          );
+          const approvedData = await this.signWalletAuthenticator({
+            organizationId: response.organizationId,
+            fingerprint: response.fingerprint,
+            type: TransactionTypeActivityKeys.ACTIVITY_TYPE_APPROVE_ACTIVITY,
+          });
+
+          if (!approvedData) throw new Error("Wallet authenticator not found");
+          
           const approvedResponse = await this.sdk.Wallet.approveActivity(
             response.fingerprint,
             response.organizationId,

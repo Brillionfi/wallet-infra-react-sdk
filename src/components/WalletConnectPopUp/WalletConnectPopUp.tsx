@@ -11,19 +11,21 @@ export const WalletConnectPopUp = ({data, afterApproval, config}: { data: Prompt
   const customClassNames = config?.customClassNames ?? {};
 
   const action = async (approved: boolean) => {
-
-    if(approved){
-      setLoadingApprove(true)
-      await data.approveAction();
-    }else{
-      setLoadingReject(true)
-      await data.rejectAction();
+    try {
+      if(approved){
+        setLoadingApprove(true)
+        await data.approveAction();
+      }else{
+        setLoadingReject(true)
+        await data.rejectAction();
+      }
+    } catch (error) {
+      console.error("WC Error in action: ", error);
+    } finally {
+      afterApproval();
+      setLoadingApprove(false);
+      setLoadingReject(false);
     }
-
-    afterApproval();
-
-    setLoadingApprove(false);
-    setLoadingReject(false);
   }
 
   return (
