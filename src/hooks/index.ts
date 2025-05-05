@@ -6,4 +6,5 @@ export * from "./useUser";
 export * from "./useWallet";
 export * from "./useWalletAuthenticatorOptions";
 export * from "./useWalletConnect";
-
+export * from "./useWalletConnectInitialization";
+export * from "./useWalletConnectEventsManager";
